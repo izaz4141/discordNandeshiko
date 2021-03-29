@@ -38,7 +38,7 @@ def get_prefix(bot, message):
 class Ready(object):
     def __init__(self):
         for cog in COGS:
-            setattr(self, cog, False)
+            setattr(self, cog.split("/")[-1], False)
 
     def ready_up(self, cog):
         setattr(self, cog, True)

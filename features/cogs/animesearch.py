@@ -92,7 +92,7 @@ class AnimeSearch(Cog):
         jikan = Jikan()
         result = jikan.search('anime', f'{nama_anime}', page=1)
         list_anime = result["results"]
-        with open("../../data/Jikan/Hasil_Carian.json", "w") as f:
+        with open("./data/Jikan/Hasil_Carian.json", "w") as f:
             dump(list_anime, f, indent=4)
         embed = Embed(title=f"Hasil search: {nama_anime}",
                       description= (
@@ -120,7 +120,7 @@ class AnimeSearch(Cog):
         else:
             anime_terpilih = list_anime[OPTIONS[reaction.emoji]]
             nilai = OPTIONS[reaction.emoji]
-            with open("../../data/Jikan/order.txt", "w") as f:
+            with open("./data/Jikan/order.txt", "w") as f:
                 f.write(str(nilai))
             embed = Embed(title= anime_terpilih["title"],
                       description=f"Score : {anime_terpilih['score']:,.2f}\nTipe : {anime_terpilih['type']}\nEpisodes : {anime_terpilih['episodes']:,}\nSinopsis :\n      {anime_terpilih['synopsis']}",
@@ -142,12 +142,12 @@ class AnimeSearch(Cog):
             if reaction.emoji == "▶️":
                 if reaction.message.id == self.as_id:
                     from json import load
-                    with open("../../data/Jikan/order.txt", "r") as f:
+                    with open("./data/Jikan/order.txt", "r") as f:
                         nilai = f.read()
                     nilai = int(nilai) + MOVER["▶️"]
-                    with open("../../data/Jikan/order.txt", "w") as f:
+                    with open("./data/Jikan/order.txt", "w") as f:
                         f.write(str(nilai))
-                    with open("../../data/Jikan/Hasil_Carian.json", "r") as f:
+                    with open("./data/Jikan/Hasil_Carian.json", "r") as f:
                         hasil_carian = load(f)
                     anime_terpilih = hasil_carian[nilai]
                     embed = Embed(title= anime_terpilih["title"],
@@ -163,12 +163,12 @@ class AnimeSearch(Cog):
             elif reaction.emoji == "◀️":
                 if reaction.message.id == self.as_id:
                     from json import load
-                    with open("../../data/Jikan/order.txt", "r") as f:
+                    with open("./data/Jikan/order.txt", "r") as f:
                         nilai = f.read()
                     nilai = int(nilai) + MOVER["◀️"]
-                    with open("../../data/Jikan/order.txt", "w") as f:
+                    with open("./data/Jikan/order.txt", "w") as f:
                         f.write(str(nilai))
-                    with open("../../data/Jikan/Hasil_Carian.json", "r") as f:
+                    with open("./data/Jikan/Hasil_Carian.json", "r") as f:
                         hasil_carian = load(f)
                     anime_terpilih = hasil_carian[nilai]
                     embed = Embed(title= anime_terpilih["title"],

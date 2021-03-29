@@ -30,6 +30,8 @@ class Fun(Cog):
             await ctx.send('Enaknyaa~ aku juga pengen laksek... bagi dong ka lucknya!')
         elif luck == 100:
             await ctx.send("(0 o 0 ) Gila beuhh")
+            
+        
 
     @command(name="dice")
     async def roll_n_dice(self, ctx, die_string: str):

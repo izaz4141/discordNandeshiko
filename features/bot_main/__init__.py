@@ -60,6 +60,7 @@ class Bot(BotBase):
     
     def setup(self):
         for cog in COGS:
+            cog = cog.split("/")[-1]
             self.load_extension(f"features.cogs.{cog}")
             print(f" {cog} cog loaded")
 

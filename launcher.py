@@ -1,4 +1,4 @@
-from lib.bot import bot
+from features.bot_main import bot
 
 
 VERSION = "0.0.1"

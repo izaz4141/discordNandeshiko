@@ -19,7 +19,7 @@ intents.members = True
 intents.presences = True
 # PREFIX = "+"
 OWNER_IDS = [343962708166574090]
-COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
+COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
 
 def remove_items(test_list, item):
@@ -60,7 +60,7 @@ class Bot(BotBase):
     
     def setup(self):
         for cog in COGS:
-            self.load_extension(f"lib.cogs.{cog}")
+            self.load_extension(f"features.cogs.{cog}")
             print(f" {cog} cog loaded")
 
     def update_db(self):
@@ -97,7 +97,7 @@ class Bot(BotBase):
         print("running setup")
         self.setup()
 
-        with open("./lib/bot/token", "r", encoding = "utf-8") as tf:
+        with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
             self.TOKEN = tf.read()
 
         print("running bot...")

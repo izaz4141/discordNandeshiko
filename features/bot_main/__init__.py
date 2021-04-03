@@ -66,7 +66,7 @@ class Bot(BotBase):
             
     def update_github(self):
         from os import system
-        system("git add . && git commit -m 'Add existing file' && git push origin")
+        system('git add . && git commit -m "Add existing file" && git push origin')
 
     def update_db(self):
         db.multiexec("INSERT OR IGNORE INTO guilds (GuildID) VALUES (?)", ((guild.id,) for guild in self.guilds))

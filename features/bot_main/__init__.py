@@ -7,11 +7,14 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 from time import time
 from glob import glob
+from os import system
 from random import choices, randint
 from asyncio import sleep
 from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
+
+system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
 
 client = Client()
 intents = Intents.default()
@@ -172,7 +175,7 @@ class Bot(BotBase):
             self.guild = self.get_guild(605057520955818010) #KALAU HANYA SATU SERVER
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)
-            self.scheculer.add_job(self.update_github, CronTrigger(second= 19 or 39 or 59))
+            self.scheculer.add_job(self.update_github, CronTrigger(minute= 19 or 39 or 59))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():

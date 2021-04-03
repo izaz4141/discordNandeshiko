@@ -64,9 +64,9 @@ class Bot(BotBase):
             self.load_extension(f"features.cogs.{cog}")
             print(f" {cog} cog loaded")
             
-    # def update_github(self):
-    #     from os import system
-    #     system("git commit && git push origin")
+    def update_github(self):
+        from os import system
+        system("git add . && git commit -m 'Add existing file' && git push origin")
 
     def update_db(self):
         db.multiexec("INSERT OR IGNORE INTO guilds (GuildID) VALUES (?)", ((guild.id,) for guild in self.guilds))
@@ -171,7 +171,7 @@ class Bot(BotBase):
             self.guild = self.get_guild(605057520955818010) #KALAU HANYA SATU SERVER
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)
-            # self.scheculer.add_job(self.update_github, CronTrigger(minute=[0,19,39,59]))
+            self.scheculer.add_job(self.update_github, CronTrigger(second= 0 or 19 or 39 or 59))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():

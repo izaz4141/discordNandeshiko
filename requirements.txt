@@ -28,12 +28,6 @@ jedi==0.18.0
 jikanpy==4.3.1
 Jinja2==2.11.3
 jsonschema==3.2.0
-jupyter==1.0.0
-jupyter-client==6.1.11
-jupyter-console==6.2.0
-jupyter-core==4.7.1
-jupyterlab-pygments==0.1.2
-jupyterlab-widgets==1.0.0
 lazy-object-proxy==1.6.0
 MarkupSafe==1.1.1
 mccabe==0.6.1
@@ -64,7 +58,6 @@ pyparsing==2.4.7
 pyrsistent==0.17.3
 python-dateutil==2.8.1
 pytz==2021.1
-pywin32==300
 pywinpty==0.5.7
 pyzmq==22.0.3
 qtconsole==5.0.2

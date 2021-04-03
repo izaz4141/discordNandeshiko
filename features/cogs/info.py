@@ -53,6 +53,13 @@ class Info(Cog):
         
     @command(name="avatar")
     async def avatar_show(self, ctx, *, target: Member):
+        """Menampilkan Display Picture
+
+        Args:
+            ctx (str): command
+            target (Member): mention member
+        """
+        target = target or ctx.author
         embed = Embed(colour= target.colour)
         embed.set_image(url= target.avatar_url)
         await ctx.send(embed= embed)

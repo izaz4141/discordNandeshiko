@@ -475,15 +475,26 @@ class AnimeSearch(Cog):
         try:
             result = jikan.character(chara_id)
             embed = Embed(title= result['name'],
-                        description= f"Kanji : {str(result['name_kanji'])} \n\
-Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} " )
+                        description= f"{str(result['name_kanji'])} \n\
+Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} ",
+                        colour= ctx.author.colour)
             
             detil_chara = ''.join(str(result['about']).split('\\n'))
+            
+            dr_anim = '\n'.join(f"{str(result['animeography'][i]['name'])} : {str(result['animeography'][i]['role'])} " for i in range(len(result['animeography'])))
+            if dr_anim == '':
+                dr_anim = 'None'
+            dr_mango = '\n'.join(f"{str(result['mangaography'][i]['name'])} : {str(result['mangaography'][i]['role'])} " for i in range(len(result['mangaography'])))
+            if dr_mango == '':
+                dr_mango = 'None'
+            seyu = '\n'.join(f"{str(result['voice_actors'][i]['name'])} : {str(result['voice_actors'][i]['language'])} " for i in range(len(result['voice_actors'])))
+            if seyu == '':
+                seyu = 'None'
 
             fields = [("Menjadi Pujaan", f"{str(result['member_favorites'])} orang", False),
-                    ("Dari Anime", '\n'.join(f"{str(result['animeography'][i]['name'])} : {str(result['animeography'][i]['role'])} " for i in range(len(result['animeography']))), False),
-                    ("Dari Manga", '\n'.join(f"{str(result['mangaography'][i]['name'])} : {str(result['mangaography'][i]['role'])} " for i in range(len(result['mangaography']))), False ),
-                    ("Seiyuu", '\n'.join(f"{str(result['voice_actors'][i]['name'])} : {str(result['voice_actors'][i]['language'])} " for i in range(len(result['voice_actors']))), False ),
+                    ("Dari Anime", dr_anim, False),
+                    ("Dari Manga", dr_mango, False ),
+                    ("Seiyuu", seyu, False ),
                     ("Detail Karakter", f"{detil_chara:.1021s}...", False )]
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
@@ -497,7 +508,9 @@ Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} " )
     async def person_detail(self, ctx, *, chara_id):
         def Umur(tanggal):
             sekarang = date.now()
-            if sekarang.month > tanggal.month:
+            if tanggal is None:
+                umur = 'Tidak diketahui'
+            elif sekarang.month > tanggal.month:
                 umur = sekarang.year - tanggal.year
             elif sekarang.month == tanggal.month:
                 if sekarang.day >= tanggal.day:
@@ -507,25 +520,43 @@ Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} " )
             elif sekarang.month < tanggal.month:
                 umur = (sekarang.year - tanggal.year) - 1
             return umur
+        
         chara_id = int(chara_id)
         try:
             result = jikan.person(chara_id)
             embed = Embed(title= result['name'],
                         description= f"Given Name : {str(result['given_name'])} \n\
 Family Name : {str(result['family_name'])} \n\
-Aliases : {', '.join(str(nama) for nama in result['alternate_names'])} " )
+Aliases : {', '.join(str(nama) for nama in result['alternate_names'])} " ,
+                        colour= ctx.author.colour)
             
-            mangas = ', '.join(str(manga) for manga in result['published_manga'])
+            karir_s = '\n'.join(f"{str(result['voice_acting_roles'][i]['anime']['name'])} : {str(result['voice_acting_roles'][i]['character']['name'])} : {str(result['voice_acting_roles'][i]['role'])} " for i in range(min(9,len(result['voice_acting_roles']))))
+            if karir_s == '':
+                karir_s = 'None'
+            
+            mangas = '\n'.join(f"{result['published_manga'][i]['manga']['name']} : {result['published_manga'][i]['position']}" for i in range(len(result['published_manga'])))
             if mangas == '':
                 mangas = 'None'
+                
+            posisi_staff = '\n'.join(f"{str(result['anime_staff_positions'][i]['anime']['name'])} : {str(result['anime_staff_positions'][i]['position'])} " for i in range(min(9, len(result['anime_staff_positions']))))
+            if posisi_staff == '':
+                posisi_staff = 'None'
+                
+            tgl = result['birthday']
+            tgl_u = None
+            if not tgl is None:
+                tgl_u = date.fromisoformat(tgl)
+                tgl = date.fromisoformat(tgl).strftime("%A, %d %B %Y")
+                
+                
                 
             detil_chara = ''.join(str(result['about']).split('\\n'))
             
             fields = [("Menjadi Pujaan", f"{str(result['member_favorites'])} orang", False),
-                    ("Tanggal lahir", str(date.fromisoformat(str(result['birthday'])).strftime("%A, %d %B %Y")), False),
-                    ("Umur", Umur(date.fromisoformat(str(result['birthday']))), False ) ,
-                    ("Karir Seiyuu", '\n'.join(f"{str(result['voice_acting_roles'][i]['anime']['name'])} : {str(result['voice_acting_roles'][i]['character']['name'])} : {str(result['voice_acting_roles'][i]['role'])} " for i in range(min(6,len(result['voice_acting_roles'])))), False),
-                    ("Posisi Staff Anime", '\n'.join(f"{str(result['anime_staff_positions'][i]['anime']['name'])} : {str(result['anime_staff_positions'][i]['position'])} " for i in range(min(6, len(result['anime_staff_positions'])))), False ),
+                    ("Tanggal lahir", str(tgl), False),
+                    ("Umur", Umur(tgl_u), False ) ,
+                    ("Karir Seiyuu", str(karir_s), False),
+                    ("Posisi Staff Anime", str(posisi_staff), False ),
                     ("Published Manga", str(mangas), False ),
                     ("Detail Karakter", f"{detil_chara:.1021s}...", False )]
             for name, value, inline in fields:
@@ -542,11 +573,12 @@ Aliases : {', '.join(str(nama) for nama in result['alternate_names'])} " )
         try:
             result = jikan.anime(anime_id)
             embed = Embed(title= f"{result['title']}/{str(result['title_english'])} ({str(result['title_japanese'])})",
-                          description= f"{'/'.join(str(alias) for alias in result['title_synonyms'])}\n\
+                          description= f"{'/'.join(str(alias) for alias in result['title_synonyms'])}\n\n\
 Score : {str(result['score'])} dari {str(result['scored_by'])} orang \n\
 Rank : {str(result['rank'])}\n\
 Favorites : {str(result['favorites'])}\n\
-Durasi Episode : {str(result['duration'])}")
+Durasi Episode : {str(result['duration'])}",
+                            colour= ctx.author.colour)
             try:
                 adaptasi = '\n'.join(str(result['related']['Adaptation'][i]['name']) for i in range(len(result['related']['Adaptation'])))
                 
@@ -608,8 +640,67 @@ Durasi Episode : {str(result['duration'])}")
         except APIException:
             await ctx.send(f"Tidak ditemukan anime dengan id {anime_id}")
             
-    # @command(name="manga")
-    # async def manga_detail(self, ctx, *, manga_id):
+    @command(name="manga")
+    async def manga_detail(self, ctx, *, manga_id):
+        manga_id = int(manga_id)
+        try:
+            result = jikan.manga(manga_id)
+            embed = Embed(title= f"{result['title']}/{str(result['title_english'])} ({str(result['title_japanese'])})",
+                          description= f"{'/'.join(str(alias) for alias in result['title_synonyms'])}\n\n\
+Score : {str(result['score'])} dari {str(result['scored_by'])} orang \n\
+Rank : {str(result['rank'])}\n\
+Favorites : {str(result['favorites'])}\n\
+Volume : {str(result['volumes'])}\n\
+Chapter : {str(result['chapters'])} ",
+                            colour= ctx.author.colour)
+            try:
+                adaptasi = '\n'.join(str(result['related']['Adaptation'][i]['name']) for i in range(len(result['related']['Adaptation'])))
+                
+            except KeyError:
+                adaptasi = 'None'
+            try:
+                side_story = '\n'.join(str(result['related']['Side story'][i]['name']) for i in range(len(result['related']['Side story'])))
+                
+            except KeyError:
+                side_story = 'None'
+            try:
+                sequel = '\n'.join(str(result['related']['Sequel'][i]['name']) for i in range(len(result['related']['Sequel'])))
+                
+            except KeyError:
+                sequel = 'None'
+            try:
+                other = '\n'.join(str(result['related']['Other'][i]['name']) for i in range(len(result['related']['Other'])))
+                
+            except KeyError:
+                other = 'None'
+            authors = '\n'.join(str(result['authors'][i]['name']) for i in range(len(result['authors'])))
+            if authors == '':
+                producers = 'None'
+            serializations = '\n'.join(f"{result['serializations'][i]['type']} : {result['serializations'][i]['name']}" for i in range(len(result['serializations'])))
+            if serializations == '':
+                serializations = 'None'
+            genres = ', '.join(str(result['genres'][i]['name']) for i in range(len(result['genres'])))
+            if genres == '':
+                genres = 'None'
+                
+            fields = ( ("Status", f"{str(result['status'])}\n{str(result['published']['string'])}", False),
+                       ("Authors", authors, False),
+                       ("Serialisasi", serializations, False),
+                       ("Genre", genres, False),
+                       ("Diadaptasi dari", adaptasi, False),
+                       ("Side Story", side_story, False),
+                       ("Sequel", sequel, False),
+                       ("Lain", other, False),
+                       ("Sinopsis", "%.1021s..." % result['synopsis'], False)
+                    )
+            for name, value, inline in fields:
+                embed.add_field(name=name, value=value, inline=inline)
+            embed.set_image(url=result['image_url'])
+            
+            await ctx.send(embed=embed)
+            
+        except APIException:
+            await ctx.send(f"Tidak ditemukan manga dengan id {manga_id}")
         
                 
             

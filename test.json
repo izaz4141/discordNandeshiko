@@ -1,125 +1,106 @@
 {
-    "request_hash": "request:manga:9fde07a7f036a46d10daaaabbbb77cb1372b7e7a",
+    "request_hash": "request:person:9d1184425c006e80506a48716d90eb4fed7a544d",
     "request_cached": true,
-    "request_cache_expiry": 85694,
-    "mal_id": 94376,
-    "url": "https://myanimelist.net/manga/94376/Yuru_Camp\u25b3",
-    "title": "Yuru Camp\u25b3",
-    "title_english": "Laid-Back Camp",
-    "title_synonyms": [
-        "Yurukyan"
+    "request_cache_expiry": 85942,
+    "mal_id": 25879,
+    "url": "https://myanimelist.net/people/25879/Pochi_Iida",
+    "image_url": "https://cdn.myanimelist.net/images/voiceactors/2/56741.jpg",
+    "website_url": "http://anenarumono.com/",
+    "name": "Pochi. Iida",
+    "given_name": "\u307d\u3061\u3002",
+    "family_name": "\u98ef\u7530",
+    "alternate_names": [
+        "\u98ef\u7530 \u307d\u3061",
+        "Pochi Iida",
+        "\u307d\u3061\u5c0f\u5c4b\u3002",
+        "Pochi-goya."
     ],
-    "title_japanese": "\u3086\u308b\u30ad\u30e3\u30f3\u25b3",
-    "status": "Publishing",
-    "image_url": "https://cdn.myanimelist.net/images/manga/1/168083.jpg",
-    "type": "Manga",
-    "volumes": null,
-    "chapters": null,
-    "publishing": true,
-    "published": {
-        "from": "2015-05-23T00:00:00+00:00",
-        "to": null,
-        "prop": {
-            "from": {
-                "day": 23,
-                "month": 5,
-                "year": 2015
-            },
-            "to": {
-                "day": null,
-                "month": null,
-                "year": null
+    "birthday": "1988-04-23T00:00:00+00:00",
+    "member_favorites": 637,
+    "about": "Twitter: @lizhi3\\n\r\npixiv: #\u307d\u3061\u3002\\n\r\nYoutube Channel: @Pochi-goya.channel",
+    "voice_acting_roles": [],
+    "anime_staff_positions": [
+        {
+            "position": "Original Creator",
+            "anime": {
+                "mal_id": 41005,
+                "url": "https://myanimelist.net/anime/41005/Ane_Naru_Mono",
+                "image_url": "https://cdn.myanimelist.net/images/anime/1544/105268.jpg?s=fc693fdb9e23c7a8a099e6e95d48e2fd",
+                "name": "Ane Naru Mono"
             }
         },
-        "string": "May  23, 2015 to ?"
-    },
-    "rank": 273,
-    "score": 8.3,
-    "scored_by": 2358,
-    "popularity": 1275,
-    "members": 10134,
-    "favorites": 567,
-    "synopsis": "Rin, a girl camping by herself at the base of Mt. Fuji. Nadeshiko, a girl who came to see Mt. Fuji on her bicycle. The scenery the two witness over a supper of cup ramen marks the start of a new friendship and many adventures to come, camping in the great outdoors! (Source: SiberOwl)",
-    "background": "Yuru Camp\u25b3 has been published in English as Laid-Back Camp by Yen Press since March 27, 2018.",
-    "related": {
-        "Adaptation": [
-            {
-                "mal_id": 38475,
-                "type": "anime",
-                "name": "Yuru Camp\u25b3 Movie",
-                "url": "https://myanimelist.net/anime/38475/Yuru_Camp\u25b3_Movie"
-            },
-            {
-                "mal_id": 40725,
-                "type": "anime",
-                "name": "",
-                "url": "https://myanimelist.net/anime/40725/"
-            },
-            {
-                "mal_id": 34798,
-                "type": "anime",
-                "name": "Yuru Camp\u25b3",
-                "url": "https://myanimelist.net/anime/34798/Yuru_Camp\u25b3"
-            },
-            {
-                "mal_id": 41061,
-                "type": "anime",
-                "name": "Heya Camp\u25b3: Sauna to Gohan to Sanrin Bike",
-                "url": "https://myanimelist.net/anime/41061/Heya_Camp\u25b3__Sauna_to_Gohan_to_Sanrin_Bike"
-            },
-            {
-                "mal_id": 38474,
-                "type": "anime",
-                "name": "Yuru Camp\u25b3 Season 2",
-                "url": "https://myanimelist.net/anime/38474/Yuru_Camp\u25b3_Season_2"
-            }
-        ]
-    },
-    "genres": [
         {
-            "mal_id": 4,
-            "type": "manga",
-            "name": "Comedy",
-            "url": "https://myanimelist.net/manga/genre/4/Comedy"
+            "position": "Original Character Design",
+            "anime": {
+                "mal_id": 38573,
+                "url": "https://myanimelist.net/anime/38573/Tsuujou_Kougeki_ga_Zentai_Kougeki_de_Ni-kai_Kougeki_no_Okaasan_wa_Suki_Desu_ka",
+                "image_url": "https://cdn.myanimelist.net/images/anime/1225/102250.jpg?s=411489455f0bb0947f64e7153ae0468e",
+                "name": "Tsuujou Kougeki ga Zentai Kougeki de Ni-kai Kougeki no Okaasan wa Suki Desu ka?"
+            }
         },
         {
-            "mal_id": 36,
-            "type": "manga",
-            "name": "Slice of Life",
-            "url": "https://myanimelist.net/manga/genre/36/Slice_of_Life"
+            "position": "Original Character Design",
+            "anime": {
+                "mal_id": 40102,
+                "url": "https://myanimelist.net/anime/40102/Tsuujou_Kougeki_ga_Zentai_Kougeki_de_Ni-kai_Kougeki_no_Okaasan_wa_Suki_Desu_ka_OVA",
+                "image_url": "https://cdn.myanimelist.net/images/anime/1599/106464.jpg?s=ba0e22821d7998d91e5f2da700e4e83c",
+                "name": "Tsuujou Kougeki ga Zentai Kougeki de Ni-kai Kougeki no Okaasan wa Suki Desu ka? OVA"
+            }
         }
     ],
-    "authors": [
+    "published_manga": [
         {
-            "mal_id": 19507,
-            "type": "people",
-            "name": "Afro",
-            "url": "https://myanimelist.net/people/19507/Afro"
-        }
-    ],
-    "serializations": [
+            "position": "Story & Art",
+            "manga": {
+                "mal_id": 96704,
+                "url": "https://myanimelist.net/manga/96704/Ane_Naru_Mono",
+                "image_url": "https://cdn.myanimelist.net/images/manga/2/177909.jpg?s=6950d47e1dcf56c5ab1b82cead25aede",
+                "name": "Ane Naru Mono"
+            }
+        },
         {
-            "mal_id": 365,
-            "type": "manga",
-            "name": "Manga Time Kirara Forward",
-            "url": "https://myanimelist.net/manga/magazine/365/Manga_Time_Kirara_Forward"
+            "position": "Story & Art",
+            "manga": {
+                "mal_id": 97760,
+                "url": "https://myanimelist.net/manga/97760/Ane_Naru_Mono",
+                "image_url": "https://cdn.myanimelist.net/images/manga/1/188812.jpg?s=4ced31942888f8c82b08374179b09e5e",
+                "name": "Ane Naru Mono"
+            }
+        },
+        {
+            "position": "Art",
+            "manga": {
+                "mal_id": 59727,
+                "url": "https://myanimelist.net/manga/59727/Pilgrim_Maiden",
+                "image_url": "https://cdn.myanimelist.net/images/manga/3/135157.jpg?s=cbccfd2e31e31d896b418e2fed1321e9",
+                "name": "Pilgrim Maiden"
+            }
+        },
+        {
+            "position": "Art",
+            "manga": {
+                "mal_id": 103578,
+                "url": "https://myanimelist.net/manga/103578/Tsuujou_Kougeki_ga_Zentai_Kougeki_de_2-kai_Kougeki_no_Okaasan_wa_Suki_desu_ka",
+                "image_url": "https://cdn.myanimelist.net/images/manga/2/189599.jpg?s=9a2ca578f7b1f6769bdeb16a073da51e",
+                "name": "Tsuujou Kougeki ga Zentai Kougeki de 2-kai Kougeki no Okaasan wa Suki desu ka?"
+            }
         }
     ],
-    "jikan_url": "https://api.jikan.moe/v3/manga/94376",
+    "jikan_url": "https://api.jikan.moe/v3/person/25879",
     "headers": {
         "Server": "nginx/1.18.0 (Ubuntu)",
-        "Date": "Sun, 04 Apr 2021 16:07:43 GMT",
+        "Date": "Sun, 04 Apr 2021 16:41:36 GMT",
         "Content-Type": "application/json",
-        "Content-Length": "1018",
+        "Content-Length": "1002",
         "Connection": "keep-alive",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "*",
         "Cache-Control": "private, must-revalidate",
-        "ETag": "\"0209f28412d0193f4f5a418bbbc72917\"",
-        "X-Request-Hash": "request:manga:9fde07a7f036a46d10daaaabbbb77cb1372b7e7a",
+        "ETag": "\"0eda3ff9ac8e9f96160c2bde12ba08f7\"",
+        "X-Request-Hash": "request:person:9d1184425c006e80506a48716d90eb4fed7a544d",
         "X-Request-Cached": "1",
-        "X-Request-Cache-Ttl": "85694",
-        "Expires": "Mon, 05 Apr 2021 15:55:57 GMT",
+        "X-Request-Cache-Ttl": "85942",
+        "Expires": "Mon, 05 Apr 2021 16:33:58 GMT",
         "Content-Encoding": "gzip",
         "Vary": "Accept-Encoding",
         "X-Cache-Status": "MISS"

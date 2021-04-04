@@ -87,9 +87,15 @@ Volume : {str(self.entries[menu.current_page]['volumes'])} \n\
 Chapters : {str(self.entries[menu.current_page]['chapters'])} \n\
 Publishing : {str(self.entries[menu.current_page]['publishing'])} \n\
 Members : {str(self.entries[menu.current_page]['members'])} \n\
-Id : {str(self.entries[menu.current_page]['mal_id'])} \n\
-Sinopsis :\n      {self.entries[menu.current_page]['synopsis']}",
+Id : {str(self.entries[menu.current_page]['mal_id'])} \n",
                       colour=self.ctx.author.colour)
+        
+        fields = [
+            ("Sinopsis", f"{str(self.entries[menu.current_page]['synopsis']):.1021s}..." )
+        ]
+        
+        for name, value in fields:
+            embed.add_field(name=name,value=value,inline=False)
 
         embed.set_image(url=self.entries[menu.current_page]["image_url"])
         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
@@ -121,12 +127,22 @@ class IsiCharaSearch(ListPageSource):
 
         embed = Embed(title=self.entries[menu.current_page]["name"],
                       description=f"Aliases : {', '.join(str(alias) for alias in self.entries[menu.current_page]['alternative_names'])}\n\
-Dari Anime : {', '.join(str(anime['name']) for anime in self.entries[menu.current_page]['anime'])}\n\
-Dari Manga : {', '.join(str(manga['name']) for manga in self.entries[menu.current_page]['manga'])}\n\
 Id : {str(self.entries[menu.current_page]['mal_id'])} ",
                       colour=self.ctx.author.colour)
+        dr_anim = ', '.join(str(anime['name']) for anime in self.entries[menu.current_page]['anime'])
+        if dr_anim == '':
+            dr_anim = 'None'
+        dr_mango = ', '.join(str(manga['name']) for manga in self.entries[menu.current_page]['manga'])
+        if dr_mango == '':
+            dr_mango = 'None'
         
+        fields = [
+            ("Dari Anime", dr_anim ),
+            ("Dari Manga", dr_mango )
+        ]
         
+        for name, value in fields:
+            embed.add_field(name=name,value=value,inline=False)
 
         embed.set_image(url=self.entries[menu.current_page]["image_url"])
         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
@@ -162,13 +178,24 @@ class IsiJadwalAnime(ListPageSource):
 Tipe : {str(self.entries[menu.current_page]['type'])}\n\
 Source : {str(self.entries[menu.current_page]['source'])}\n\
 Episodes : {str(self.entries[menu.current_page]['episodes'])}\n\
-Producer : {', '.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))}\n\
-Licensors : {', '.join(str(i) for i in self.entries[menu.current_page]['licensors'])} \n\
-Genre : {', '.join(str(genre['name']) for genre in self.entries[menu.current_page]['genres'])} \n\
-Id : {str(self.entries[menu.current_page]['mal_id'])}\n\
-Sinopsis :\n{str(self.entries[menu.current_page]['synopsis'])}",
+Id : {str(self.entries[menu.current_page]['mal_id'])}\n",
                       colour=self.ctx.author.colour)
-
+        try:
+            produsa = '\n'.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))
+        except IndexError:
+            produsa = 'None'
+        lisensa = '\n'.join(str(i) for i in self.entries[menu.current_page]['licensors'])
+        if lisensa == '':
+            lisensa = 'None'
+        
+        fields = [
+            ("Producers", produsa ),
+            ("Licensors", lisensa ),
+            ("Genre", ', '.join(str(genre['name']) for genre in self.entries[menu.current_page]['genres']) ),
+            ("Sinopsis", f"{str(self.entries[menu.current_page]['synopsis']):.1021s}...")
+        ]
+        for name, value in fields:
+            embed.add_field(name=name, value=value, inline=False)
         embed.set_image(url=self.entries[menu.current_page]["image_url"])
         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
 
@@ -204,13 +231,24 @@ class IsiSeasonSearch(ListPageSource):
 Tipe : {str(self.entries[menu.current_page]['type'])}\n\
 Source : {str(self.entries[menu.current_page]['source'])}\n\
 Episodes : {str(self.entries[menu.current_page]['episodes'])}\n\
-Producer : {', '.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))}\n\
-Licensors : {', '.join(str(i) for i in self.entries[menu.current_page]['licensors'])} \n\
-Genre : {', '.join(str(genre['name']) for genre in self.entries[menu.current_page]['genres'])} \n\
-Id : {str(self.entries[menu.current_page]['mal_id'])}\n\
-Sinopsis :\n{str(self.entries[menu.current_page]['synopsis'])}",
+Id : {str(self.entries[menu.current_page]['mal_id'])}\n",
                       colour=self.ctx.author.colour)
+        try:
+            produsa = '\n'.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))
+        except IndexError:
+            produsa = 'None'
+        lisensa = '\n'.join(str(i) for i in self.entries[menu.current_page]['licensors'])
+        if lisensa == '':
+            lisensa = 'None'
         
+        fields = [
+            ("Producers", produsa ),
+            ("Licensors", lisensa ),
+            ("Genre", ', '.join(str(genre['name']) for genre in self.entries[menu.current_page]['genres']) ),
+            ("Sinopsis", f"{str(self.entries[menu.current_page]['synopsis']):.1021s}...")
+        ]
+        for name, value in fields:
+            embed.add_field(name=name, value=value, inline=False)
         # fields=[]
         # for genre in self.entries[menu.current_page]["genres"]:
         #     fields.append(genre["name"])
@@ -406,7 +444,7 @@ class AnimeSearch(Cog):
         try:
             result = jikan.search("person", person_name, page=1)
             list_person = result["results"]
-            if str(list_person) == '':
+            if list_person == []:
                 await ctx.send("Maaf kak orang dengan nama itu tidak ditemukan\nPerintah ini memang agak rusak.")
             else:
                 menu = MenuPages(source=IsiPersonSearch(ctx, list_person),
@@ -415,7 +453,7 @@ class AnimeSearch(Cog):
                 
                 await menu.start(ctx)
             
-        except APIException or IndexError:
+        except APIException:
             await ctx.send("Siapa itu ?")
         
             
@@ -439,12 +477,14 @@ class AnimeSearch(Cog):
             embed = Embed(title= result['name'],
                         description= f"Kanji : {str(result['name_kanji'])} \n\
 Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} " )
+            
+            detil_chara = ''.join(str(result['about']).split('\\n'))
 
             fields = [("Menjadi Pujaan", f"{str(result['member_favorites'])} orang", False),
                     ("Dari Anime", '\n'.join(f"{str(result['animeography'][i]['name'])} : {str(result['animeography'][i]['role'])} " for i in range(len(result['animeography']))), False),
                     ("Dari Manga", '\n'.join(f"{str(result['mangaography'][i]['name'])} : {str(result['mangaography'][i]['role'])} " for i in range(len(result['mangaography']))), False ),
                     ("Seiyuu", '\n'.join(f"{str(result['voice_actors'][i]['name'])} : {str(result['voice_actors'][i]['language'])} " for i in range(len(result['voice_actors']))), False ),
-                    ("Detail Karakter", "".join(str(result['about']).split("\\n")), False )]
+                    ("Detail Karakter", f"{detil_chara:.1021s}...", False )]
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
             embed.set_image(url=result['image_url'])
@@ -479,6 +519,7 @@ Aliases : {', '.join(str(nama) for nama in result['alternate_names'])} " )
             if mangas == '':
                 mangas = 'None'
                 
+            detil_chara = ''.join(str(result['about']).split('\\n'))
             
             fields = [("Menjadi Pujaan", f"{str(result['member_favorites'])} orang", False),
                     ("Tanggal lahir", str(date.fromisoformat(str(result['birthday'])).strftime("%A, %d %B %Y")), False),
@@ -486,7 +527,7 @@ Aliases : {', '.join(str(nama) for nama in result['alternate_names'])} " )
                     ("Karir Seiyuu", '\n'.join(f"{str(result['voice_acting_roles'][i]['anime']['name'])} : {str(result['voice_acting_roles'][i]['character']['name'])} : {str(result['voice_acting_roles'][i]['role'])} " for i in range(min(6,len(result['voice_acting_roles'])))), False),
                     ("Posisi Staff Anime", '\n'.join(f"{str(result['anime_staff_positions'][i]['anime']['name'])} : {str(result['anime_staff_positions'][i]['position'])} " for i in range(min(6, len(result['anime_staff_positions'])))), False ),
                     ("Published Manga", str(mangas), False ),
-                    ("Detail Karakter", "".join(str(result['about']).split("\\n")), False )]
+                    ("Detail Karakter", f"{detil_chara:.1021s}...", False )]
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
             embed.set_image(url=result['image_url'])
@@ -566,6 +607,9 @@ Durasi Episode : {str(result['duration'])}")
             
         except APIException:
             await ctx.send(f"Tidak ditemukan anime dengan id {anime_id}")
+            
+    # @command(name="manga")
+    # async def manga_detail(self, ctx, *, manga_id):
         
                 
             

@@ -1,30 +1,29 @@
 {
-    "request_hash": "request:anime:70d465e5b16e6050213c3a3bb2b6ac4c6e26cbd2",
+    "request_hash": "request:manga:9fde07a7f036a46d10daaaabbbb77cb1372b7e7a",
     "request_cached": true,
-    "request_cache_expiry": 32333,
-    "mal_id": 38475,
-    "url": "https://myanimelist.net/anime/38475/Yuru_Camp\u25b3_Movie",
-    "image_url": "https://cdn.myanimelist.net/images/anime/1629/113922.jpg",
-    "trailer_url": null,
-    "title": "Yuru Camp\u25b3 Movie",
-    "title_english": null,
-    "title_japanese": "\u6620\u753b \u3086\u308b\u30ad\u30e3\u30f3\u25b3",
+    "request_cache_expiry": 85694,
+    "mal_id": 94376,
+    "url": "https://myanimelist.net/manga/94376/Yuru_Camp\u25b3",
+    "title": "Yuru Camp\u25b3",
+    "title_english": "Laid-Back Camp",
     "title_synonyms": [
-        "Eiga Yuru Camp"
+        "Yurukyan"
     ],
-    "type": "Movie",
-    "source": "Manga",
-    "episodes": 1,
-    "status": "Not yet aired",
-    "airing": false,
-    "aired": {
-        "from": "2022-01-01T00:00:00+00:00",
+    "title_japanese": "\u3086\u308b\u30ad\u30e3\u30f3\u25b3",
+    "status": "Publishing",
+    "image_url": "https://cdn.myanimelist.net/images/manga/1/168083.jpg",
+    "type": "Manga",
+    "volumes": null,
+    "chapters": null,
+    "publishing": true,
+    "published": {
+        "from": "2015-05-23T00:00:00+00:00",
         "to": null,
         "prop": {
             "from": {
-                "day": 1,
-                "month": 1,
-                "year": 2022
+                "day": 23,
+                "month": 5,
+                "year": 2015
             },
             "to": {
                 "day": null,
@@ -32,74 +31,97 @@
                 "year": null
             }
         },
-        "string": "2022 to ?"
+        "string": "May  23, 2015 to ?"
     },
-    "duration": "Unknown",
-    "rating": "None",
-    "score": null,
-    "scored_by": null,
-    "rank": null,
-    "popularity": 3347,
-    "members": 26172,
-    "favorites": 41,
-    "synopsis": "",
-    "background": null,
-    "premiered": null,
-    "broadcast": null,
+    "rank": 273,
+    "score": 8.3,
+    "scored_by": 2358,
+    "popularity": 1275,
+    "members": 10134,
+    "favorites": 567,
+    "synopsis": "Rin, a girl camping by herself at the base of Mt. Fuji. Nadeshiko, a girl who came to see Mt. Fuji on her bicycle. The scenery the two witness over a supper of cup ramen marks the start of a new friendship and many adventures to come, camping in the great outdoors! (Source: SiberOwl)",
+    "background": "Yuru Camp\u25b3 has been published in English as Laid-Back Camp by Yen Press since March 27, 2018.",
     "related": {
         "Adaptation": [
             {
-                "mal_id": 94376,
-                "type": "manga",
-                "name": "Yuru Camp\u25b3",
-                "url": "https://myanimelist.net/manga/94376/Yuru_Camp\u25b3"
-            }
-        ],
-        "Other": [
+                "mal_id": 38475,
+                "type": "anime",
+                "name": "Yuru Camp\u25b3 Movie",
+                "url": "https://myanimelist.net/anime/38475/Yuru_Camp\u25b3_Movie"
+            },
+            {
+                "mal_id": 40725,
+                "type": "anime",
+                "name": "",
+                "url": "https://myanimelist.net/anime/40725/"
+            },
             {
                 "mal_id": 34798,
                 "type": "anime",
                 "name": "Yuru Camp\u25b3",
                 "url": "https://myanimelist.net/anime/34798/Yuru_Camp\u25b3"
+            },
+            {
+                "mal_id": 41061,
+                "type": "anime",
+                "name": "Heya Camp\u25b3: Sauna to Gohan to Sanrin Bike",
+                "url": "https://myanimelist.net/anime/41061/Heya_Camp\u25b3__Sauna_to_Gohan_to_Sanrin_Bike"
+            },
+            {
+                "mal_id": 38474,
+                "type": "anime",
+                "name": "Yuru Camp\u25b3 Season 2",
+                "url": "https://myanimelist.net/anime/38474/Yuru_Camp\u25b3_Season_2"
             }
         ]
     },
-    "producers": [],
-    "licensors": [],
-    "studios": [],
     "genres": [
         {
             "mal_id": 4,
-            "type": "anime",
+            "type": "manga",
             "name": "Comedy",
-            "url": "https://myanimelist.net/anime/genre/4/Comedy"
+            "url": "https://myanimelist.net/manga/genre/4/Comedy"
         },
         {
             "mal_id": 36,
-            "type": "anime",
+            "type": "manga",
             "name": "Slice of Life",
-            "url": "https://myanimelist.net/anime/genre/36/Slice_of_Life"
+            "url": "https://myanimelist.net/manga/genre/36/Slice_of_Life"
         }
     ],
-    "opening_themes": [],
-    "ending_themes": [],
-    "jikan_url": "https://api.jikan.moe/v3/anime/38475",
+    "authors": [
+        {
+            "mal_id": 19507,
+            "type": "people",
+            "name": "Afro",
+            "url": "https://myanimelist.net/people/19507/Afro"
+        }
+    ],
+    "serializations": [
+        {
+            "mal_id": 365,
+            "type": "manga",
+            "name": "Manga Time Kirara Forward",
+            "url": "https://myanimelist.net/manga/magazine/365/Manga_Time_Kirara_Forward"
+        }
+    ],
+    "jikan_url": "https://api.jikan.moe/v3/manga/94376",
     "headers": {
         "Server": "nginx/1.18.0 (Ubuntu)",
-        "Date": "Sun, 04 Apr 2021 14:48:01 GMT",
+        "Date": "Sun, 04 Apr 2021 16:07:43 GMT",
         "Content-Type": "application/json",
-        "Content-Length": "685",
+        "Content-Length": "1018",
         "Connection": "keep-alive",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "*",
         "Cache-Control": "private, must-revalidate",
-        "ETag": "\"85ad069e5e1b9df6e79a1b124ea06223\"",
-        "X-Request-Hash": "request:anime:70d465e5b16e6050213c3a3bb2b6ac4c6e26cbd2",
+        "ETag": "\"0209f28412d0193f4f5a418bbbc72917\"",
+        "X-Request-Hash": "request:manga:9fde07a7f036a46d10daaaabbbb77cb1372b7e7a",
         "X-Request-Cached": "1",
-        "X-Request-Cache-Ttl": "32333",
-        "Expires": "Sun, 04 Apr 2021 23:46:01 GMT",
+        "X-Request-Cache-Ttl": "85694",
+        "Expires": "Mon, 05 Apr 2021 15:55:57 GMT",
         "Content-Encoding": "gzip",
         "Vary": "Accept-Encoding",
-        "X-Cache-Status": "HIT"
+        "X-Cache-Status": "MISS"
     }
 }

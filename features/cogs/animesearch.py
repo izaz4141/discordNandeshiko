@@ -4,6 +4,7 @@ from discord.utils import get
 from discord import Embed
 from asyncio import TimeoutError
 from jikanpy import Jikan
+from jikanpy.exceptions import APIException
 from typing import Optional
 from datetime import datetime as date
 
@@ -33,6 +34,10 @@ jikan = Jikan()
 #     "◀️": -1,
 #     "▶️": 1
 # }
+
+HEART = {
+    "❤️": 0
+}
 
 class IsiMangaSearch(ListPageSource):
     def __init__(self, ctx, data):
@@ -88,6 +93,8 @@ Dari Anime : {', '.join(str(anime['name']) for anime in self.entries[menu.curren
 Dari Manga : {', '.join(str(manga['name']) for manga in self.entries[menu.current_page]['manga'])}\n\
 Id : {str(self.entries[menu.current_page]['mal_id'])} ",
                       colour=self.ctx.author.colour)
+        
+        
 
         embed.set_image(url=self.entries[menu.current_page]["image_url"])
         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
@@ -100,7 +107,7 @@ Id : {str(self.entries[menu.current_page]['mal_id'])} ",
     async def format_page(self, menu, entries):
         fields = []
         
-        
+        chara_id = str(self.entries[menu.current_page]['mal_id'])
 
         
         # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
@@ -211,10 +218,11 @@ class IsiAnimeSearch(ListPageSource):
 
         embed.set_image(url=self.entries[menu.current_page]["image_url"])
         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
+        
+       
 
         # for name, value in fields:
         #     embed.add_field(name=name, value=value, inline=False)
-
         return embed
 
     async def format_page(self, menu, entries):
@@ -330,12 +338,23 @@ class AnimeSearch(Cog):
         
     @command(name="charasearch", aliases=["cs"])
     async def chara_search(self, ctx, *, chara):
+    
+        chara = str(chara)
+        
         result = jikan.search("character", f"{chara}", page=1)
         list_chara = result["results"]
         menu = MenuPages(source=IsiCharaSearch(ctx, list_chara),
-                         delete_message_after=False,
-                         timeout=60.0)# bisa ditambah clear_reaction_after=True
+                        delete_message_after=False,
+                        timeout=60.0 )# bisa ditambah clear_reaction_after=True
+        
         await menu.start(ctx)
+        
+            
+        
+    @chara_search.error
+    async def chara_search_error(self, ctx, exc):
+        if isinstance(exc.original, APIException):
+            await ctx.send("Siapa itu?")
         
     @command(name="mangasearch", aliases=["ms"])
     async def manga_search(self, ctx, *, manga):
@@ -373,6 +392,7 @@ Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} " )
         for name, value, inline in fields:
             embed.add_field(name=name, value=value, inline=inline)
         embed.set_image(url=result['image_url'])
+        
         await ctx.send(embed=embed)
         
         

@@ -51,7 +51,7 @@ class Fun(Cog):
             await ctx.send("Gamau")
         else: 
             await ctx.send(f"Nandeshiko menampar {member.mention} karena {reason}")
-        print(member)
+        # print(member)
     @slap_member.error
     async def slap_member_error(self, ctx, exc):
         if isinstance(exc, BadArgument):

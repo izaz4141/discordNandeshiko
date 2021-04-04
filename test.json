@@ -1,0 +1,80 @@
+{
+    "request_hash": "request:character:ece9aa7443dcbd6fa42a4bca7ce6bec4b0531146",
+    "request_cached": true,
+    "request_cache_expiry": 86400,
+    "mal_id": 152120,
+    "url": "https://myanimelist.net/character/152120/Nadeshiko_Kagamihara",
+    "name": "Nadeshiko Kagamihara",
+    "name_kanji": null,
+    "nicknames": [],
+    "about": "Nadeshiko Kagamihara is a young girl from Nanbucho. She is very cheerful and energetic, but easily forgets things. She also likes to eat a lot.\\n\r\n\\n\r\nNadeshiko has long pink hair which she keeps in twin ponytails on the back of her head (held by white ruffled scrunchies), light blue eyes, and pale skin.\\n\r\n\\n\r\nWhen camping, she wears a plaid pink jacket, a light pink ruffled dress underneath, black leggings, and green-and-white lace-up boots (or, alternatively, dark brown boots that are rolled down) with grey fingerless gloves and an orange scarf.\\n\r\n\\n\r\nIn school, she wears the typical female uniform (seifuku, \u5236\u670d). She's currently wearing the winter seifuku.\\n\r\n\\n\r\nHer birthday is same as Aoi Inuyama's.\\n\r\n\\n\r\n(Source: Yuru Camp Wiki)\\n\\n\n\t\t\t\n\t\t\t\\n\\n",
+    "member_favorites": 2155,
+    "image_url": "https://cdn.myanimelist.net/images/characters/6/337010.jpg",
+    "animeography": [
+        {
+            "mal_id": 34798,
+            "name": "Yuru Camp\u25b3",
+            "url": "https://myanimelist.net/anime/34798/Yuru_Camp\u25b3",
+            "image_url": "https://cdn.myanimelist.net/images/anime/4/89877.jpg?s=24bca2552c22ff5ab094fd0a3b89c991",
+            "role": "Main"
+        },
+        {
+            "mal_id": 37341,
+            "name": "Yuru Camp\u25b3 Specials",
+            "url": "https://myanimelist.net/anime/37341/Yuru_Camp\u25b3_Specials",
+            "image_url": "https://cdn.myanimelist.net/images/anime/1258/91059.jpg?s=a78269ec354e2582b6ff27692f55e08c",
+            "role": "Main"
+        },
+        {
+            "mal_id": 38474,
+            "name": "Yuru Camp\u25b3 Season 2",
+            "url": "https://myanimelist.net/anime/38474/Yuru_Camp\u25b3_Season_2",
+            "image_url": "https://cdn.myanimelist.net/images/anime/1255/110636.jpg?s=196e7921b6cae4e06875a07057fb233d",
+            "role": "Main"
+        },
+        {
+            "mal_id": 38476,
+            "name": "Heya Camp\u25b3",
+            "url": "https://myanimelist.net/anime/38476/Heya_Camp\u25b3",
+            "image_url": "https://cdn.myanimelist.net/images/anime/1228/104364.jpg?s=36c36fc08ead64cfb33a8bf7bb361c59",
+            "role": "Main"
+        }
+    ],
+    "mangaography": [
+        {
+            "mal_id": 94376,
+            "name": "Yuru Camp\u25b3",
+            "url": "https://myanimelist.net/manga/94376/Yuru_Camp\u25b3",
+            "image_url": "https://cdn.myanimelist.net/images/manga/1/168083.jpg?s=73963e82064b609e8a6f6e67de8afbb8",
+            "role": "Main"
+        }
+    ],
+    "voice_actors": [
+        {
+            "mal_id": 21543,
+            "name": "Hanamori, Yumiri",
+            "url": "https://myanimelist.net/people/21543/Yumiri_Hanamori",
+            "image_url": "https://cdn.myanimelist.net/images/voiceactors/1/55530.jpg",
+            "language": "Japanese"
+        }
+    ],
+    "jikan_url": "https://api.jikan.moe/v3/character/152120",
+    "headers": {
+        "Server": "nginx/1.18.0 (Ubuntu)",
+        "Date": "Sat, 03 Apr 2021 16:41:40 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "1115",
+        "Connection": "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "*",
+        "Cache-Control": "private, must-revalidate",
+        "ETag": "\"7ce2d0cfb38a74bc313767590d2187bc\"",
+        "X-Request-Hash": "request:character:ece9aa7443dcbd6fa42a4bca7ce6bec4b0531146",
+        "X-Request-Cached": "1",
+        "X-Request-Cache-Ttl": "86400",
+        "Expires": "Sun, 04 Apr 2021 16:41:40 GMT",
+        "Content-Encoding": "gzip",
+        "Vary": "Accept-Encoding",
+        "X-Cache-Status": "MISS"
+    }
+}

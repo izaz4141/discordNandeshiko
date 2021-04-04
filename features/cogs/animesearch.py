@@ -34,6 +34,119 @@ jikan = Jikan()
 #     "▶️": 1
 # }
 
+class IsiMangaSearch(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=1)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*1) + 1
+        len_data = len(self.entries)
+
+        embed = Embed(title=self.entries[menu.current_page]["title"],
+                      description=f"Score : {str(self.entries[menu.current_page]['score'])}\n\
+Volume : {str(self.entries[menu.current_page]['volumes'])} \n\
+Chapters : {str(self.entries[menu.current_page]['chapters'])} \n\
+Publishing : {str(self.entries[menu.current_page]['publishing'])} \n\
+Members : {str(self.entries[menu.current_page]['members'])} \n\
+Id : {str(self.entries[menu.current_page]['mal_id'])} \n\
+Sinopsis :\n      {self.entries[menu.current_page]['synopsis']}",
+                      colour=self.ctx.author.colour)
+
+        embed.set_image(url=self.entries[menu.current_page]["image_url"])
+        embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
+
+        # for name, value in fields:
+        #     embed.add_field(name=name, value=value, inline=False)
+
+        return embed
+
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        
+
+        
+        # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
+
+        return await self.write_page(menu, fields)
+
+class IsiCharaSearch(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=1)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*1) + 1
+        len_data = len(self.entries)
+
+        embed = Embed(title=self.entries[menu.current_page]["name"],
+                      description=f"Aliases : {', '.join(str(alias) for alias in self.entries[menu.current_page]['alternative_names'])}\n\
+Dari Anime : {', '.join(str(anime['name']) for anime in self.entries[menu.current_page]['anime'])}\n\n\
+Dari Manga : {', '.join(str(manga['name']) for manga in self.entries[menu.current_page]['manga'])}\n\
+Id : {str(self.entries[menu.current_page]['mal_id'])} ",
+                      colour=self.ctx.author.colour)
+
+        embed.set_image(url=self.entries[menu.current_page]["image_url"])
+        embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
+
+        # for name, value in fields:
+        #     embed.add_field(name=name, value=value, inline=False)
+
+        return embed
+
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        
+
+        
+        # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
+
+        return await self.write_page(menu, fields)
+
+class IsiJadwalAnime(ListPageSource):
+    def __init__(self, day, ctx, data):
+        self.ctx = ctx
+        self.day = day
+
+        super().__init__(data, per_page=1)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*1) + 1
+        len_data = len(self.entries)
+
+        embed = Embed(title=f"{self.day}\n{self.entries[menu.current_page]['title']}",
+                      description=f"Score : {str(self.entries[menu.current_page]['score'])}\n\
+Tipe : {str(self.entries[menu.current_page]['type'])}\n\
+Source : {str(self.entries[menu.current_page]['source'])}\n\
+Episodes : {str(self.entries[menu.current_page]['episodes'])}\n\
+Producer : {', '.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))}\n\
+Licensors : {', '.join(str(i) for i in self.entries[menu.current_page]['licensors'])} \n\
+Genre : {', '.join(str(genre['name']) for genre in self.entries[menu.current_page]['genres'])} \n\
+Sinopsis :\n{str(self.entries[menu.current_page]['synopsis'])}",
+                      colour=self.ctx.author.colour)
+
+        embed.set_image(url=self.entries[menu.current_page]["image_url"])
+        embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
+
+        # for name, value in fields:
+        #     embed.add_field(name=name, value=value, inline=False)
+
+        return embed
+
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        
+
+        
+        # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
+
+        return await self.write_page(menu, fields)
+
 class IsiSeasonSearch(ListPageSource):
     def __init__(self, season, year, ctx, data):
         self.ctx = ctx
@@ -47,13 +160,14 @@ class IsiSeasonSearch(ListPageSource):
         len_data = len(self.entries)
 
         embed = Embed(title=f"{self.season} {self.year}\n{self.entries[menu.current_page]['title']}",
-                      description=f"Score : {self.entries[menu.current_page]['score']:,.2f}\n\
-Tipe : {self.entries[menu.current_page]['type']}\n\
-Episodes : {self.entries[menu.current_page]['episodes']}\n\
+                      description=f"Score : {str(self.entries[menu.current_page]['score'])}\n\
+Tipe : {str(self.entries[menu.current_page]['type'])}\n\
+Source : {str(self.entries[menu.current_page]['source'])}\n\
+Episodes : {str(self.entries[menu.current_page]['episodes'])}\n\
 Producer : {', '.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))}\n\
-Licencors : {', '.join(str(i) for i in self.entries[menu.current_page]['licensors'])} \n\
+Licensors : {', '.join(str(i) for i in self.entries[menu.current_page]['licensors'])} \n\
 Genre : {', '.join(str(genre['name']) for genre in self.entries[menu.current_page]['genres'])} \n\
-Sinopsis :\n{self.entries[menu.current_page]['synopsis']}",
+Sinopsis :\n{str(self.entries[menu.current_page]['synopsis'])}",
                       colour=self.ctx.author.colour)
         
         # fields=[]
@@ -130,7 +244,7 @@ class AnimeSearch(Cog):
         result = jikan.search('anime', f'{nama_anime}', page=1)
         list_anime = result["results"]
         menu = MenuPages(source=IsiAnimeSearch(ctx, list_anime),
-                         delete_message_after=True,
+                         delete_message_after=False,
                          timeout=60.0)# bisa ditambah clear_reaction_after=True
         await menu.start(ctx)
 
@@ -200,12 +314,67 @@ class AnimeSearch(Cog):
         season = result["season_name"]
         list_anime = result["anime"]
         menu = MenuPages(source=IsiSeasonSearch(season, year, ctx, list_anime),
-                         delete_message_after=True,
+                         delete_message_after=False,
                          timeout=60.0)# bisa ditambah clear_reaction_after=True
         await menu.start(ctx)
         
-    # @command(name="jadwal")
-    # async def jadwal_anime(self, ctx, *, hari:Optional[str]= date.today().strftime("%A")):
+    @command(name="jadwalanime", aliases=["ja"])
+    async def jadwal_anime(self, ctx, *, hari:Optional[str]= date.today().strftime("%A")):
+        hari_ = hari.lower()
+        result = jikan.schedule(day= hari_)
+        list_anime = result[f"{hari_}"]
+        menu = MenuPages(source=IsiJadwalAnime(hari, ctx, list_anime),
+                         delete_message_after=False,
+                         timeout=60.0)# bisa ditambah clear_reaction_after=True
+        await menu.start(ctx)
+        
+    @command(name="charasearch", aliases=["cs"])
+    async def chara_search(self, ctx, *, chara):
+        result = jikan.search("character", f"{chara}", page=1)
+        list_chara = result["results"]
+        menu = MenuPages(source=IsiCharaSearch(ctx, list_chara),
+                         delete_message_after=False,
+                         timeout=60.0)# bisa ditambah clear_reaction_after=True
+        await menu.start(ctx)
+        
+    @command(name="mangasearch", aliases=["ms"])
+    async def manga_search(self, ctx, *, manga):
+        
+        result = jikan.search("manga", f"{manga}", page=1)
+        list_manga = result["results"]
+        menu = MenuPages(source=IsiMangaSearch(ctx, list_manga),
+                         delete_message_after=False,
+                         timeout=60.0)# bisa ditambah clear_reaction_after=True
+        await menu.start(ctx)
+        
+    @command(name="character")
+    async def character(self, ctx, *, chara_id):
+        chara_id = int(chara_id)
+        result = jikan.character(chara_id)
+        embed = Embed(title= result['name'],
+                      description= f"Kanji : {str(result['name_kanji'])} \n\
+Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} " )
+# Menjadi pujaan {str(result['member_favorites'])} orang \n\
+# Dari Anime :\n" +
+# '\n'.join(f"{str(result['animeography'][i]['name'])} : {str(result['animeography'][i]['role'])} "
+#             for i in range(len(result['animeography']))) + "\n" +
+# "Dari Manga : \n" +
+# '\n'.join(f"{str(result['mangaography'][i]['name'])} : {str(result['mangaography'][i]['role'])} "
+#             for i in range(len(result['mangaography']))) + "\n" +
+# "Seiyuu :\n" +
+# '\n'.join(f"{str(result['voice_actors'][i]['name'])} : {str(result['voice_actors'][i]['language'])} "
+#             for i in range(len(result['voice_actors']))) + "\n" +
+# f"Detail Karakter :\n {str(result['about'])} ")
+        fields = [("Menjadi Pujaan", f"{str(result['member_favorites'])} orang", False),
+                  ("Dari Anime", '\n'.join(f"{str(result['animeography'][i]['name'])} : {str(result['animeography'][i]['role'])} " for i in range(len(result['animeography']))), False),
+                  ("Dari Manga", '\n'.join(f"{str(result['mangaography'][i]['name'])} : {str(result['mangaography'][i]['role'])} " for i in range(len(result['mangaography']))), False ),
+                  ("Seiyuu", '\n'.join(f"{str(result['voice_actors'][i]['name'])} : {str(result['voice_actors'][i]['language'])} " for i in range(len(result['voice_actors']))), False ),
+                  ("Detail Karakter", "".join(str(result['about']).split("\\n")), False )]
+        for name, value, inline in fields:
+            embed.add_field(name=name, value=value, inline=inline)
+        embed.set_image(url=result['image_url'])
+        await ctx.send(embed=embed)
+        
         
                 
             

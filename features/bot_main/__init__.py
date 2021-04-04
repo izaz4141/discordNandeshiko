@@ -14,7 +14,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
 
-system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
+# system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
 
 client = Client()
 intents = Intents.default()
@@ -68,7 +68,6 @@ class Bot(BotBase):
             print(f" {cog} cog loaded")
             
     def update_github(self):
-        from os import system
         system('git add . && git commit -m "Add existing file"')
         system('git push origin')
 

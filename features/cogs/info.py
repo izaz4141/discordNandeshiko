@@ -52,7 +52,7 @@ class Info(Cog):
         await ctx.send(embed=embed)
         
     @command(name="avatar")
-    async def avatar_show(self, ctx, *, target: Member):
+    async def avatar_show(self, ctx, *, target: Optional[Member]):
         """Menampilkan Display Picture
 
         Args:

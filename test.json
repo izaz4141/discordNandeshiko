@@ -1,51 +1,51 @@
 {
-    "request_hash": "request:anime:1b348317378027bca60cfd841dfd0b1005ee9a47",
+    "request_hash": "request:anime:70d465e5b16e6050213c3a3bb2b6ac4c6e26cbd2",
     "request_cached": true,
-    "request_cache_expiry": 7020,
-    "mal_id": 34798,
-    "url": "https://myanimelist.net/anime/34798/Yuru_Camp\u25b3",
-    "image_url": "https://cdn.myanimelist.net/images/anime/4/89877.jpg",
-    "trailer_url": "https://www.youtube.com/embed/vpH42sJ8t9c?enablejsapi=1&wmode=opaque&autoplay=1",
-    "title": "Yuru Camp\u25b3",
-    "title_english": "Laid-Back Camp",
-    "title_japanese": "\u3086\u308b\u30ad\u30e3\u30f3\u25b3",
+    "request_cache_expiry": 32333,
+    "mal_id": 38475,
+    "url": "https://myanimelist.net/anime/38475/Yuru_Camp\u25b3_Movie",
+    "image_url": "https://cdn.myanimelist.net/images/anime/1629/113922.jpg",
+    "trailer_url": null,
+    "title": "Yuru Camp\u25b3 Movie",
+    "title_english": null,
+    "title_japanese": "\u6620\u753b \u3086\u308b\u30ad\u30e3\u30f3\u25b3",
     "title_synonyms": [
-        "Yurukyan"
+        "Eiga Yuru Camp"
     ],
-    "type": "TV",
+    "type": "Movie",
     "source": "Manga",
-    "episodes": 12,
-    "status": "Finished Airing",
+    "episodes": 1,
+    "status": "Not yet aired",
     "airing": false,
     "aired": {
-        "from": "2018-01-04T00:00:00+00:00",
-        "to": "2018-03-22T00:00:00+00:00",
+        "from": "2022-01-01T00:00:00+00:00",
+        "to": null,
         "prop": {
             "from": {
-                "day": 4,
+                "day": 1,
                 "month": 1,
-                "year": 2018
+                "year": 2022
             },
             "to": {
-                "day": 22,
-                "month": 3,
-                "year": 2018
+                "day": null,
+                "month": null,
+                "year": null
             }
         },
-        "string": "Jan 4, 2018 to Mar 22, 2018"
+        "string": "2022 to ?"
     },
-    "duration": "23 min per ep",
-    "rating": "PG-13 - Teens 13 or older",
-    "score": 8.27,
-    "scored_by": 133478,
-    "rank": 245,
-    "popularity": 453,
-    "members": 328228,
-    "favorites": 7157,
-    "synopsis": "While the perfect getaway for most girls her age might be a fancy vacation with their loved ones, Rin Shima's ideal way of spending her days off is camping alone at the base of Mount Fuji. From pitching her tent to gathering firewood, she has always done everything by herself, and has no plans of leaving her little solitary world. However, what starts off as one of Rin's usual camping sessions somehow ends up as a surprise get-together for two when the lost Nadeshiko Kagamihara is forced to take refuge at her campsite. Originally intending to see the picturesque view of Mount Fuji for herself, Nadeshiko's plans are disrupted when she ends up falling asleep partway to her destination. Alone and with no other choice, she seeks help from the only other person nearby. Despite their hasty introductions, the two girls nevertheless enjoy the chilly night together, eating ramen and conversing while the campfire keeps them warm. And even after Nadeshiko's sister finally picks her up later that night, both girls silently ponder the possibility of another camping trip together. [Written by MAL Rewrite]",
+    "duration": "Unknown",
+    "rating": "None",
+    "score": null,
+    "scored_by": null,
+    "rank": null,
+    "popularity": 3347,
+    "members": 26172,
+    "favorites": 41,
+    "synopsis": "",
     "background": null,
-    "premiered": "Winter 2018",
-    "broadcast": "Thursdays at 23:00 (JST)",
+    "premiered": null,
+    "broadcast": null,
     "related": {
         "Adaptation": [
             {
@@ -55,133 +55,51 @@
                 "url": "https://myanimelist.net/manga/94376/Yuru_Camp\u25b3"
             }
         ],
-        "Side story": [
-            {
-                "mal_id": 37341,
-                "type": "anime",
-                "name": "Yuru Camp\u25b3 Specials",
-                "url": "https://myanimelist.net/anime/37341/Yuru_Camp\u25b3_Specials"
-            }
-        ],
-        "Sequel": [
-            {
-                "mal_id": 38474,
-                "type": "anime",
-                "name": "Yuru Camp\u25b3 Season 2",
-                "url": "https://myanimelist.net/anime/38474/Yuru_Camp\u25b3_Season_2"
-            }
-        ],
         "Other": [
             {
-                "mal_id": 38475,
+                "mal_id": 34798,
                 "type": "anime",
-                "name": "Yuru Camp\u25b3 Movie",
-                "url": "https://myanimelist.net/anime/38475/Yuru_Camp\u25b3_Movie"
-            },
-            {
-                "mal_id": 38476,
-                "type": "anime",
-                "name": "Heya Camp\u25b3",
-                "url": "https://myanimelist.net/anime/38476/Heya_Camp\u25b3"
+                "name": "Yuru Camp\u25b3",
+                "url": "https://myanimelist.net/anime/34798/Yuru_Camp\u25b3"
             }
         ]
     },
-    "producers": [
-        {
-            "mal_id": 64,
-            "type": "anime",
-            "name": "Sotsu",
-            "url": "https://myanimelist.net/anime/producer/64/Sotsu"
-        },
-        {
-            "mal_id": 238,
-            "type": "anime",
-            "name": "AT-X",
-            "url": "https://myanimelist.net/anime/producer/238/AT-X"
-        },
-        {
-            "mal_id": 737,
-            "type": "anime",
-            "name": "Sony Music Communications",
-            "url": "https://myanimelist.net/anime/producer/737/Sony_Music_Communications"
-        },
-        {
-            "mal_id": 963,
-            "type": "anime",
-            "name": "MAGES.",
-            "url": "https://myanimelist.net/anime/producer/963/MAGES"
-        },
-        {
-            "mal_id": 1185,
-            "type": "anime",
-            "name": "81 Produce",
-            "url": "https://myanimelist.net/anime/producer/1185/81_Produce"
-        },
-        {
-            "mal_id": 1416,
-            "type": "anime",
-            "name": "BS11",
-            "url": "https://myanimelist.net/anime/producer/1416/BS11"
-        },
-        {
-            "mal_id": 1590,
-            "type": "anime",
-            "name": "FuRyu",
-            "url": "https://myanimelist.net/anime/producer/1590/FuRyu"
-        },
-        {
-            "mal_id": 1784,
-            "type": "anime",
-            "name": "Crunchyroll SC Anime Fund",
-            "url": "https://myanimelist.net/anime/producer/1784/Crunchyroll_SC_Anime_Fund"
-        }
-    ],
+    "producers": [],
     "licensors": [],
-    "studios": [
-        {
-            "mal_id": 1075,
-            "type": "anime",
-            "name": "C-Station",
-            "url": "https://myanimelist.net/anime/producer/1075/C-Station"
-        }
-    ],
+    "studios": [],
     "genres": [
-        {
-            "mal_id": 36,
-            "type": "anime",
-            "name": "Slice of Life",
-            "url": "https://myanimelist.net/anime/genre/36/Slice_of_Life"
-        },
         {
             "mal_id": 4,
             "type": "anime",
             "name": "Comedy",
             "url": "https://myanimelist.net/anime/genre/4/Comedy"
+        },
+        {
+            "mal_id": 36,
+            "type": "anime",
+            "name": "Slice of Life",
+            "url": "https://myanimelist.net/anime/genre/36/Slice_of_Life"
         }
     ],
-    "opening_themes": [
-        "\"SHINY DAYS\" by Asaka"
-    ],
-    "ending_themes": [
-        "\"Fuyu Biyori (\u3075\u3086\u3073\u3088\u308a)\" by Eri Sasaki"
-    ],
-    "jikan_url": "https://api.jikan.moe/v3/anime/34798",
+    "opening_themes": [],
+    "ending_themes": [],
+    "jikan_url": "https://api.jikan.moe/v3/anime/38475",
     "headers": {
         "Server": "nginx/1.18.0 (Ubuntu)",
-        "Date": "Sun, 04 Apr 2021 11:47:41 GMT",
+        "Date": "Sun, 04 Apr 2021 14:48:01 GMT",
         "Content-Type": "application/json",
-        "Content-Length": "1772",
+        "Content-Length": "685",
         "Connection": "keep-alive",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "*",
         "Cache-Control": "private, must-revalidate",
-        "ETag": "\"e018f747f67e99747d19da2becaf5e9d\"",
-        "X-Request-Hash": "request:anime:1b348317378027bca60cfd841dfd0b1005ee9a47",
+        "ETag": "\"85ad069e5e1b9df6e79a1b124ea06223\"",
+        "X-Request-Hash": "request:anime:70d465e5b16e6050213c3a3bb2b6ac4c6e26cbd2",
         "X-Request-Cached": "1",
-        "X-Request-Cache-Ttl": "7020",
-        "Expires": "Sun, 04 Apr 2021 13:44:41 GMT",
+        "X-Request-Cache-Ttl": "32333",
+        "Expires": "Sun, 04 Apr 2021 23:46:01 GMT",
         "Content-Encoding": "gzip",
         "Vary": "Accept-Encoding",
-        "X-Cache-Status": "EXPIRED"
+        "X-Cache-Status": "HIT"
     }
 }

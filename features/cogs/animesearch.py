@@ -406,11 +406,14 @@ class AnimeSearch(Cog):
         try:
             result = jikan.search("person", person_name, page=1)
             list_person = result["results"]
-            menu = MenuPages(source=IsiPersonSearch(ctx, list_person),
-                            delete_message_after=False,
-                            timeout=60.0 )# bisa ditambah clear_reaction_after=True
-            
-            await menu.start(ctx)
+            if str(list_person) == '':
+                await ctx.send("Maaf kak orang dengan nama itu tidak ditemukan\nPerintah ini memang agak rusak.")
+            else:
+                menu = MenuPages(source=IsiPersonSearch(ctx, list_person),
+                                delete_message_after=False,
+                                timeout=60.0 )# bisa ditambah clear_reaction_after=True
+                
+                await menu.start(ctx)
             
         except APIException or IndexError:
             await ctx.send("Siapa itu ?")
@@ -495,7 +498,74 @@ Aliases : {', '.join(str(nama) for nama in result['alternate_names'])} " )
     @command(name="anime")
     async def anime_detail(self, ctx, *, anime_id):
         anime_id = int(anime_id)
-        
+        try:
+            result = jikan.anime(anime_id)
+            embed = Embed(title= f"{result['title']}/{str(result['title_english'])} ({str(result['title_japanese'])})",
+                          description= f"{'/'.join(str(alias) for alias in result['title_synonyms'])}\n\
+Score : {str(result['score'])} dari {str(result['scored_by'])} orang \n\
+Rank : {str(result['rank'])}\n\
+Favorites : {str(result['favorites'])}\n\
+Durasi Episode : {str(result['duration'])}")
+            try:
+                adaptasi = '\n'.join(str(result['related']['Adaptation'][i]['name']) for i in range(len(result['related']['Adaptation'])))
+                
+            except KeyError:
+                adaptasi = 'None'
+            try:
+                side_story = '\n'.join(str(result['related']['Side story'][i]['name']) for i in range(len(result['related']['Side story'])))
+                
+            except KeyError:
+                side_story = 'None'
+            try:
+                sequel = '\n'.join(str(result['related']['Sequel'][i]['name']) for i in range(len(result['related']['Sequel'])))
+                
+            except KeyError:
+                sequel = 'None'
+            try:
+                other = '\n'.join(str(result['related']['Other'][i]['name']) for i in range(len(result['related']['Other'])))
+                
+            except KeyError:
+                other = 'None'
+            producers = '\n'.join(str(result['producers'][i]['name']) for i in range(len(result['producers'])))
+            if producers == '':
+                producers = 'None'
+            licensors = '\n'.join(str(result['licensors'][i]['name']) for i in range(len(result['licensors'])))
+            if licensors == '':
+                licensors = 'None'
+            studios = ', '.join(str(result['studios'][i]['name']) for i in range(len(result['studios'])))
+            if studios == '':
+                studios = 'None'
+            genres = ', '.join(str(result['genres'][i]['name']) for i in range(len(result['genres'])))
+            if genres == '':
+                genres = 'None'
+            openings = '\n'.join(str(opening) for opening in result['opening_themes'])
+            if openings == '':
+                openings = 'None'
+            endings = '\n'.join(str(ending) for ending in result['ending_themes'])
+            if endings == '':
+                endings = 'None'
+            fields = ( ("Status", f"{str(result['status'])}\n{str(result['aired']['string'])}", False),
+                       ("Premiere", f"{str(result['premiered'])}", False),
+                       ("Producers", producers, False),
+                       ("Licensors", licensors, False),
+                       ("Studio", studios, False),
+                       ("Genre", genres, False),
+                       ("Diadaptasi dari", adaptasi, False),
+                       ("Side Story", side_story, False),
+                       ("Sequel", sequel, False),
+                       ("Lain", other, False),
+                       ("Opening", openings, False),
+                       ("Ending", endings, False),
+                       ("Sinopsis", "%.1021s..." % result['synopsis'], False)
+                    )
+            for name, value, inline in fields:
+                embed.add_field(name=name, value=value, inline=inline)
+            embed.set_image(url=result['image_url'])
+            
+            await ctx.send(embed=embed)
+            
+        except APIException:
+            await ctx.send(f"Tidak ditemukan anime dengan id {anime_id}")
         
                 
             

@@ -39,6 +39,38 @@ HEART = {
     "❤️": 0
 }
 
+class IsiPersonSearch(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=1)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*1) + 1
+        len_data = len(self.entries)
+
+        embed = Embed(title=self.entries[menu.current_page]["name"],
+                      description=f"Aliases : {', '.join(str(alias) for alias in self.entries[menu.current_page]['alternative_names'])}\nId : {str(self.entries[menu.current_page]['mal_id'])}",
+                      colour=self.ctx.author.colour)
+
+        embed.set_image(url=self.entries[menu.current_page]["image_url"])
+        embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
+
+        # for name, value in fields:
+        #     embed.add_field(name=name, value=value, inline=False)
+
+        return embed
+
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        
+
+        
+        # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
+
+        return await self.write_page(menu, fields)
+
 class IsiMangaSearch(ListPageSource):
     def __init__(self, ctx, data):
         self.ctx = ctx
@@ -89,7 +121,7 @@ class IsiCharaSearch(ListPageSource):
 
         embed = Embed(title=self.entries[menu.current_page]["name"],
                       description=f"Aliases : {', '.join(str(alias) for alias in self.entries[menu.current_page]['alternative_names'])}\n\
-Dari Anime : {', '.join(str(anime['name']) for anime in self.entries[menu.current_page]['anime'])}\n\n\
+Dari Anime : {', '.join(str(anime['name']) for anime in self.entries[menu.current_page]['anime'])}\n\
 Dari Manga : {', '.join(str(manga['name']) for manga in self.entries[menu.current_page]['manga'])}\n\
 Id : {str(self.entries[menu.current_page]['mal_id'])} ",
                       colour=self.ctx.author.colour)
@@ -133,6 +165,7 @@ Episodes : {str(self.entries[menu.current_page]['episodes'])}\n\
 Producer : {', '.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))}\n\
 Licensors : {', '.join(str(i) for i in self.entries[menu.current_page]['licensors'])} \n\
 Genre : {', '.join(str(genre['name']) for genre in self.entries[menu.current_page]['genres'])} \n\
+Id : {str(self.entries[menu.current_page]['mal_id'])}\n\
 Sinopsis :\n{str(self.entries[menu.current_page]['synopsis'])}",
                       colour=self.ctx.author.colour)
 
@@ -174,6 +207,7 @@ Episodes : {str(self.entries[menu.current_page]['episodes'])}\n\
 Producer : {', '.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))}\n\
 Licensors : {', '.join(str(i) for i in self.entries[menu.current_page]['licensors'])} \n\
 Genre : {', '.join(str(genre['name']) for genre in self.entries[menu.current_page]['genres'])} \n\
+Id : {str(self.entries[menu.current_page]['mal_id'])}\n\
 Sinopsis :\n{str(self.entries[menu.current_page]['synopsis'])}",
                       colour=self.ctx.author.colour)
         
@@ -213,7 +247,7 @@ class IsiAnimeSearch(ListPageSource):
         len_data = len(self.entries)
 
         embed = Embed(title=self.entries[menu.current_page]["title"],
-                      description=f"Score : {self.entries[menu.current_page]['score']:,.2f}\nTipe : {self.entries[menu.current_page]['type']}\nEpisodes : {self.entries[menu.current_page]['episodes']:,}\nSinopsis :\n      {self.entries[menu.current_page]['synopsis']}",
+                      description=f"Score : {self.entries[menu.current_page]['score']:,.2f}\nTipe : {self.entries[menu.current_page]['type']}\nEpisodes : {self.entries[menu.current_page]['episodes']:,}\nId : {str(self.entries[menu.current_page]['mal_id'])}\nSinopsis :\n      {self.entries[menu.current_page]['synopsis']}",
                       colour=self.ctx.author.colour)
 
         embed.set_image(url=self.entries[menu.current_page]["image_url"])
@@ -241,20 +275,23 @@ class AnimeSearch(Cog):
 
 
     @command(name="animesearch", aliases=["as"])
-    async def anime_search(self, ctx, *, nama_anime: str):
+    async def anime_search(self, ctx, *, nama_anime):
         """Mencari Anime berdasar judul
 
         Args:
             ctx (str): command
             nama_anime (str): judul
         """
-        
-        result = jikan.search('anime', f'{nama_anime}', page=1)
-        list_anime = result["results"]
-        menu = MenuPages(source=IsiAnimeSearch(ctx, list_anime),
-                         delete_message_after=False,
-                         timeout=60.0)# bisa ditambah clear_reaction_after=True
-        await menu.start(ctx)
+        nama_anime = str(nama_anime)
+        try:
+            result = jikan.search('anime', f'{nama_anime}', page=1)
+            list_anime = result["results"]
+            menu = MenuPages(source=IsiAnimeSearch(ctx, list_anime),
+                            delete_message_after=False,
+                            timeout=60.0)# bisa ditambah clear_reaction_after=True
+            await menu.start(ctx)
+        except APIException:
+            await ctx.send(f"Tidak ditemukan anime dengan nama {nama_anime}\nMaaf >n<")
 
     # @command(name="animesearch", aliases=["as"])
     # async def ani_search(self, ctx, *, nama_anime: str):
@@ -308,11 +345,19 @@ class AnimeSearch(Cog):
                 
     #         self.as_id = msg.id
     
-    @command(name="seasonsearch", aliases=["ss"])
+    @command(name="season", aliases=["s"])
     async def season_search(self, ctx, *, musim_tahun: Optional[str]=None):
         """Harus berupa musim *spasi* tahun\nKategori musim : spring, summer, fall, winter.\nContoh: +ss fall 2020"""
         musim_tahun = str(musim_tahun).split(" ")
-        musim = musim_tahun[0]
+        musim = musim_tahun[0].lower()
+        if musim == "gugur":
+            musim = "fall"
+        elif musim == "semi":
+            musim = "spring"
+        elif musim == "dingin" or musim == "salju":
+            musim = "winter"
+        elif musim == "panas":
+            musim = "summer"
         try:
             tahun = musim_tahun[1]
             result = jikan.season(year= tahun, season= musim)
@@ -329,32 +374,49 @@ class AnimeSearch(Cog):
     @command(name="jadwalanime", aliases=["ja"])
     async def jadwal_anime(self, ctx, *, hari:Optional[str]= date.today().strftime("%A")):
         hari_ = hari.lower()
-        result = jikan.schedule(day= hari_)
-        list_anime = result[f"{hari_}"]
-        menu = MenuPages(source=IsiJadwalAnime(hari, ctx, list_anime),
-                         delete_message_after=False,
-                         timeout=60.0)# bisa ditambah clear_reaction_after=True
-        await menu.start(ctx)
+        try:
+            result = jikan.schedule(day= hari_)
+            list_anime = result[f"{hari_}"]
+            menu = MenuPages(source=IsiJadwalAnime(hari, ctx, list_anime),
+                            delete_message_after=False,
+                            timeout=60.0)# bisa ditambah clear_reaction_after=True
+            await menu.start(ctx)
+        except APIException:
+            await ctx.send(f"{hari} bukan merupakan nama hari!")
         
     @command(name="charasearch", aliases=["cs"])
     async def chara_search(self, ctx, *, chara):
     
         chara = str(chara)
-        
-        result = jikan.search("character", f"{chara}", page=1)
-        list_chara = result["results"]
-        menu = MenuPages(source=IsiCharaSearch(ctx, list_chara),
-                        delete_message_after=False,
-                        timeout=60.0 )# bisa ditambah clear_reaction_after=True
-        
-        await menu.start(ctx)
+        try:
+            result = jikan.search("character", f"{chara}", page=1)
+            list_chara = result["results"]
+            menu = MenuPages(source=IsiCharaSearch(ctx, list_chara),
+                            delete_message_after=False,
+                            timeout=60.0 )# bisa ditambah clear_reaction_after=True
+            
+            await menu.start(ctx)
+            
+        except APIException:
+            await ctx.send("Siapa itu?")
+            
+    @command(name="personsearch", aliases=["ps"])
+    async def seiyuu_search(self, ctx, *, person_name):
+        person_name = str(person_name)
+        try:
+            result = jikan.search("person", person_name, page=1)
+            list_person = result["results"]
+            menu = MenuPages(source=IsiPersonSearch(ctx, list_person),
+                            delete_message_after=False,
+                            timeout=60.0 )# bisa ditambah clear_reaction_after=True
+            
+            await menu.start(ctx)
+            
+        except APIException or IndexError:
+            await ctx.send("Siapa itu ?")
         
             
         
-    @chara_search.error
-    async def chara_search_error(self, ctx, exc):
-        if isinstance(exc.original, APIException):
-            await ctx.send("Siapa itu?")
         
     @command(name="mangasearch", aliases=["ms"])
     async def manga_search(self, ctx, *, manga):
@@ -367,33 +429,72 @@ class AnimeSearch(Cog):
         await menu.start(ctx)
         
     @command(name="character")
-    async def character(self, ctx, *, chara_id):
+    async def character_detail(self, ctx, *, chara_id):
         chara_id = int(chara_id)
-        result = jikan.character(chara_id)
-        embed = Embed(title= result['name'],
-                      description= f"Kanji : {str(result['name_kanji'])} \n\
+        try:
+            result = jikan.character(chara_id)
+            embed = Embed(title= result['name'],
+                        description= f"Kanji : {str(result['name_kanji'])} \n\
 Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} " )
-# Menjadi pujaan {str(result['member_favorites'])} orang \n\
-# Dari Anime :\n" +
-# '\n'.join(f"{str(result['animeography'][i]['name'])} : {str(result['animeography'][i]['role'])} "
-#             for i in range(len(result['animeography']))) + "\n" +
-# "Dari Manga : \n" +
-# '\n'.join(f"{str(result['mangaography'][i]['name'])} : {str(result['mangaography'][i]['role'])} "
-#             for i in range(len(result['mangaography']))) + "\n" +
-# "Seiyuu :\n" +
-# '\n'.join(f"{str(result['voice_actors'][i]['name'])} : {str(result['voice_actors'][i]['language'])} "
-#             for i in range(len(result['voice_actors']))) + "\n" +
-# f"Detail Karakter :\n {str(result['about'])} ")
-        fields = [("Menjadi Pujaan", f"{str(result['member_favorites'])} orang", False),
-                  ("Dari Anime", '\n'.join(f"{str(result['animeography'][i]['name'])} : {str(result['animeography'][i]['role'])} " for i in range(len(result['animeography']))), False),
-                  ("Dari Manga", '\n'.join(f"{str(result['mangaography'][i]['name'])} : {str(result['mangaography'][i]['role'])} " for i in range(len(result['mangaography']))), False ),
-                  ("Seiyuu", '\n'.join(f"{str(result['voice_actors'][i]['name'])} : {str(result['voice_actors'][i]['language'])} " for i in range(len(result['voice_actors']))), False ),
-                  ("Detail Karakter", "".join(str(result['about']).split("\\n")), False )]
-        for name, value, inline in fields:
-            embed.add_field(name=name, value=value, inline=inline)
-        embed.set_image(url=result['image_url'])
-        
-        await ctx.send(embed=embed)
+
+            fields = [("Menjadi Pujaan", f"{str(result['member_favorites'])} orang", False),
+                    ("Dari Anime", '\n'.join(f"{str(result['animeography'][i]['name'])} : {str(result['animeography'][i]['role'])} " for i in range(len(result['animeography']))), False),
+                    ("Dari Manga", '\n'.join(f"{str(result['mangaography'][i]['name'])} : {str(result['mangaography'][i]['role'])} " for i in range(len(result['mangaography']))), False ),
+                    ("Seiyuu", '\n'.join(f"{str(result['voice_actors'][i]['name'])} : {str(result['voice_actors'][i]['language'])} " for i in range(len(result['voice_actors']))), False ),
+                    ("Detail Karakter", "".join(str(result['about']).split("\\n")), False )]
+            for name, value, inline in fields:
+                embed.add_field(name=name, value=value, inline=inline)
+            embed.set_image(url=result['image_url'])
+            
+            await ctx.send(embed=embed)
+        except APIException:
+            await ctx.send(f"Tidak ditemukan karakter dengan id {chara_id}")
+            
+    @command(name="person")
+    async def person_detail(self, ctx, *, chara_id):
+        def Umur(tanggal):
+            sekarang = date.now()
+            if sekarang.month > tanggal.month:
+                umur = sekarang.year - tanggal.year
+            elif sekarang.month == tanggal.month:
+                if sekarang.day >= tanggal.day:
+                    umur = sekarang.year - tanggal.year
+                elif sekarang.day < tanggal.day:
+                    umur = (sekarang.year - tanggal.year) - 1
+            elif sekarang.month < tanggal.month:
+                umur = (sekarang.year - tanggal.year) - 1
+            return umur
+        chara_id = int(chara_id)
+        try:
+            result = jikan.person(chara_id)
+            embed = Embed(title= result['name'],
+                        description= f"Given Name : {str(result['given_name'])} \n\
+Family Name : {str(result['family_name'])} \n\
+Aliases : {', '.join(str(nama) for nama in result['alternate_names'])} " )
+            
+            mangas = ', '.join(str(manga) for manga in result['published_manga'])
+            if mangas == '':
+                mangas = 'None'
+                
+            
+            fields = [("Menjadi Pujaan", f"{str(result['member_favorites'])} orang", False),
+                    ("Tanggal lahir", str(date.fromisoformat(str(result['birthday'])).strftime("%A, %d %B %Y")), False),
+                    ("Umur", Umur(date.fromisoformat(str(result['birthday']))), False ) ,
+                    ("Karir Seiyuu", '\n'.join(f"{str(result['voice_acting_roles'][i]['anime']['name'])} : {str(result['voice_acting_roles'][i]['character']['name'])} : {str(result['voice_acting_roles'][i]['role'])} " for i in range(min(6,len(result['voice_acting_roles'])))), False),
+                    ("Posisi Staff Anime", '\n'.join(f"{str(result['anime_staff_positions'][i]['anime']['name'])} : {str(result['anime_staff_positions'][i]['position'])} " for i in range(min(6, len(result['anime_staff_positions'])))), False ),
+                    ("Published Manga", str(mangas), False ),
+                    ("Detail Karakter", "".join(str(result['about']).split("\\n")), False )]
+            for name, value, inline in fields:
+                embed.add_field(name=name, value=value, inline=inline)
+            embed.set_image(url=result['image_url'])
+            
+            await ctx.send(embed=embed)
+        except APIException:
+            await ctx.send(f"Tidak ditemukan manusia dengan id {chara_id}")
+            
+    @command(name="anime")
+    async def anime_detail(self, ctx, *, anime_id):
+        anime_id = int(anime_id)
         
         
                 

@@ -14,7 +14,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
 
-system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
+# system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
 
 client = Client()
 intents = Intents.default()
@@ -206,24 +206,50 @@ class Bot(BotBase):
         if not message.author.bot:
             if message.content == '':
                 pass
-            elif ":" == message.content[0] and ":" == message.content[-1]:
-                sa = time()
-                a = []
+            
+            elif "nandeshi" in message.content :
                 total_emojis =  self.guild.emojis + self.comfy.emojis
-                total_emojis_set = set(total_emojis)
-                emoji_name = message.content[1:-1]
-                kum_emoji = emoji_name.split('::')
-                # kumpul_emoji = "".join(kumpula_emoji)
-                # kum_emoji = kumpul_emoji.split(': :')
-                kum_emoji_set = set(kum_emoji)
-                for nama_emoji in kum_emoji_set:
-                    for emoji in total_emojis_set:
-                        if nama_emoji == emoji.name:
-                            a.append(str(emoji))
-                            break
-                            
-                if len(a) >= 1:
-                    print_emoji = "".join(a)
+                await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis))])], weights= [1, 1, 2], k=1)[0])
+                
+            else:
+                await self.process_commands(message)
+            
+            if not message.content == '':
+                l_kata = message.content.split(" ")
+                a = {}
+                for i, kata in enumerate(l_kata):
+                    sa = time()
+                    if ":" == kata[0] and ":" == kata[-1]:
+                        
+                        
+                        total_emojis =  self.guild.emojis + self.comfy.emojis
+                        total_emojis_set = set(total_emojis)
+                        emoji_name = kata[1:-1]
+                        kum_emoji = emoji_name.split('::')
+                        # kumpul_emoji = "".join(kumpula_emoji)
+                        # kum_emoji = kumpul_emoji.split(': :')
+                        kum_emoji_set = set(kum_emoji)
+                        for n, nama_emoji in enumerate(kum_emoji):
+                            for emoji in total_emojis_set:
+                                if nama_emoji.lower() == emoji.name.lower():
+                                    a[f"{nama_emoji}_{i}_{n}"] = str(emoji)
+                                    break
+                                
+                                
+                    else:
+                        a[i] = kata
+                
+                bener = False
+                for key in a.keys():  
+                    if a[key][0] == "<" and a[key][-1] == ">":
+                        bener = True
+                        break
+                if bener is True:
+                    ass = []
+                    for key in a.keys():
+                        ass.append(a[key])
+                        
+                    print_emoji = " ".join(ass)
                     try:
                         await message.delete()
                         await message.channel.send(print_emoji)
@@ -232,12 +258,6 @@ class Bot(BotBase):
                     except NotFound:
                         pass
 
-
-            elif "nandeshi" in message.content :
-                total_emojis =  self.guild.emojis + self.comfy.emojis
-                await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis))])], weights= [1, 1, 2], k=1)[0])
-
-            else:
-                await self.process_commands(message)
+            
 
 bot = Bot()

@@ -204,10 +204,9 @@ class Bot(BotBase):
     async def on_message(self, message):
         
         if not message.author.bot:
-            if message.content == '':
-                pass
             
-            elif "nandeshi" in message.content :
+            
+            if "nandeshi" in message.content :
                 total_emojis =  self.guild.emojis + self.comfy.emojis
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis))])], weights= [1, 1, 2], k=1)[0])
                 
@@ -217,11 +216,12 @@ class Bot(BotBase):
             if not message.content == '':
                 l_kata = message.content.split(" ")
                 a = {}
+                bener = False
                 for i, kata in enumerate(l_kata):
                     sa = time()
                     if ":" == kata[0] and ":" == kata[-1]:
                         
-                        
+                        bener = True
                         total_emojis =  self.guild.emojis + self.comfy.emojis
                         total_emojis_set = set(total_emojis)
                         emoji_name = kata[1:-1]
@@ -238,13 +238,13 @@ class Bot(BotBase):
                                 
                     else:
                         a[i] = kata
-                
-                bener = False
-                for key in a.keys():  
+                salah = False
+                for key in a.keys():
                     if a[key][0] == "<" and a[key][-1] == ">":
-                        bener = True
+                        salah = True
                         break
-                if bener is True:
+                
+                if bener is True and salah is True:
                     ass = []
                     for key in a.keys():
                         ass.append(a[key])

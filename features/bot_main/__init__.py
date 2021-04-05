@@ -14,7 +14,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
 
-# system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
+system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
 
 client = Client()
 intents = Intents.default()

@@ -14,7 +14,8 @@ from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
 
-system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
+# system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
+# system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
 
 client = Client()
 intents = Intents.default()

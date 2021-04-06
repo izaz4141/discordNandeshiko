@@ -1,4 +1,4 @@
-from discord.ext.commands import Cog, CheckFailure, command, has_permissions, has_role
+from discord.ext.commands import Cog, CheckFailure, command, has_permissions, has_role, cooldown, BucketType
 
 from discord import Embed
 
@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from random import randint, choices
 from typing import Optional
 from asyncio import TimeoutError
-from json import loads
+from json import loads, JSONDecodeError, dumps
 from ..db import db
 
 OPTIONS = {
@@ -109,8 +109,16 @@ class Player:
         self.statP = db.record("SELECT StatusPoint FROM exp WHERE UserID = ?", self.identity)[0]
         self.yen = db.record("SELECT Yen FROM exp WHERE UserID = ?", self.identity)[0]
         self.nadeC = db.record("SELECT Nadecoin FROM exp WHERE UserID = ?", self.identity)[0]
-        self.items = loads(db.record("SELECT Items FROM exp WHERE UserID = ?", self.identity)[0])
-        self.charas = loads(db.record("SELECT Charas FROM exp WHERE UserID = ?", self.identity)[0])
+        self.items = db.record("SELECT Items FROM exp WHERE UserID = ?", self.identity)[0]
+        self.charas = db.record("SELECT Charas FROM exp WHERE UserID = ?", self.identity)[0]
+        try:
+            self.charas = loads(self.charas)
+        except JSONDecodeError:
+            self.charas = self.charas.split('"')
+        try:
+            self.items = loads(self.items)
+        except JSONDecodeError:
+            self.items = self.items
         if not m_name is None:
             self.m_name = m_name
         if not d_name is None:
@@ -138,8 +146,11 @@ class Player:
     
     def items_change(self, delta_items:dict):
         for key in delta_items.keys():
-            self.items[key] += delta_items[key]
-        db.execute("UPDATE SET Items = ? FROM exp WHERE UserID = ?", self.items, self.identity)
+            try:
+                self.items[key] += delta_items[key]
+            except KeyError:
+                self.items[key] = delta_items[key]
+        db.execute("UPDATE SET Items = ? FROM exp WHERE UserID = ?", dumps(self.items), self.identity)
         
     def dungeon_treasures(self, ctx, dungeon_place:dict):
         kali = randint(dungeon_place["Treasure_times"][0], dungeon_place["Treasure_times"][1])
@@ -171,12 +182,14 @@ class Player:
         nadeC_lama = db.record("SELECT Nadecoin FROM exp WHERE UserID = ?", ctx.message.author.id)[0]
         nadeC_baru = nadeC_lama + delta_nadeC_akhir
         
-        items_lama = db.record("SELECT Items FROM exp WHERE UserID + ?", ctx.message.author.id)[0]
         for item in delta_items.keys():
-            items_lama[item] += delta_items[item]
+            try:
+                self.items[item] += delta_items[item]
+            except KeyError:
+                self.items[item] = delta_items[item]
         self.yen = yen_baru
         self.nadeC = nadeC_baru
-        self.items = items_lama
+        items_lama = dumps(self.items)
         db.execute("UPDATE exp SET Yen = ?, Nadecoin = ?, Items = ? WHERE UserID = ?", yen_baru, nadeC_baru, items_lama, ctx.message.author.id)
         return self.yen, delta_yen_akhir, self.nadeC, delta_nadeC_akhir, self.items, delta_items
         
@@ -348,6 +361,8 @@ class Game(Cog):
         await ctx.send('\n'.join(d_list))
         
     @command(name="dungeon")
+    @cooldown(3, 60.0, BucketType.user)
+    @has_role("BLANKET")
     async def dungeon_enter(self, ctx, *, nomor):
         def _check(r, u):
             return (
@@ -370,11 +385,11 @@ class Game(Cog):
                 timestamp= datetime.utcnow()
             )
             fields = [
-                ("Yen", f"{p_yen} ```+{de_yen}```"),
-                ("NadeCoin", f"{p_nadeC} ```+{de_nadeC}```")
+                ("Yen", f"{p_yen}   ```+{de_yen}```"),
+                ("NadeCoin", f"{p_nadeC}   ```+{de_nadeC}```")
             ]
             for item in de_items:
-                fields.append(item, f"{p_items[item]} ```+{de_items[item]}```")
+                fields.append((item, f"{p_items[item]}   ```+{de_items[item]}```"))
             
             for name, value in fields:
                 embed.add_field(name=name, value=value, inline=False)
@@ -385,22 +400,23 @@ class Game(Cog):
             
         elif dungeon_event == "Monster":
             dungeon_monster = choices([*dungeon_place["Monster"]])[0]
-            p_hp, p_mp, p_str, p_int, p_dex, p_luck, p_items, p_statP, p_yen, p_nadeC, p_charas = db.record("SELECT HP, MP, Strength, Intelligence, Dexerity, Luck, Items, StatusPoint, Yen, Nadecoin, Charas FROM exp WHERE UserID = ?", ctx.message.author.id)
-            p_id = ctx.message.author.id
-            fight = Fight(Player(ctx.author.id, ctx), Monster(dungeon_monster, dungeon_place, ctx.author.id))
-            global inBattle
-            inBattle[p_id] = True
-            embed = Fight(Player(ctx.author.id, ctx, m_name=dungeon_monster, d_name=dungeon_place_name), Monster(dungeon_monster, dungeon_place, ctx.author.id)).oneVone_Battle(ctx, ctx.message.author.id)
-            msg = await ctx.send(embed=embed)
-            fight.players[ctx.author.id].battle_id = msg.id
-            for emoji in list(OPTIONS.keys()):
-                await msg.add_reaction(emoji)
-            try:
-                await self.bot.wait_for("reaction_add", timeout=300.0, check=_check)
-            except TimeoutError:
-                await ctx.send("Dikarenakan melebihi 5 menit, Pertandingan berakhir")
-                await msg.delete()
-                inBattle[ctx.message.author.id] = False
+            await ctx.send(f"Seekor {dungeon_monster} lewat")
+            # p_hp, p_mp, p_str, p_int, p_dex, p_luck, p_items, p_statP, p_yen, p_nadeC, p_charas = db.record("SELECT HP, MP, Strength, Intelligence, Dexerity, Luck, Items, StatusPoint, Yen, Nadecoin, Charas FROM exp WHERE UserID = ?", ctx.message.author.id)
+            # p_id = ctx.message.author.id
+            # fight = Fight(Player(ctx.author.id, ctx), Monster(dungeon_monster, dungeon_place, ctx.author.id))
+            # global inBattle
+            # inBattle[p_id] = True
+            # embed = Fight(Player(ctx.author.id, ctx, m_name=dungeon_monster, d_name=dungeon_place_name), Monster(dungeon_monster, dungeon_place, ctx.author.id)).oneVone_Battle(ctx, ctx.message.author.id)
+            # msg = await ctx.send(embed=embed)
+            # fight.players[ctx.author.id].battle_id = msg.id
+            # for emoji in list(OPTIONS.keys()):
+            #     await msg.add_reaction(emoji)
+            # try:
+            #     await self.bot.wait_for("reaction_add", timeout=300.0, check=_check)
+            # except TimeoutError:
+            #     await ctx.send("Dikarenakan melebihi 5 menit, Pertandingan berakhir")
+            #     await msg.delete()
+            #     inBattle[ctx.message.author.id] = False
             
                 
 
@@ -411,7 +427,7 @@ class Game(Cog):
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:
-            
+            self.levelup_channel = self.bot.get_channel(823774055134920765)
             self.bot.cogs_ready.ready_up("game")
 
     @Cog.listener()
@@ -419,51 +435,51 @@ class Game(Cog):
         if not message.author.bot:
             await self.process_xp(message)
             
-    @Cog.listener()
-    async def on_reaction_add(self,reaction,user):
-        if user.id in [*inBattle]:
-            if reaction.message.id == Fight.players[user.id].battle_id:
-                def _check(r, u):
-                    return (
-                        r.emoji in OPTIONS.keys()
-                        and u == user
-                        and r.message.id == msg.id
-                    )
-                if reaction.emoji == "⚔️":
-                    p_dmg = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name),user.id).User_Attack(user.id)
-                    p_act = "Menyerang"
+    # @Cog.listener()
+    # async def on_reaction_add(self,reaction,user):
+    #     if user.id in [*inBattle]:
+    #         if reaction.message.id == Fight.players[user.id].battle_id:
+    #             def _check(r, u):
+    #                 return (
+    #                     r.emoji in OPTIONS.keys()
+    #                     and u == user
+    #                     and r.message.id == msg.id
+    #                 )
+    #             if reaction.emoji == "⚔️":
+    #                 p_dmg = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name),user.id).User_Attack(user.id)
+    #                 p_act = "Menyerang"
                 
                     
-                if reaction.emoji == "🛡️":
-                    fight = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name, user.id))
-                    fight.players[user.id].strength = fight.players[user.id].strength * (1.6*(randint(fight.players[user.id].luck, 100)/100))
-                    fight.players[ctx.message.author.id].dexerity = fight.players[user.id].dexerity * (1.4*(randint(fight.players[user.id].luck, 100)/100))
-                    p_act = "Bertahan"
+    #             if reaction.emoji == "🛡️":
+    #                 fight = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name, user.id))
+    #                 fight.players[user.id].strength = fight.players[user.id].strength * (1.6*(randint(fight.players[user.id].luck, 100)/100))
+    #                 fight.players[ctx.message.author.id].dexerity = fight.players[user.id].dexerity * (1.4*(randint(fight.players[user.id].luck, 100)/100))
+    #                 p_act = "Bertahan"
                     
-                e_action = choices(["attack", "defend"])[0]
+    #             e_action = choices(["attack", "defend"])[0]
                 
-                if e_action == "attack":
-                    fight = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name, user.id))
-                    m_dmg = fight.Monster_Attack(user.id)
-                    m_act = "Menyerang"
+    #             if e_action == "attack":
+    #                 fight = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name, user.id))
+    #                 m_dmg = fight.Monster_Attack(user.id)
+    #                 m_act = "Menyerang"
                     
-                if e_action == "defend":
-                    fight = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name, user.id))
-                    fight.monsters[user.id].strength = fight.monsters[user.id].strength * (1.6*(randint(fight.monsters[user.id].luck, 100)/100))
-                    fight.monsters[user.id].dexerity = fight.monsters[user.id].dexerity * (1.4*(randint(fight.monsters[user.id].luck, 100)/100))
-                    m_act = "Bertahan"
+    #             if e_action == "defend":
+    #                 fight = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name, user.id))
+    #                 fight.monsters[user.id].strength = fight.monsters[user.id].strength * (1.6*(randint(fight.monsters[user.id].luck, 100)/100))
+    #                 fight.monsters[user.id].dexerity = fight.monsters[user.id].dexerity * (1.4*(randint(fight.monsters[user.id].luck, 100)/100))
+    #                 m_act = "Bertahan"
                 
-                embed = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name)).Battle_Response(user, p_dmg, m_dmg, p_act, m_act)
+    #             embed = Fight(Player(user.id), Monster(Player(user.id).m_name, Player(user.id).d_name)).Battle_Response(user, p_dmg, m_dmg, p_act, m_act)
                 
-                msg = await reaction.message.edit(embed=embed)
-                for emoji in list(OPTIONS.keys()):
-                    await msg.add_reaction(emoji)
-                try:
-                    await self.bot.wait_for("reaction_add", timeout=300.0, check=_check)
-                except TimeoutError:
-                    await reaction.message.channel.send("Dikarenakan melebihi 5 menit, Pertandingan berakhir")
-                    await msg.delete()
-                    inBattle[user.id] = False
+    #             msg = await reaction.message.edit(embed=embed)
+    #             for emoji in list(OPTIONS.keys()):
+    #                 await msg.add_reaction(emoji)
+    #             try:
+    #                 await self.bot.wait_for("reaction_add", timeout=300.0, check=_check)
+    #             except TimeoutError:
+    #                 await reaction.message.channel.send("Dikarenakan melebihi 5 menit, Pertandingan berakhir")
+    #                 await msg.delete()
+    #                 inBattle[user.id] = False
                 
                 
 

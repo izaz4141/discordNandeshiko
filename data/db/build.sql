@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS exp (
 	Dexerity integer DEFAULT 0,
 	Yen integer DEFAULT 500,
 	Nadecoin integer DEFAULT 0,
-	Items text  "{}",
-	Charas text  "{}"
+	Items text  '{}',
+	Charas text  '{}'
 );
 
 CREATE TABLE IF NOT EXISTS mutes (

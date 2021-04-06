@@ -17,7 +17,7 @@ class Fun(Cog):
 
 
     @command(name="luck")
-    @cooldown(1, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
+    @cooldown(3, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
     async def luck(self, ctx):
         luck = randint(1,100)
         if luck <= 30:
@@ -30,6 +30,7 @@ class Fun(Cog):
             await ctx.send('Enaknyaa~ aku juga pengen laksek... bagi dong ka lucknya!')
         elif luck == 100:
             await ctx.send("(0 o 0 ) Gila beuhh")
+        db.execute("UPDATE exp SET Luck = ? WHERE UserID = ?", luck, ctx.author.id)
             
         
 

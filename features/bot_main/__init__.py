@@ -1,7 +1,7 @@
 from discord import Embed, File, Client, Intents
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import CommandNotFound, Context, BadArgument, MissingRequiredArgument, CommandOnCooldown, when_mentioned_or
-from discord.ext.commands.errors import MissingPermissions, BotMissingPermissions
+from discord.ext.commands.errors import MissingPermissions, MissingRole
 from discord.errors import HTTPException, Forbidden, NotFound
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
@@ -14,8 +14,8 @@ from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
 
-# system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
-# system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
+system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
+system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
 
 client = Client()
 intents = Intents.default()
@@ -156,6 +156,9 @@ class Bot(BotBase):
 
             else:
                 await ctx.send(f"Sabar kak, sedang terjadi {str(exc.cooldown.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after/3600:,.4f} jam.")
+                
+        elif isinstance(exc, MissingRole):
+            await ctx.send(f"Maaf kakak tidak dapat mengakses perintah ini karena belum bergabung dalam **{exc.missing_role}**")
         
         
         elif hasattr(exc, "original"):

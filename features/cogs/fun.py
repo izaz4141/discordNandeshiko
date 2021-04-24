@@ -128,6 +128,9 @@ class PostListK(ListPageSource):
         sauce = post_detail["source"]
         if sauce == "":
             sauce = "Unknown"
+        elif "pximg" in sauce:
+            sauced = sauce.split("/")[-1].split("_")[0]
+            sauce = "https://pixiv.net/artworks/" + str(sauced)
         
         fields = [
             ("Source", sauce),
@@ -171,6 +174,9 @@ class PostListL(ListPageSource):
         sauce = post_detail["source"]
         if sauce == "":
             sauce = "Unknown"
+        elif "pximg" in sauce:
+            sauced = sauce.split("/")[-1].split("_")[0]
+            sauce = "https://pixiv.net/artworks/" + str(sauced)
         
         fields = [
             ("Source", sauce),

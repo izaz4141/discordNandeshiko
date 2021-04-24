@@ -62,13 +62,13 @@ class PostListD(ListPageSource):
         len_data = len(self.entries)
         post_detail = self.entries[menu.current_page]
         try:
-	        embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
-	                    description= post_detail["id"],
-	                    colour=self.ctx.author.colour)
+            embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
+                        description= post_detail["id"],
+                        colour=self.ctx.author.colour)
         except KeyError :
-	    	embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
-	    				description= "No Id",
-	    				colour= self.ctx.author.colour)
+            embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
+                        description= "No Id",
+                        colour= self.ctx.author.colour)
         if not post_detail["pixiv_id"] is None:
             sauce =  "https://pixiv.net/artworks/" + str(post_detail["pixiv_id"])
         else:

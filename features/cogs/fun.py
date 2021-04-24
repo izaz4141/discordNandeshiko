@@ -65,7 +65,7 @@ class PostListD(ListPageSource):
 	        embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
 	                    description= post_detail["id"],
 	                    colour=self.ctx.author.colour)
-	    except KeyError:
+        except KeyError :
 	    	embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
 	    				description= "No Id",
 	    				colour= self.ctx.author.colour)

@@ -61,9 +61,14 @@ class PostListD(ListPageSource):
         offset = (menu.current_page*1) + 1
         len_data = len(self.entries)
         post_detail = self.entries[menu.current_page]
-        embed = Embed(title= post_detail["tag_string_character"],
-                    description= post_detail["id"],
-                    colour=self.ctx.author.colour)
+        try:
+	        embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
+	                    description= post_detail["id"],
+	                    colour=self.ctx.author.colour)
+	    except KeyError:
+	    	embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
+	    				description= "No Id",
+	    				colour= self.ctx.author.colour)
         if not post_detail["pixiv_id"] is None:
             sauce =  "https://pixiv.net/artworks/" + str(post_detail["pixiv_id"])
         else:
@@ -253,6 +258,7 @@ class Fun(Cog):
     @command(name="danbooru")
     async def danbooru_postList(self, ctx, *, tagss):
         tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = tagss.lower()
         hasil_post = dclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
             await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
@@ -306,6 +312,7 @@ class Fun(Cog):
     @command(name= "safebooru")
     async def safebooru_postList(self, ctx, *, tagss):
         tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = tagss.lower()
         hasil_post = sclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
             await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
@@ -358,6 +365,7 @@ class Fun(Cog):
     @command(name= "danboorutaglist", aliases=["dtl"])
     async def danbooru_tagList(self, ctx, *, animek):
         animek = "_".join(animek.split(" "))
+        animek = animek.lower()
         tags_list = dclient.tag_related(query= animek)
         char_list = False
         for key in tags_list["other_wikis"].keys():
@@ -385,6 +393,7 @@ class Fun(Cog):
     @command(name="konachan")
     async def konachan_postList(self, ctx, *, tagss):
         tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = tagss.lower()
         hasil_post = kclient.post_list(tags=tagss, limit= 50)
         if hasil_post == []:
             await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
@@ -397,6 +406,7 @@ class Fun(Cog):
     @command(name="yanbooru")
     async def yandere_postList(self, ctx, *, tagss):
         tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = tagss.lower()
         hasil_post = yclient.post_list(tags=tagss, limit= 50)
         if hasil_post == []:
             await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
@@ -409,6 +419,7 @@ class Fun(Cog):
     @command(name= "lolibooru")
     async def lolibooru_postList(self, ctx, *, tagss):
         tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = tagss.lower()
         hasil_post = lclient.post_list(tags=tagss, limit= 50)
         if hasil_post == []:
             await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")

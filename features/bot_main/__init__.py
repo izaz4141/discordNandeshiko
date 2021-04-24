@@ -14,7 +14,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
 
-system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
+# system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
 
 client = Client()
@@ -223,25 +223,28 @@ class Bot(BotBase):
                 bener = False
                 for i, kata in enumerate(l_kata):
                     sa = time()
-                    if ":" == kata[0] and ":" == kata[-1]:
-                        
-                        bener = True
-                        total_emojis =  self.guild.emojis + self.comfy.emojis
-                        total_emojis_set = set(total_emojis)
-                        emoji_name = kata[1:-1]
-                        kum_emoji = emoji_name.split('::')
-                        # kumpul_emoji = "".join(kumpula_emoji)
-                        # kum_emoji = kumpul_emoji.split(': :')
-                        kum_emoji_set = set(kum_emoji)
-                        for n, nama_emoji in enumerate(kum_emoji):
-                            for emoji in total_emojis_set:
-                                if nama_emoji.lower() == emoji.name.lower():
-                                    a[f"{nama_emoji}_{i}_{n}"] = str(emoji)
-                                    break
-                                
-                                
-                    else:
-                        a[i] = kata
+                    try:
+                        if ":" == kata[0] and ":" == kata[-1]:
+                            
+                            bener = True
+                            total_emojis =  self.guild.emojis + self.comfy.emojis
+                            total_emojis_set = set(total_emojis)
+                            emoji_name = kata[1:-1]
+                            kum_emoji = emoji_name.split('::')
+                            # kumpul_emoji = "".join(kumpula_emoji)
+                            # kum_emoji = kumpul_emoji.split(': :')
+                            kum_emoji_set = set(kum_emoji)
+                            for n, nama_emoji in enumerate(kum_emoji):
+                                for emoji in total_emojis_set:
+                                    if nama_emoji.lower() == emoji.name.lower():
+                                        a[f"{nama_emoji}_{i}_{n}"] = str(emoji)
+                                        break
+                                    
+                                    
+                        else:
+                            a[i] = kata
+                    except IndexError:
+                        pass
                 salah = False
                 for key in a.keys():
                     if a[key][0] == "<" and a[key][-1] == ">":

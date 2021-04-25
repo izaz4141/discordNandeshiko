@@ -21,6 +21,7 @@ class IsiNHenHome(ListPageSource):
         
         fields = [
             ("Bahasa", self.entries[menu.current_page]['language']),
+            ("Jumlah Halaman", self.entries[menu.current_page]["pages"]),
             ("Tags", ', '.join(str(tag) for tag in self.entries[menu.current_page]['tags']))
         ]
         
@@ -93,12 +94,15 @@ class Nhen(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_tags = dojin.data_tags #list
+            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_pages = str(dojin_d.total_pages)
+            dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
+                "pages" : dojin_pages,
                 "image_url" : dojin_cover
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
@@ -117,12 +121,15 @@ class Nhen(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_tags = dojin.data_tags #list
+            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_pages = str(dojin_d.total_pages)
+            dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
+                "pages" : dojin_pages,
                 "image_url" : dojin_cover
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
@@ -141,12 +148,15 @@ class Nhen(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_tags = dojin.data_tags #list
+            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_pages = str(dojin_d.total_pages)
+            dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
+                "pages" : dojin_pages,
                 "image_url" : dojin_cover
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
@@ -165,12 +175,15 @@ class Nhen(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_tags = dojin.data_tags #list
+            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_pages = str(dojin_d.total_pages)
+            dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
+                "pages" : dojin_pages,
                 "image_url" : dojin_cover
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
@@ -179,7 +192,7 @@ class Nhen(Cog):
         await menu.start(ctx)
         
     @command(name="mencarisurga", aliases=["msl"])
-    async def Nhen_searchPT(self, ctx, *, kata_kunci):
+    async def Nhen_searchPL(self, ctx, *, kata_kunci):
         """Mencari surga yang baru saja dibentuk"""
         kamus_hen = {}
         hasil = nhen.search(query=kata_kunci)
@@ -189,12 +202,15 @@ class Nhen(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_tags = dojin.data_tags #list
+            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_pages = str(dojin_d.total_pages)
+            dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
+                "pages" : dojin_pages,
                 "image_url" : dojin_cover
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),

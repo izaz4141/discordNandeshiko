@@ -8,6 +8,7 @@ from aiohttp import request
 from jikanpy import Jikan
 from datetime import datetime
 from pybooru import Danbooru, Moebooru
+from pygelbooru import Gelbooru
 from difflib import get_close_matches
 
 from ..db import db
@@ -17,6 +18,7 @@ sclient = Danbooru("safebooru")
 kclient = Moebooru("konachan")
 yclient = Moebooru("yandere")
 lclient = Moebooru("lolibooru")
+gclient = Gelbooru()
 
 class IsiTagsList(ListPageSource):
     def __init__(self, ctx, data, animek):
@@ -28,7 +30,7 @@ class IsiTagsList(ListPageSource):
     async def write_page(self, menu, fields=[]):
         offset = (menu.current_page*self.per_page) + 1
         len_data = len(self.entries)
-        chara = "\n".join(cr[0] for cr in fields)
+        chara = "\n".join(cr for cr in fields)
         embed = Embed(title=self.animek,
                       description = f"```{chara}```",
                       colour=self.ctx.author.colour)
@@ -47,7 +49,7 @@ class IsiTagsList(ListPageSource):
         
 
         for entry in entries:
-            fields.append((entry, " "))
+            fields.append(entry)
 
         return await self.write_page(menu, fields)
 
@@ -62,11 +64,11 @@ class PostListD(ListPageSource):
         len_data = len(self.entries)
         post_detail = self.entries[menu.current_page]
         try:
-            embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
+            embed = Embed(title= " ".join(f"[{char}]" for char in post_detail["tag_string_character"].split(" ")[:5]),
                         description= post_detail["id"],
                         colour=self.ctx.author.colour)
         except KeyError :
-            embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")),
+            embed = Embed(title= " ".join(f'[{char}]' for char in post_detail["tag_string_character"].split(" ")[:5]),
                         description= "No Id",
                         colour= self.ctx.author.colour)
         if not post_detail["pixiv_id"] is None:
@@ -75,14 +77,14 @@ class PostListD(ListPageSource):
             sauce = post_detail["source"]
             if sauce == "":
                 sauce = "Unknown"
-        try:
-            artis = post_detail["tag_string_artist"]
-        except KeyError:
+        
+        artis = post_detail["tag_string_artist"]
+        if artis == "":
             artis = "Unknown"
         fields = [
             ("Artist", artis),
             ("Source", sauce),
-            ("Tags", " ".join(f'[{tag}]' for tag in post_detail["tag_string_general"].split(" ")[:25]))
+            ("Tags", "```"+" ".join(f'[{tag}]' for tag in post_detail["tag_string_general"].split(" ")[:20])+"```")
         ]
         
         for name, value in fields:
@@ -116,6 +118,38 @@ class PostListD(ListPageSource):
         
         return await self.write_page(menu, fields)
     
+class IsiSearchTag(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=20)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*self.per_page) + 1
+        len_data = len(self.entries)
+        chara = "\n".join(cr for cr in fields)
+        embed = Embed(title="Hasil Search",
+                      description = f"```{chara}```",
+                      colour=self.ctx.author.colour)
+        
+        # for name, value in fields:
+        #     embed.add_field(name=name,value=value,inline=False)
+
+        embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} hasil.")
+
+
+        return embed
+
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        
+
+        for entry in entries:
+            fields.append(entry)
+
+        return await self.write_page(menu, fields)
+    
 class PostListK(ListPageSource):
     def __init__(self, ctx, data):
         self.ctx = ctx
@@ -139,7 +173,7 @@ class PostListK(ListPageSource):
         
         fields = [
             ("Source", sauce),
-            ("Tags", " ".join(f'[{tag}]' for tag in post_detail["tags"].split(" ")[:25]))
+            ("Tags", "```"+" ".join(f'[{tag}]' for tag in post_detail["tags"].split(" ")[:20])+"```")
         ]
         
         for name, value in fields:
@@ -185,7 +219,7 @@ class PostListL(ListPageSource):
         
         fields = [
             ("Source", sauce),
-            ("Tags", " ".join(f'[{tag}]' for tag in post_detail["tags"].split(" ")[:25]))
+            ("Tags", "```"+" ".join(f"[{tag}]" for tag in post_detail["tags"].split(" ")[:20])+"```")
         ]
         
         for name, value in fields:
@@ -193,6 +227,52 @@ class PostListL(ListPageSource):
             
         try:
             embed.set_image(url=post_detail["preview_url"])
+        except KeyError:
+            pass
+        embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
+
+        # for name, value in fields:
+        #     embed.add_field(name=name, value=value, inline=False)
+
+        return embed
+
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        
+        return await self.write_page(menu, fields)
+    
+class PostListG(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=1)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*1) + 1
+        len_data = len(self.entries)
+        post_detail = self.entries[menu.current_page]
+        embed = Embed(title= post_detail.id,
+                    description= f"({post_detail.width}X{post_detail.height})",
+                    colour=self.ctx.author.colour)
+        
+        sauce = post_detail.source
+        if sauce is None:
+            sauce = "Unknown"
+        elif "pximg" in sauce:
+            sauced = sauce.split("/")[-1].split("_")[0]
+            sauce = "https://pixiv.net/artworks/" + str(sauced)
+        
+        fields = [
+            ("Source", sauce),
+            ("Tags", "```"+" ".join(f"[{tag}]" for tag in post_detail.tags[:20])+"```")
+        ]
+        
+        for name, value in fields:
+            embed.add_field(name=name, value=value, inline=False)
+            
+        try:
+            embed.set_image(url=post_detail.file_url)
         except KeyError:
             pass
         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
@@ -257,7 +337,7 @@ class Fun(Cog):
 
     @command(name="danbooru")
     async def danbooru_postList(self, ctx, *, tagss):
-        tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = " ".join("_".join(tagss.split(" ")).split("^"))
         tagss = tagss.lower()
         hasil_post = dclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
@@ -311,7 +391,7 @@ class Fun(Cog):
             
     @command(name= "safebooru")
     async def safebooru_postList(self, ctx, *, tagss):
-        tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = " ".join("_".join(tagss.split(" ")).split("^"))
         tagss = tagss.lower()
         hasil_post = sclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
@@ -392,7 +472,7 @@ class Fun(Cog):
 
     @command(name="konachan")
     async def konachan_postList(self, ctx, *, tagss):
-        tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = " ".join("_".join(tagss.split(" ")).split("^"))
         tagss = tagss.lower()
         hasil_post = kclient.post_list(tags=tagss, limit= 50)
         if hasil_post == []:
@@ -405,7 +485,7 @@ class Fun(Cog):
             
     @command(name="yanbooru")
     async def yandere_postList(self, ctx, *, tagss):
-        tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = " ".join("_".join(tagss.split(" ")).split("^"))
         tagss = tagss.lower()
         hasil_post = yclient.post_list(tags=tagss, limit= 50)
         if hasil_post == []:
@@ -418,7 +498,7 @@ class Fun(Cog):
             
     @command(name= "lolibooru")
     async def lolibooru_postList(self, ctx, *, tagss):
-        tagss = " ".join("_".join(tagss.split(" ")).split("+"))
+        tagss = " ".join("_".join(tagss.split(" ")).split("^"))
         tagss = tagss.lower()
         hasil_post = lclient.post_list(tags=tagss, limit= 50)
         if hasil_post == []:
@@ -428,6 +508,59 @@ class Fun(Cog):
                              clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
             await menu.start(ctx)
+            
+    @command(name = "gelbooru")
+    async def gelbooru_postList(self, ctx, *, tagss):
+        """['///' untuk exclude tags] ['::' untuk halaman]"""
+        tagss = tagss.lower()
+        if "///" in tagss:
+            if "::" in tagss:
+                quary = "_".join(tagss.split(" ")).split("///")[0].split("^")
+                exclude = "_".join(tagss.split(" ")).split("///")[1].split("::")[0].split("^")
+                try:
+                    pagee = int("_".join(tagss.split(" ")).split("///")[1].split("::")[1])
+                    hasil_post = await gclient.search_posts(tags= quary, exclude_tags= exclude, limit =1000, page= pagee)
+                    
+                except ValueError:
+                    await ctx.send("Halaman yang kakak masukkan harus berupa bilangan bulat")
+            else:
+                quary = "_".join(tagss.split(" ")).split("///")[0].split("^")
+                exclude = "_".join(tagss.split(" ")).split("///")[1].split("^")
+                hasil_post = await gclient.search_posts(tags= quary, exclude_tags= exclude, limit =1000)
+                
+        else:
+            if "::" in tagss:
+                quary = "_".join(tagss.split(" ")).split("::")[0].split("^")
+                try:
+                    pagee = int("_".join(tagss.split(" ")).split("::")[1])
+                    hasil_post = await gclient.search_posts(tags= quary, limit =1000, page= pagee)
+                    
+                except ValueError:
+                    await ctx.send("Halaman yang kakak masukkan harus berupa bilangan bulat")
+            else:
+                quary = "_".join(tagss.split(" ")).split("^")
+                hasil_post = await gclient.search_posts(tags= quary, limit =1000)
+                
+        if hasil_post == []:
+            await ctx.send(f"Post dengan tag {str(quary)} tidak ditemukan")
+        if not hasil_post == []:
+            menu = MenuPages(source=PostListG(ctx, hasil_post),
+                            clear_reactions_after=True,
+                            timeout=60.0)# bisa ditambah clear_reaction_after=True
+            await menu.start(ctx)
+            
+    @command(name="tagsearch", aliases=["ts"])
+    async def gelbooru_tagSearch(self, ctx, *, term):
+        term = term.lower
+        charlist = []
+        hasil_search = await gclient.tag_list(name_pattern= "%" + term + "%")
+        for i, char in enumerate(hasil_search):
+            charlist.append(f"{i+1:3d}  {char}")
+        menu = MenuPages(source=IsiSearchTag(ctx, charlist),
+                        clear_reactions_after=True,
+                        timeout=60.0)# bisa ditambah clear_reaction_after=True
+        await menu.start(ctx)
+        
 
     @Cog.listener()
     async def on_ready(self):

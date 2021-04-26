@@ -107,10 +107,12 @@ class Help(Cog):
         self.bot = bot
         for ccom in self.bot.commands:
             if ccom.name == "help":
-                if not ccom.aliases[0] == "helps":
-                    self.bot.remove_command("help")
-                    break
-        
+                try:
+                    if not ccom.aliases[0] == "helps":
+                        self.bot.remove_command("help")
+                        break
+                except IndexError:
+                     self.bot.remove_command("help")
 
     async def cmd_help(self, ctx, command):
         embed = Embed(title=f"Help with `{command}`",

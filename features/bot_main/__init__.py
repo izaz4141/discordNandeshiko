@@ -64,6 +64,7 @@ class Bot(BotBase):
         super().__init__(command_prefix=get_prefix, owner_ids=OWNER_IDS, intents=intents)
     
     def setup(self):
+        self.remove_command("help")
         for cog in COGS:
             cog = cog.split("/")[-1]
             self.load_extension(f"features.cogs.{cog}")

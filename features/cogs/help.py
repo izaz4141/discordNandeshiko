@@ -105,6 +105,11 @@ class HelpCogMenu(ListPageSource):
 class Help(Cog):
     def __init__(self, bot):
         self.bot = bot
+        for ccom in self.bot.commands:
+            if ccom.name == "help":
+                if not ccom.aliases[0] == "helps":
+                    self.bot.remove_command("help")
+                    break
         
 
     async def cmd_help(self, ctx, command):
@@ -126,7 +131,7 @@ class Help(Cog):
                              timeout=60.0)# bisa ditambah clear_reaction_after=True
         await menu.start(ctx)
 
-    @command(name="help")
+    @command(name="help", aliases= ["helps"])
     async def show_help(self, ctx, cmd: Optional[str]):
         """Menu help untuk semua perintah (tanpa argumen), cog, perintah individu
 

@@ -106,12 +106,10 @@ class Bot(BotBase):
         try:
         # with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
             # self.TOKEN = tf.read() 
-            self.TOKEN = environ['DIS_TOKEN']
+            self.TOKEN = environ['DISCORD_TOKEN']
         except Exception:
             with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
                 self.TOKEN = tf.read()
-        except FileNotFoundError:
-            self.TOKEN = environ['DISCORD_TOKEN']
 
         print("running bot...")
         super().run(self.TOKEN, reconnect=True)

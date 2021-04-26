@@ -7,7 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 from time import time
 from glob import glob
-from os import system
+from os import system, environ
 from random import choices, randint
 from asyncio import sleep
 from apscheduler.triggers.cron import CronTrigger
@@ -104,8 +104,9 @@ class Bot(BotBase):
         print("running setup")
         self.setup()
 
-        with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
-            self.TOKEN = tf.read()
+        # with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
+            # self.TOKEN = tf.read()
+        self.TOKEN = environ['DISCORD-TOKEN']
 
         print("running bot...")
         super().run(self.TOKEN, reconnect=True)

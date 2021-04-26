@@ -13,10 +13,12 @@ from asyncio import sleep
 from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
-from ..cogs.help import Help
+
 
 system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
 system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
+
+from ..cogs.help import Help
 
 client = Client()
 intents = Intents.default()

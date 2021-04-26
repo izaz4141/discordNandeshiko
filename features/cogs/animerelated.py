@@ -385,7 +385,7 @@ class AnimeRelated(Cog):
     
     @command(name="season", aliases=["s"])
     async def season_search(self, ctx, *, musim_tahun: Optional[str]=None):
-        """Harus berupa musim *spasi* tahun\nKategori musim : spring, summer, fall, winter.\nContoh: +ss fall 2020"""
+        """Harus berupa musim *spasi* tahun\nKategori musim : spring, summer, fall, winter.\nContoh: +s fall 2020"""
         musim_tahun = str(musim_tahun).split(" ")
         musim = musim_tahun[0].lower()
         if musim == "gugur":

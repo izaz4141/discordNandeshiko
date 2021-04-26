@@ -13,6 +13,7 @@ from asyncio import sleep
 from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
+from ..cogs.help import Help
 
 system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
@@ -67,8 +68,8 @@ class Bot(BotBase):
             print(f" {cog} cog loaded")
             
     def update_github(self):
-        system('git add . && git commit -m "Add existing file"')
-        system('git push origin')
+        system('git add . && git commit -am "pre-heroku"')
+        system('git push heroku master')
 
     def update_db(self):
         db.multiexec("INSERT OR IGNORE INTO guilds (GuildID) VALUES (?)", ((guild.id,) for guild in self.guilds))
@@ -140,7 +141,10 @@ class Bot(BotBase):
         if any([isinstance(exc, error) for error in IGNORE_EXCEPTION]):
             pass
         elif isinstance(exc, MissingRequiredArgument):
+            
+            
             await ctx.send("Perintahnya tidak lengkap kak")
+            await Help(self).cmd_help(ctx, ctx.command)
         
         elif isinstance(exc, MissingPermissions):
             await ctx.send("Kamu siapa? kamu bukan temenku!!")
@@ -179,7 +183,7 @@ class Bot(BotBase):
             self.total_emojiss = []
             for g in self.guilds:
                 self.total_emojiss += g.emojis
-            # self.scheculer.add_job(self.update_github, CronTrigger(minute= 19 or 39 or 59))
+            self.scheculer.add_job(self.update_github, CronTrigger(minute= 19 or 39 or 59))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():
@@ -210,7 +214,6 @@ class Bot(BotBase):
         
         if not message.author.bot:
             
-            
             if "nandeshi" in message.content :
                 total_emojis = self.total_emojiss
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis))])], weights= [1, 1, 2], k=1)[0])
@@ -223,7 +226,7 @@ class Bot(BotBase):
                 a = {}
                 bener = False
                 for i, kata in enumerate(l_kata):
-                    sa = time()
+                    # sa = time()
                     try:
                         if ":" == kata[0] and ":" == kata[-1]:
                             
@@ -261,7 +264,7 @@ class Bot(BotBase):
                     try:
                         await message.delete()
                         await message.channel.send(print_emoji)
-                        print(f"{time()-sa}")
+                        # print(f"{time()-sa}")
 
                     except NotFound:
                         pass

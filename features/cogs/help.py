@@ -105,7 +105,7 @@ class HelpCogMenu(ListPageSource):
 class Help(Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot.remove_command("help")
+        
 
     async def cmd_help(self, ctx, command):
         embed = Embed(title=f"Help with `{command}`",

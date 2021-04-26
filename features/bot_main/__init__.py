@@ -105,7 +105,7 @@ class Bot(BotBase):
         self.setup()
 
         # with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
-            # self.TOKEN = tf.read()
+            # self.TOKEN = tf.read() 
         self.TOKEN = environ['DISCORD-TOKEN']
 
         print("running bot...")

@@ -185,7 +185,6 @@ class Bot(BotBase):
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)
             self.total_emojiss = []
-            self.remove_command("help")
             for g in self.guilds:
                 self.total_emojiss += g.emojis
             self.scheculer.add_job(self.update_github, CronTrigger(minute= 19 or 39 or 59))

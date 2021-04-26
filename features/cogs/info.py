@@ -66,6 +66,7 @@ class Info(Cog):
 
     @command(name="serverinfo", aliases=["guildinfo", "si", "gi"])
     async def server_info(self, ctx):
+        """Menampilkan info server"""
         embed = Embed(title="Server information",
                       colour=ctx.guild.owner.colour,
                       timestamp=datetime.utcnow())

@@ -14,7 +14,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
 
-system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
+# system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
 
 client = Client()
@@ -27,8 +27,6 @@ COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
 
 def remove_items(test_list, item):
-      
-
     # using list comprehension to perform the tast for n in item:
 
     res = [i for i in set(test_list) if i != item]
@@ -178,6 +176,9 @@ class Bot(BotBase):
             self.guild = self.get_guild(605057520955818010) #KALAU HANYA SATU SERVER
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)
+            self.total_emojiss = []
+            for g in self.guilds:
+                self.total_emojiss += g.emojis
             # self.scheculer.add_job(self.update_github, CronTrigger(minute= 19 or 39 or 59))
             self.scheculer.start()
             self.update_db()
@@ -211,7 +212,7 @@ class Bot(BotBase):
             
             
             if "nandeshi" in message.content :
-                total_emojis =  self.guild.emojis + self.comfy.emojis
+                total_emojis = self.total_emojiss
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis))])], weights= [1, 1, 2], k=1)[0])
                 
             else:
@@ -227,13 +228,13 @@ class Bot(BotBase):
                         if ":" == kata[0] and ":" == kata[-1]:
                             
                             bener = True
-                            total_emojis =  self.guild.emojis + self.comfy.emojis
+                            total_emojis =  self.total_emojiss
                             total_emojis_set = set(total_emojis)
                             emoji_name = kata[1:-1]
                             kum_emoji = emoji_name.split('::')
                             # kumpul_emoji = "".join(kumpula_emoji)
                             # kum_emoji = kumpul_emoji.split(': :')
-                            kum_emoji_set = set(kum_emoji)
+                            # kum_emoji_set = set(kum_emoji)
                             for n, nama_emoji in enumerate(kum_emoji):
                                 for emoji in total_emojis_set:
                                     if nama_emoji.lower() == emoji.name.lower():

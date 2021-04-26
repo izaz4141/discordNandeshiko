@@ -9,6 +9,11 @@ class Misc(Cog):
     @command(name="prefix")
     @has_permissions(manage_guild=True)
     async def change_prefix(self, ctx, new:str):
+        """Mengganti prefix server (default= **+**)
+        
+        Contoh:
+        ```prefix %```
+        """
         if len(new) > 5:
             await ctx.send("Prefixnya terlalu panjang")
 

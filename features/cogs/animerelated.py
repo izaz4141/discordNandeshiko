@@ -155,7 +155,7 @@ Id : {str(self.entries[menu.current_page]['mal_id'])} ",
     async def format_page(self, menu, entries):
         fields = []
         
-        chara_id = str(self.entries[menu.current_page]['mal_id'])
+        # chara_id = str(self.entries[menu.current_page]['mal_id'])
 
         
         # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
@@ -307,7 +307,7 @@ class IsiAnimeSearch(ListPageSource):
 
         return await self.write_page(menu, fields)
 
-class AnimeSearch(Cog):
+class AnimeRelated(Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -411,7 +411,23 @@ class AnimeSearch(Cog):
         
     @command(name="jadwalanime", aliases=["ja"])
     async def jadwal_anime(self, ctx, *, hari:Optional[str]= date.today().strftime("%A")):
+        """Mencari anime yang tayang pada hari yang dilampirkan (default= hari ini)"""
         hari_ = hari.lower()
+        if hari_ == "senin":
+            hari_ = "monday"
+        elif hari_ == "selasa":
+            hari_ = "tuesday"
+        elif hari_ == "rabu":
+            hari_ = "wednesday"
+        elif hari_ == "kamis":
+            hari_ = "thursday"
+        elif hari_ == "jumat" or hari_ == "jum'at" or hari_ == "jum at":
+            hari_ = "friday"
+        elif hari_ == "sabtu":
+            hari_ = "saturday"
+        elif hari_ == "minggu" or hari_ == "ahad":
+            hari_ = "sunday"
+        
         try:
             result = jikan.schedule(day= hari_)
             list_anime = result[f"{hari_}"]
@@ -424,6 +440,7 @@ class AnimeSearch(Cog):
         
     @command(name="charasearch", aliases=["cs"])
     async def chara_search(self, ctx, *, chara):
+        """Mencari character dengan kata kunci"""
     
         chara = str(chara)
         try:
@@ -440,6 +457,7 @@ class AnimeSearch(Cog):
             
     @command(name="personsearch", aliases=["ps"])
     async def seiyuu_search(self, ctx, *, person_name):
+        """Mencari orang (seiyuu dkk) dengan kata kunci"""
         person_name = str(person_name)
         try:
             result = jikan.search("person", person_name, page=1)
@@ -461,6 +479,7 @@ class AnimeSearch(Cog):
         
     @command(name="mangasearch", aliases=["ms"])
     async def manga_search(self, ctx, *, manga):
+        """Mencari manga dengan kata kunci"""
         
         result = jikan.search("manga", f"{manga}", page=1)
         list_manga = result["results"]
@@ -471,6 +490,7 @@ class AnimeSearch(Cog):
         
     @command(name="character")
     async def character_detail(self, ctx, *, chara_id):
+        """Mengambil info character dengan Character Id"""
         chara_id = int(chara_id)
         try:
             result = jikan.character(chara_id)
@@ -506,6 +526,7 @@ Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} ",
             
     @command(name="person")
     async def person_detail(self, ctx, *, chara_id):
+        """Mengambil info orang dengan Id"""
         def Umur(tanggal):
             sekarang = date.now()
             if tanggal is None:
@@ -569,6 +590,7 @@ Aliases : {', '.join(str(nama) for nama in result['alternate_names'])} " ,
             
     @command(name="anime")
     async def anime_detail(self, ctx, *, anime_id):
+        """Mengambil info anime dengan Anime Id"""
         anime_id = int(anime_id)
         try:
             result = jikan.anime(anime_id)
@@ -642,6 +664,7 @@ Durasi Episode : {str(result['duration'])}",
             
     @command(name="manga")
     async def manga_detail(self, ctx, *, manga_id):
+        """Mengambil info manga dengan Manga Id"""
         manga_id = int(manga_id)
         try:
             result = jikan.manga(manga_id)
@@ -675,7 +698,7 @@ Chapter : {str(result['chapters'])} ",
                 other = 'None'
             authors = '\n'.join(str(result['authors'][i]['name']) for i in range(len(result['authors'])))
             if authors == '':
-                producers = 'None'
+                authors = 'None'
             serializations = '\n'.join(f"{result['serializations'][i]['type']} : {result['serializations'][i]['name']}" for i in range(len(result['serializations'])))
             if serializations == '':
                 serializations = 'None'
@@ -758,7 +781,7 @@ Chapter : {str(result['chapters'])} ",
 
     @Cog.listener()
     async def on_ready(self):
-        self.bot.cogs_ready.ready_up("animesearch")
+        self.bot.cogs_ready.ready_up("animerelated")
 
 def setup(bot):
-    bot.add_cog(AnimeSearch(bot))
+    bot.add_cog(AnimeRelated(bot))

@@ -220,6 +220,7 @@ class Nhen(Cog):
         
     @command(name="infosurga", aliases=["is"])
     async def Doujin_Info(self, ctx, *, doujin_id):
+        """Melihat ingfo surga dengan kode tertentu"""
         dojin = nhen._get_doujin(doujin_id)
         dojin_id = dojin.id
         dojin_title = dojin.title
@@ -264,6 +265,7 @@ class Nhen(Cog):
         
     @command(name="infosurgarandom", aliases=["isr"])
     async def Doujin_Info_Random(self, ctx):
+        """Melihat ingfo surga yang belum dijelajahi sebelumnya"""
         dojin = nhen.get_random()
         dojin_id = dojin.id
         dojin_title = dojin.title
@@ -308,6 +310,7 @@ class Nhen(Cog):
         
     @command(name="bacakitab", aliases=["bk"])
     async def Baca_Doujin(self, ctx, *, rahasia_dunia):
+        """Mengintip Pintu Surga Menuju Kenikmatan Tak Terbatas (ada passwordnya)"""
         dojin = nhen._get_doujin(rahasia_dunia)
         dojin_imgs = dojin.images
         menu = MenuPages(source=IsiSurga(ctx, dojin_imgs),

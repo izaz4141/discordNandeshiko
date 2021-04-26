@@ -172,6 +172,34 @@ class Help(Cog):
                             break
                 if benar is False:
                     await ctx.send("Nandeshiko belum bisa melakukan perintah itu")
+    @command(name="about")
+    async def about_bot(self,ctx):
+        """Segalanya Tentang Nandeshikyot-bot!"""
+        embed = Embed(
+            title= "About Nandeshikyot-bot",
+            description = f"Dibuat Oleh: {self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}",
+            colour= ctx.author.colour
+        )
+        fields = [
+            ("Invite Link", "https://bit.ly/3sTBi5K")
+        ]
+        embed.set_author(icon_url=self.bot.get_user(self.bot.owner_ids[0]).avatar_url, name= f"{self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}")
+        embed.set_thumbnail(url=ctx.guild.me.avatar_url)
+        for name, value in fields:
+            embed.add_field(name=name, value=value)
+        await ctx.send(embed=embed)
+        
+    @command(name="invite", aliases= ["invitelink"])
+    async def invite_link(self,ctx):
+        """Menunjukkan link untuk mengundang Nandeshikyot-bot"""
+        embed = Embed(
+            title= "Invite Link",
+            description= "https://bit.ly/3sTBi5K",
+            colour = ctx.author.colour
+        )
+        embed.set_author(icon_url=self.bot.get_user(self.bot.owner_ids[0]).avatar_url, name= f"{self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}")
+        embed.set_thumbnail(url=ctx.guild.me.avatar_url)
+        await ctx.send(embed=embed)
 
 
 

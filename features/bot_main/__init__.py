@@ -103,13 +103,9 @@ class Bot(BotBase):
 
         print("running setup")
         self.setup()
-        try:
-        # with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
-            # self.TOKEN = tf.read() 
-            self.TOKEN = environ['DISCORD_TOKEN']
-        except Exception:
-            with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
-                self.TOKEN = tf.read()
+        
+        with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
+            self.TOKEN = tf.read()
 
         print("running bot...")
         super().run(self.TOKEN, reconnect=True)

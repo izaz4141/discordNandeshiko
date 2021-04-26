@@ -1,0 +1,6 @@
+- name: heroku
+  env:
+      DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+  run: |
+    nbdev_test_nbs
+    python launcher.py

@@ -16,7 +16,7 @@ from ..db import db
 from ..cogs.help import Help
 
 system("python -m pip install -U git+https://github.com/Rapptz/discord-ext-menus")
-# system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
+system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
 
 client = Client()
 intents = Intents.default()
@@ -68,6 +68,7 @@ class Bot(BotBase):
             print(f" {cog} cog loaded")
             
     def update_github(self):
+        system('git pull origin master')
         system('git add . && git commit -am "pre-heroku"')
         system('git push heroku master')
 

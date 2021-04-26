@@ -1,5 +1,5 @@
 - name: discord-token
   env:
-      DISCORD-TOKEN: ${{ secrets.token }}
+      DIS_TOKEN: ${{ secrets.DISCORD_TOKEN }}
   run: |
     nbdev_test_nbs

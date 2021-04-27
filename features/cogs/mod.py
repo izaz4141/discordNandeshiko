@@ -36,6 +36,7 @@ class BannedUser(Converter):
 class Mod(Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.log_channel = self.bot.get_channel(823774055134920765)
 
        
 
@@ -118,7 +119,7 @@ class Mod(Cog):
     @has_permissions(ban_members=True)
     async def unban_command(self, ctx, targets: Greedy[BannedUser], *, reason: Optional[str] = "No reason provided."):
         if not len(targets):
-            await ctx.send("Siapa kamu nyuruh - nyuruh?")
+            await ctx.send("? Siapa?")
 
         else:
             for target in targets:

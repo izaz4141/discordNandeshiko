@@ -9,7 +9,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 from time import time
 from glob import glob
-from os import system, environ
 from random import choices, randint
 from asyncio import sleep
 from apscheduler.triggers.cron import CronTrigger

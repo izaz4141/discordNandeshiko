@@ -169,7 +169,7 @@ class Bot(BotBase):
             await Help(self).cmd_help(ctx, ctx.command)
         
         elif isinstance(exc, MissingPermissions):
-            await ctx.send("Kamu siapa? kamu bukan temenku!!")
+            await ctx.send("Kamu siapa? kamu bukan temanku!!")
 
         elif isinstance(exc, CommandOnCooldown):
             if exc.retry_after < 60:
@@ -188,13 +188,11 @@ class Bot(BotBase):
         elif hasattr(exc, "original"):
             if isinstance(exc.original, HTTPException):
                 await ctx.send("Perasaanku tidak dapat disampaikan dengan kata - kata")
+                raise exc.original
             elif isinstance(exc.original, Forbidden):
                 await ctx.send("Tidak memiliki authoritas")
             elif isinstance(exc.original, SSLError):
-                if isinstance(exc.original.args[0], MaxRetryError):
-                    await ctx.send("Terdapat masalah pada koneksi")
-                else:
-                    raise exc.original
+                print(f"Halaman yang diakses {ctx.author.name} terblokir (coba pakai vpn)")
                 
             else:
                 raise exc.original

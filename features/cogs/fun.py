@@ -15,43 +15,43 @@ from ..db import db
 
 dclient = Danbooru("danbooru")
 sclient = Danbooru("safebooru")
-kclient = Moebooru("konachan")
-yclient = Moebooru("yandere")
-lclient = Moebooru("lolibooru")
+# kclient = Moebooru("konachan")
+# yclient = Moebooru("yandere")
+# lclient = Moebooru("lolibooru")
 gclient = Gelbooru()
 
-class IsiTagsList(ListPageSource):
-    def __init__(self, ctx, data, animek):
-        self.ctx = ctx
-        self.animek = animek
+# class IsiTagsList(ListPageSource):
+#     def __init__(self, ctx, data, animek):
+#         self.ctx = ctx
+#         self.animek = animek
 
-        super().__init__(data, per_page=20)
+#         super().__init__(data, per_page=20)
 
-    async def write_page(self, menu, fields=[]):
-        offset = (menu.current_page*self.per_page) + 1
-        len_data = len(self.entries)
-        chara = "\n".join(cr for cr in fields)
-        embed = Embed(title=self.animek,
-                      description = f"```{chara}```",
-                      colour=self.ctx.author.colour)
+#     async def write_page(self, menu, fields=[]):
+#         offset = (menu.current_page*self.per_page) + 1
+#         len_data = len(self.entries)
+#         chara = "\n".join(cr for cr in fields)
+#         embed = Embed(title=self.animek,
+#                       description = f"```{chara}```",
+#                       colour=self.ctx.author.colour)
         
-        # for name, value in fields:
-        #     embed.add_field(name=name,value=value,inline=False)
+#         # for name, value in fields:
+#         #     embed.add_field(name=name,value=value,inline=False)
 
-        embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} hasil.")
+#         embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} hasil.")
 
 
-        return embed
+#         return embed
 
-    async def format_page(self, menu, entries):
-        fields = []
+#     async def format_page(self, menu, entries):
+#         fields = []
         
         
 
-        for entry in entries:
-            fields.append(entry)
+#         for entry in entries:
+#             fields.append(entry)
 
-        return await self.write_page(menu, fields)
+#         return await self.write_page(menu, fields)
 
 class PostListD(ListPageSource):
     def __init__(self, ctx, data):
@@ -90,6 +90,7 @@ class PostListD(ListPageSource):
         for name, value in fields:
             embed.add_field(name=name, value=value, inline=False)
         img_format = ["jpg", "png", "gif", "jpeg"]
+        vid_format = ["webm", "mp4", "mkv"]
         try:
             imag = False
             for forma in img_format:
@@ -100,11 +101,25 @@ class PostListD(ListPageSource):
                     
             if imag is False:
                 embed.set_image(url=post_detail["preview_file_url"])
+            
+        
+                    
         except KeyError:
-            if not sauce == "Unknown":
-                for forma in img_format:
-                    if forma in post_detail["source"][-5:]:
-                        embed.set_image(url=post_detail["source"])
+            pass
+        
+        try:
+            for forma in vid_format:
+                large_fu = post_detail["large_file_url"][len(post_detail["large_file_url"])-7:]
+                if forma in post_detail["file_ext"]:
+                    embed.add_field(name="Video", value= post_detail["file_url"], inline=False)
+                
+                elif forma in large_fu:
+                    embed.add_field(name="Video", value= post_detail["large_file_url"], inline=False)
+        except KeyError:
+            pass
+            
+        
+        
         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
 
         # for name, value in fields:
@@ -151,97 +166,97 @@ class IsiSearchTag(ListPageSource):
 
         return await self.write_page(menu, fields)
     
-class PostListK(ListPageSource):
-    def __init__(self, ctx, data):
-        self.ctx = ctx
+# class PostListK(ListPageSource):
+#     def __init__(self, ctx, data):
+#         self.ctx = ctx
 
-        super().__init__(data, per_page=1)
+#         super().__init__(data, per_page=1)
 
-    async def write_page(self, menu, fields=[]):
-        offset = (menu.current_page*1) + 1
-        len_data = len(self.entries)
-        post_detail = self.entries[menu.current_page]
-        embed = Embed(title= post_detail["author"],
-                    description= f"({post_detail['width']}X{post_detail['height']})",
-                    colour=self.ctx.author.colour)
+#     async def write_page(self, menu, fields=[]):
+#         offset = (menu.current_page*1) + 1
+#         len_data = len(self.entries)
+#         post_detail = self.entries[menu.current_page]
+#         embed = Embed(title= post_detail["author"],
+#                     description= f"({post_detail['width']}X{post_detail['height']})",
+#                     colour=self.ctx.author.colour)
         
-        sauce = post_detail["source"]
-        if sauce == "":
-            sauce = "Unknown"
-        elif "pximg" in sauce:
-            sauced = sauce.split("/")[-1].split("_")[0]
-            sauce = "https://pixiv.net/artworks/" + str(sauced)
+#         sauce = post_detail["source"]
+#         if sauce == "":
+#             sauce = "Unknown"
+#         elif "pximg" in sauce:
+#             sauced = sauce.split("/")[-1].split("_")[0]
+#             sauce = "https://pixiv.net/artworks/" + str(sauced)
         
-        fields = [
-            ("Source", sauce),
-            ("Tags", "```"+" ".join(f'[{tag}]' for tag in post_detail["tags"].split(" ")[:20])+"```")
-        ]
+#         fields = [
+#             ("Source", sauce),
+#             ("Tags", "```"+" ".join(f'[{tag}]' for tag in post_detail["tags"].split(" ")[:20])+"```")
+#         ]
         
-        for name, value in fields:
-            embed.add_field(name=name, value=value, inline=False)
+#         for name, value in fields:
+#             embed.add_field(name=name, value=value, inline=False)
             
-        try:
-            embed.set_image(url=post_detail["jpeg_url"])
-        except KeyError:
-            pass
-        embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
+#         try:
+#             embed.set_image(url=post_detail["jpeg_url"])
+#         except KeyError:
+#             pass
+#         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
 
-        # for name, value in fields:
-        #     embed.add_field(name=name, value=value, inline=False)
+#         # for name, value in fields:
+#         #     embed.add_field(name=name, value=value, inline=False)
 
-        return embed
+#         return embed
 
-    async def format_page(self, menu, entries):
-        fields = []
+#     async def format_page(self, menu, entries):
+#         fields = []
         
         
-        return await self.write_page(menu, fields)
+#         return await self.write_page(menu, fields)
     
-class PostListL(ListPageSource):
-    def __init__(self, ctx, data):
-        self.ctx = ctx
+# class PostListL(ListPageSource):
+#     def __init__(self, ctx, data):
+#         self.ctx = ctx
 
-        super().__init__(data, per_page=1)
+#         super().__init__(data, per_page=1)
 
-    async def write_page(self, menu, fields=[]):
-        offset = (menu.current_page*1) + 1
-        len_data = len(self.entries)
-        post_detail = self.entries[menu.current_page]
-        embed = Embed(title= post_detail["author"],
-                    description= f"({post_detail['width']}X{post_detail['height']})",
-                    colour=self.ctx.author.colour)
+#     async def write_page(self, menu, fields=[]):
+#         offset = (menu.current_page*1) + 1
+#         len_data = len(self.entries)
+#         post_detail = self.entries[menu.current_page]
+#         embed = Embed(title= post_detail["author"],
+#                     description= f"({post_detail['width']}X{post_detail['height']})",
+#                     colour=self.ctx.author.colour)
         
-        sauce = post_detail["source"]
-        if sauce == "":
-            sauce = "Unknown"
-        elif "pximg" in sauce:
-            sauced = sauce.split("/")[-1].split("_")[0]
-            sauce = "https://pixiv.net/artworks/" + str(sauced)
+#         sauce = post_detail["source"]
+#         if sauce == "":
+#             sauce = "Unknown"
+#         elif "pximg" in sauce:
+#             sauced = sauce.split("/")[-1].split("_")[0]
+#             sauce = "https://pixiv.net/artworks/" + str(sauced)
         
-        fields = [
-            ("Source", sauce),
-            ("Tags", "```"+" ".join(f"[{tag}]" for tag in post_detail["tags"].split(" ")[:20])+"```")
-        ]
+#         fields = [
+#             ("Source", sauce),
+#             ("Tags", "```"+" ".join(f"[{tag}]" for tag in post_detail["tags"].split(" ")[:20])+"```")
+#         ]
         
-        for name, value in fields:
-            embed.add_field(name=name, value=value, inline=False)
+#         for name, value in fields:
+#             embed.add_field(name=name, value=value, inline=False)
             
-        try:
-            embed.set_image(url=post_detail["preview_url"])
-        except KeyError:
-            pass
-        embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
+#         try:
+#             embed.set_image(url=post_detail["preview_url"])
+#         except KeyError:
+#             pass
+#         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
 
-        # for name, value in fields:
-        #     embed.add_field(name=name, value=value, inline=False)
+#         # for name, value in fields:
+#         #     embed.add_field(name=name, value=value, inline=False)
 
-        return embed
+#         return embed
 
-    async def format_page(self, menu, entries):
-        fields = []
+#     async def format_page(self, menu, entries):
+#         fields = []
         
         
-        return await self.write_page(menu, fields)
+#         return await self.write_page(menu, fields)
     
 class PostListG(ListPageSource):
     def __init__(self, ctx, data):
@@ -358,13 +373,52 @@ class Fun(Cog):
         if hasil_post == []:
             await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
             tagl = tagss.split(" ")
+            hasil_passSearch = {}
             for tagg in tagl:
-                await self.gelbooru_passiveSearch(ctx, tagg)
+                hasil_passSearch[tagg] = await self.gelbooru_passiveSearch(ctx, tagg)
+            tagsatu = True
+            
+            for key in hasil_passSearch.keys():
+                exact_tag = False
+                if not len(hasil_passSearch[key]) == 1:
+                    for char in hasil_passSearch[key]:
+                        if char.name == key:
+                            exact_tag = True
+                            hasil_passSearch[key] = [char.name]
+                            break
+                    if exact_tag is False:
+                        tagsatu = False
+                        break
+            if tagsatu is True:
+                lis_tag = []
+                for ab in hasil_passSearch.values():
+                    lis_tag.append(ab[0])
+                
+                await self.danbooru_passivePost(ctx, tagss="^".join(lis_tag))
+            else:
+                for tagg in tagl:
+                    await self.gelbooru_tagSearch(ctx, term=tagg)
         else:
             menu = MenuPages(source=PostListD(ctx, hasil_post),
                              clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
             await menu.start(ctx)
+            
+            
+    async def danbooru_passivePost(self,ctx, tagss):
+        tagss = tagss.lower()
+        tagss = " ".join("_".join(tagss.split(" ")).split("^"))
+        hasil_post = dclient.post_list(tags=tagss, random=True, limit= 50)
+        if hasil_post == []:
+            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+            
+        else:
+            await ctx.send(f"Ditemukan post dengan tag {tagss}")
+            menu = MenuPages(source=PostListD(ctx, hasil_post),
+                             clear_reactions_after=True,
+                            timeout=60.0)# bisa ditambah clear_reaction_after=True
+            await menu.start(ctx)
+            
             
     @command(name= "safebooru")
     async def safebooru_postList(self, ctx, *, tagss):
@@ -381,9 +435,46 @@ class Fun(Cog):
         if hasil_post == []:
             await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
             tagl = tagss.split(" ")
+            hasil_passSearch = {}
             for tagg in tagl:
-                await self.gelbooru_passiveSearch(ctx, tagg)
+                hasil_passSearch[tagg] = await self.gelbooru_passiveSearch(ctx, tagg)
+            tagsatu = True
+            
+            for key in hasil_passSearch.keys():
+                exact_tag = False
+                if not len(hasil_passSearch[key]) == 1:
+                    for char in hasil_passSearch[key]:
+                        if char.name == key:
+                            exact_tag = True
+                            hasil_passSearch[key] = [char.name]
+                            break
+                    if exact_tag is False:
+                        tagsatu = False
+                        break
+            if tagsatu is True:
+                lis_tag = []
+                for ab in hasil_passSearch.values():
+                    lis_tag.append(ab[0])
+                
+                await self.safebooru_passivePost(ctx, tagss="^".join(lis_tag))
+            else:
+                for tagg in tagl:
+                    await self.gelbooru_tagSearch(ctx, term=tagg)
         else:
+            menu = MenuPages(source=PostListD(ctx, hasil_post),
+                             clear_reactions_after=True,
+                            timeout=60.0)# bisa ditambah clear_reaction_after=True
+            await menu.start(ctx)
+            
+    async def safebooru_passivePost(self,ctx, tagss):
+        tagss = tagss.lower()
+        tagss = " ".join("_".join(tagss.split(" ")).split("^"))
+        hasil_post = sclient.post_list(tags=tagss, random=True, limit= 50)
+        if hasil_post == []:
+            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+            
+        else:
+            await ctx.send(f"Ditemukan post dengan tag {tagss}")
             menu = MenuPages(source=PostListD(ctx, hasil_post),
                              clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
@@ -416,108 +507,144 @@ class Fun(Cog):
     #                         timeout=60.0)# bisa ditambah clear_reaction_after=True
     #         await menu.start(ctx)
 
-    @command(name="konachan")
-    async def konachan_postList(self, ctx, *, tagss):
-        """Pencarian gambar/video dengan tag yang diberikan (tidak random)
-        Dapat dicari kombinasi tag dengan pemisah ^
-        Spasi otomatis dikonversi ke underscore (untuk kemudahan)
-        Dapat dicari dengan dua argumen:
-        tags : str dengan pemisah ^
-        halaman : int dengan pemisah ::
+    # @command(name="konachan")
+    # async def konachan_postList(self, ctx, *, tagss):
+    #     """Pencarian gambar/video dengan tag yang diberikan (tidak random)
+    #     Dapat dicari kombinasi tag dengan pemisah ^
+    #     Spasi otomatis dikonversi ke underscore (untuk kemudahan)
+    #     Dapat dicari dengan dua argumen:
+    #     tags : str dengan pemisah ^
+    #     halaman : int dengan pemisah ::
 
-        Contoh:
-        ```konachan kagamihara nadeshiko^smile^looking at viewer::3```
-        """
-        if "::" in tagss:
-            try:
-                pagee = int(tagss.split("::")[-1])
-                tagss = " ".join("_".join(tagss.split(" ")).split("::")[0].split("^"))
-                tagss = tagss.lower()
-                hasil_post = lclient.post_list(tags=tagss, limit= 50, page= pagee)
-            except ValueError:
-                await ctx.send("Halaman yang dimasukkan harus berupa bilangan bulat")
-        else:
-            tagss = " ".join("_".join(tagss.split(" ")).split("^"))
-            tagss = tagss.lower()
-            hasil_post = lclient.post_list(tags=tagss, limit= 50)
-        if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
-            tagl = tagss.split(" ")
-            for tagg in tagl:
-                await self.gelbooru_passiveSearch(ctx, tagg)
-        else:
-            menu = MenuPages(source=PostListK(ctx, hasil_post),
-                             clear_reactions_after=True,
-                            timeout=60.0)# bisa ditambah clear_reaction_after=True
-            await menu.start(ctx)
+    #     Contoh:
+    #     ```konachan kagamihara nadeshiko^smile^looking at viewer::3```
+    #     """
+    #     if "::" in tagss:
+    #         try:
+    #             pagee = int(tagss.split("::")[-1])
+    #             tagss = " ".join("_".join(tagss.split(" ")).split("::")[0].split("^"))
+    #             tagss = tagss.lower()
+    #             hasil_post = lclient.post_list(tags=tagss, limit= 50, page= pagee)
+    #         except ValueError:
+    #             await ctx.send("Halaman yang dimasukkan harus berupa bilangan bulat")
+    #     else:
+    #         tagss = " ".join("_".join(tagss.split(" ")).split("^"))
+    #         tagss = tagss.lower()
+    #         hasil_post = lclient.post_list(tags=tagss, limit= 50)
+    #     if hasil_post == []:
+    #         await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+    #         tagl = tagss.split(" ")
+    #         for tagg in tagl:
+    #             await self.gelbooru_passiveSearch(ctx, tagg)
+    #     else:
+    #         try:
+    #             menu = MenuPages(source=PostListK(ctx, hasil_post),
+    #                             clear_reactions_after=True,
+    #                             timeout=60.0)# bisa ditambah clear_reaction_after=True
+    #             await menu.start(ctx)
+    #         except HTTPException:
+    #             menu = MenuPages(source=PostListL(ctx, hasil_post),
+    #                             clear_reactions_after=True,
+    #                             timeout=60.0)# bisa ditambah clear_reaction_after=True
+    #             await menu.start(ctx)
             
-    @command(name="yanbooru")
-    async def yandere_postList(self, ctx, *, tagss):
-        """Pencarian gambar/video dengan tag yang diberikan (tidak random)
-        Dapat dicari kombinasi tag dengan pemisah ^
-        Spasi otomatis dikonversi ke underscore (untuk kemudahan)
-        Dapat dicari dengan dua argumen:
-        tags : str dengan pemisah ^
-        halaman : int dengan pemisah ::
+    # @command(name="yanbooru")
+    # async def yandere_postList(self, ctx, *, tagss):
+    #     """Pencarian gambar/video dengan tag yang diberikan (tidak random)
+    #     Dapat dicari kombinasi tag dengan pemisah ^
+    #     Spasi otomatis dikonversi ke underscore (untuk kemudahan)
+    #     Dapat dicari dengan dua argumen:
+    #     tags : str dengan pemisah ^
+    #     halaman : int dengan pemisah ::
 
-        Contoh:
-        ```yanbooru kagamihara nadeshiko^smile^looking at viewer::3```
-        """
-        if "::" in tagss:
-            try:
-                pagee = int(tagss.split("::")[-1])
-                tagss = " ".join("_".join(tagss.split(" ")).split("::")[0].split("^"))
-                tagss = tagss.lower()
-                hasil_post = lclient.post_list(tags=tagss, limit= 50, page= pagee)
-            except ValueError:
-                await ctx.send("Halaman yang dimasukkan harus berupa bilangan bulat")
-        else:
-            tagss = " ".join("_".join(tagss.split(" ")).split("^"))
-            tagss = tagss.lower()
-            hasil_post = lclient.post_list(tags=tagss, limit= 50)
-        if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
-            tagl = tagss.split(" ")
-            for tagg in tagl:
-                await self.gelbooru_passiveSearch(ctx, tagg)
-        else:
-            menu = MenuPages(source=PostListK(ctx, hasil_post),
-                             clear_reactions_after=True,
-                            timeout=60.0)# bisa ditambah clear_reaction_after=True
-            await menu.start(ctx)
+    #     Contoh:
+    #     ```yanbooru kagamihara nadeshiko^smile^looking at viewer::3```
+    #     """
+    #     if "::" in tagss:
+    #         try:
+    #             pagee = int(tagss.split("::")[-1])
+    #             tagss = " ".join("_".join(tagss.split(" ")).split("::")[0].split("^"))
+    #             tagss = tagss.lower()
+    #             hasil_post = lclient.post_list(tags=tagss, limit= 50, page= pagee)
+    #         except ValueError:
+    #             await ctx.send("Halaman yang dimasukkan harus berupa bilangan bulat")
+    #     else:
+    #         tagss = " ".join("_".join(tagss.split(" ")).split("^"))
+    #         tagss = tagss.lower()
+    #         hasil_post = lclient.post_list(tags=tagss, limit= 50)
+    #     if hasil_post == []:
+    #         await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+    #         tagl = tagss.split(" ")
+    #         for tagg in tagl:
+    #             await self.gelbooru_passiveSearch(ctx, tagg)
+    #     else:
+    #         try:
+    #             menu = MenuPages(source=PostListK(ctx, hasil_post),
+    #                             clear_reactions_after=True,
+    #                             timeout=60.0)# bisa ditambah clear_reaction_after=True
+    #             await menu.start(ctx)
+    #         except HTTPException:
+    #             menu = MenuPages(source=PostListL(ctx, hasil_post),
+    #                             clear_reactions_after=True,
+    #                             timeout=60.0)# bisa ditambah clear_reaction_after=True
+    #             await menu.start(ctx)
             
-    @command(name= "lolibooru")
-    async def lolibooru_postList(self, ctx, *, tagss):
-        """Pencarian gambar/video dengan tag yang diberikan (tidak random)
-        Dapat dicari kombinasi tag dengan pemisah ^
-        Spasi otomatis dikonversi ke underscore (untuk kemudahan)
-        Dapat dicari dengan dua argumen:
-        tags : str dengan pemisah ^
-        halaman : int dengan pemisah ::
+    # @command(name= "lolibooru")
+    # async def lolibooru_postList(self, ctx, *, tagss):
+    #     """Pencarian gambar/video dengan tag yang diberikan (tidak random)
+    #     Dapat dicari kombinasi tag dengan pemisah ^
+    #     Spasi otomatis dikonversi ke underscore (untuk kemudahan)
+    #     Dapat dicari dengan dua argumen:
+    #     tags : str dengan pemisah ^
+    #     halaman : int dengan pemisah ::
 
-        Contoh:
-        ```lolibooru kagamihara nadeshiko^smile^looking at viewer::3```
-        """
-        if "::" in tagss:
-            try:
-                pagee = int(tagss.split("::")[-1])
-                tagss = " ".join("_".join(tagss.split(" ")).split("::")[0].split("^"))
-                tagss = tagss.lower()
-                hasil_post = lclient.post_list(tags=tagss, limit= 50, page= pagee)
-            except ValueError:
-                await ctx.send("Halaman yang dimasukkan harus berupa bilangan bulat")
-        else:
-            tagss = " ".join("_".join(tagss.split(" ")).split("^"))
-            tagss = tagss.lower()
-            hasil_post = lclient.post_list(tags=tagss, limit= 50)
+    #     Contoh:
+    #     ```lolibooru kagamihara nadeshiko^smile^looking at viewer::3```
+    #     """
+    #     if "::" in tagss:
+    #         try:
+    #             pagee = int(tagss.split("::")[-1])
+    #             tagss = " ".join("_".join(tagss.split(" ")).split("::")[0].split("^"))
+    #             tagss = tagss.lower()
+    #             hasil_post = lclient.post_list(tags=tagss, limit= 50, page= pagee)
+    #         except ValueError:
+    #             await ctx.send("Halaman yang dimasukkan harus berupa bilangan bulat")
+    #     else:
+    #         tagss = " ".join("_".join(tagss.split(" ")).split("^"))
+    #         tagss = tagss.lower()
+    #         hasil_post = lclient.post_list(tags=tagss, limit= 50)
+    #     if hasil_post == []:
+    #         await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+    #         tagl = tagss.split(" ")
+    #         for tagg in tagl:
+    #             await self.gelbooru_passiveSearch(ctx, tagg)
+    #     else:
+    #         try:
+    #             menu = MenuPages(source=PostListK(ctx, hasil_post),
+    #                             clear_reactions_after=True,
+    #                             timeout=60.0)# bisa ditambah clear_reaction_after=True
+    #             await menu.start(ctx)
+    #         except HTTPException:
+    #             menu = MenuPages(source=PostListL(ctx, hasil_post),
+    #                             clear_reactions_after=True,
+    #                             timeout=60.0)# bisa ditambah clear_reaction_after=True
+    #             await menu.start(ctx)
+                
+    async def gelbooru_passivePost(self,ctx, tagss:list, exclude_tags: Optional[list]=[], pagee:Optional[int]=0):
+        if exclude_tags == []:
+            hasil_post = await gclient.search_posts(tags=tagss, limit= 50, page=pagee)
+        if not exclude_tags == []:
+            hasil_post = await gclient.search_posts(tags=tagss, exclude_tags=exclude_tags, limit= 50, page=pagee)
+                
         if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
-            tagl = tagss.split(" ")
-            for tagg in tagl:
-                await self.gelbooru_passiveSearch(ctx, tagg)
-        else:
-            menu = MenuPages(source=PostListL(ctx, hasil_post),
-                             clear_reactions_after=True,
+            await ctx.send(f"Post dengan query `{'^'.join(tagss)}///{'^'.join(exclude_tags)}::{pagee}` tidak ditemukan")
+        if not hasil_post == []:
+            if exclude_tags == []:
+                await ctx.send(f"Ditemukan post dengan query `{'^'.join(tagss)}::{pagee}`")
+            else:
+                await ctx.send(f"Ditemukan post dengan query `{'^'.join(tagss)}///{'^'.join(exclude_tags)}::{pagee}`")
+            menu = MenuPages(source=PostListG(ctx, hasil_post),
+                            clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
             await menu.start(ctx)
             
@@ -534,6 +661,7 @@ class Fun(Cog):
         ```gelbooru nakano nino^large breasts///netorare^cum::2```
         """
         tagss = tagss.lower()
+        pagee = 0
         if "///" in tagss:
             if "::" in tagss:
                 quary = "_".join(tagss.split(" ")).split("///")[0].split("^")
@@ -564,13 +692,62 @@ class Fun(Cog):
                 
         if hasil_post == []:
             await ctx.send(f"Post dengan query {str(tagss)} tidak ditemukan")
+            hasil_passSearch = {}
             for tagog in quary:
-                await self.gelbooru_passiveSearch(ctx, tagog)
+                hasil_passSearch[tagog] = await self.gelbooru_passiveSearch(ctx, tagog)
+            passSearch_exclude = {}
             try:
                 for tagog in exclude:
-                    await self.gelbooru_passiveSearch(ctx, tagog)
+                    passSearch_exclude[tagog] = await self.gelbooru_passiveSearch(ctx, tagog)
             except Exception:
                 pass
+            tagsatu = True
+            excludesatu = True
+            
+            for key in hasil_passSearch.keys():
+                exact_tag = False
+                if not len(hasil_passSearch[key]) == 1:
+                    for char in hasil_passSearch[key]:
+                        if char.name == key:
+                            exact_tag = True
+                            hasil_passSearch[key] = [char.name]
+                            break
+                    if exact_tag is False:
+                        tagsatu = False
+                        break
+            if not passSearch_exclude == {}:
+                for key in passSearch_exclude.keys():
+                    exact_exclude = False
+                    if not len(passSearch_exclude[key]) == 1:
+                        for charaa in passSearch_exclude[key]:
+                            if charaa.name == key:
+                                exact_exclude = True
+                                passSearch_exclude[key] = [charaa.name]
+                                break
+                        if exact_exclude is False:
+                            excludesatu = False
+                            break
+            if tagsatu is True and excludesatu is True:
+                lis_tag = []
+                lis_ex = []
+                for ab in hasil_passSearch.values():
+                    lis_tag.append(ab[0])
+                
+                        
+                if passSearch_exclude == {}:
+                    await self.gelbooru_passivePost(ctx, tagss=lis_tag, pagee=pagee)
+                else:
+                    for bc in passSearch_exclude.values():
+                        lis_ex.append(bc[0])
+                    await self.gelbooru_passivePost(ctx, tagss= lis_tag, exclude_tags= lis_ex, pagee=pagee)
+            else:
+                for tagog in quary:
+                    await self.gelbooru_tagSearch(ctx, tagog)
+                try:
+                    for tagog in exclude:
+                        await self.gelbooru_tagSearch(ctx, tagog)
+                except Exception:
+                    pass
             
         if not hasil_post == []:
             menu = MenuPages(source=PostListG(ctx, hasil_post),
@@ -580,32 +757,47 @@ class Fun(Cog):
     
     async def gelbooru_passiveSearch(self, ctx, term):
         term = term.lower()
-        charlist = []
-        hasil_search = await gclient.tag_list(name_pattern= "%" + term + "%")
-        if hasil_search == []:
-            await ctx.send(f"Tag {term} tidak ditemukan")
-        else:
-            for i, char in enumerate(hasil_search):
-                charlist.append(f"{i+1:3d}  {char}")
-            menu = MenuPages(source=IsiSearchTag(ctx, charlist, term),
-                            clear_reactions_after=True,
-                            timeout=60.0)# bisa ditambah clear_reaction_after=True
-            await menu.start(ctx)
+        # charlist = []
+        hasil_search = await gclient.tag_list(name_pattern= "%" + term + "%", limit= 30)
+        try:
+            if hasil_search == []:
+                await ctx.send(f"Tag {term} tidak ditemukan")
+            # else:
+                # for i, char in enumerate(hasil_search):
+                #     charlist.append(f"{i+1:3d}  {char}")
+                # menu = MenuPages(source=IsiSearchTag(ctx, charlist, term),
+                #                 clear_reactions_after=True,
+                #                 timeout=60.0)# bisa ditambah clear_reaction_after=True
+                # await menu.start(ctx)
+            else:
+                hasil_search[0]
+            return hasil_search
+        except TypeError:
+            return [hasil_search.name]
     
     @command(name="tagsearch", aliases=["ts"])
-    async def gelbooru_tagSearch(self, ctx, *, term):
+    async def gelbooru_tagSearch(self, ctx, term):
+        """Mencari tag pada situs danbooru dengan kata kunci eksak"""
         term = term.lower()
         charlist = []
-        hasil_search = await gclient.tag_list(name_pattern= "%" + term + "%")
-        if hasil_search == []:
-            await ctx.send(f"Tag {term} tidak ditemukan")
-        else:
-            for i, char in enumerate(hasil_search):
-                charlist.append(f"{i+1:3d}  {char}")
-            menu = MenuPages(source=IsiSearchTag(ctx, charlist, term),
-                            clear_reactions_after=True,
-                            timeout=60.0)# bisa ditambah clear_reaction_after=True
-            await menu.start(ctx)
+        hasil_search = await gclient.tag_list(name_pattern= "%" + term + "%", limit= 10000)
+        try:
+            if hasil_search == []:
+                await ctx.send(f"Tag {term} tidak ditemukan")
+            else:
+                for i, char in enumerate(hasil_search):
+                    charlist.append(f"{i+1:3d}  {char}")
+                menu = MenuPages(source=IsiSearchTag(ctx, charlist, term),
+                                clear_reactions_after=True,
+                                timeout=60.0)# bisa ditambah clear_reaction_after=True
+                await menu.start(ctx)
+        except TypeError:
+            embed = Embed(
+                title= f"Hasil Search {term}",
+                description="```{hasil_search.name}```"
+            )
+            await ctx.send(embed=embed)
+            
         
 
     @Cog.listener()

@@ -10,7 +10,8 @@ from datetime import datetime
 from pybooru import Danbooru, Moebooru
 from pygelbooru import Gelbooru
 from difflib import get_close_matches
-
+from saucenao_api import SauceNao
+import asyncio
 from ..db import db
 
 dclient = Danbooru("danbooru")
@@ -19,6 +20,7 @@ sclient = Danbooru("safebooru")
 # yclient = Moebooru("yandere")
 # lclient = Moebooru("lolibooru")
 gclient = Gelbooru()
+sauce = SauceNao(api_key="b6bf271b3608983569e56e08ef9c7244fc424ac8")
 
 # class IsiTagsList(ListPageSource):
 #     def __init__(self, ctx, data, animek):
@@ -109,7 +111,7 @@ class PostListD(ListPageSource):
         
         try:
             for forma in vid_format:
-                large_fu = post_detail["large_file_url"][len(post_detail["large_file_url"])-7:]
+                large_fu = post_detail["large_file_url"]
                 if forma in post_detail["file_ext"]:
                     embed.add_field(name="Video", value= post_detail["file_url"], inline=False)
                 
@@ -290,6 +292,55 @@ class PostListG(ListPageSource):
         try:
             embed.set_image(url=post_detail.file_url)
         except KeyError:
+            pass
+        embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
+
+        # for name, value in fields:
+        #     embed.add_field(name=name, value=value, inline=False)
+
+        return embed
+
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        
+        return await self.write_page(menu, fields)
+    
+class IsiSauceNao(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=1)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*1) + 1
+        len_data = len(self.entries)
+        post_detail = self.entries[menu.current_page]
+        embed = Embed(title= post_detail.title,
+                    description= f"Similarity : {post_detail.similarity}%",
+                    colour=self.ctx.author.colour)
+        
+        sauce = "\n".join(post_detail.urls)
+        if sauce == "":
+            sauce = "Unknown"
+        elif "pximg" in sauce:
+            sauced = sauce.split("/")[-1].split("_")[0]
+            sauce = "https://pixiv.net/artworks/" + str(sauced)
+            
+        autor = post_detail.author
+        if autor is None:
+            autor = "Unknown"
+        
+        fields = [("Author", autor),
+            ("Source", sauce)
+        ]
+        
+        for name, value in fields:
+            embed.add_field(name=name, value=value, inline=False)
+            
+        try:
+            embed.set_image(url=post_detail.thumbnail)
+        except Exception:
             pass
         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
 
@@ -797,6 +848,63 @@ class Fun(Cog):
                 description="```{hasil_search.name}```"
             )
             await ctx.send(embed=embed)
+            
+    @command(name="sauce")
+    async def sauceNao_link(self,ctx, link:Optional[str]="Takda"):
+        """Mencari saos dari gambar yg dikirim
+
+        Args:
+            link (Optional[str], optional): Link gambar yang ingin dicari saosnya.
+
+        Jika link tidak dikirim bersamaan dengan command, gambar juga dapat dikirim setelah command
+        """
+        if link == "Takda":
+            def _check(m):
+                if m.author == ctx.author:
+                    
+                    for forma in img_format:
+                        try:
+                            if forma in m.attachments[0].url:
+                                return True
+                        except IndexError:
+                            if forma in m.content:
+                                return True
+            msg = await ctx.send("Kirim gambar kak")
+            img_format = ["jpg", "png", "gif", "jpeg"]
+            try:
+                link = await self.bot.wait_for("message", timeout=60, check=_check)
+            except asyncio.TimeoutError:
+                await ctx.message.delete()
+                await msg.delete()
+            if link:
+                try:
+                    result = sauce.from_url(link.attachments[0].url)
+                    hasil_saos = result.results
+                    menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
+                                    clear_reactions_after=True,
+                                    timeout=60.0)# bisa ditambah clear_reaction_after=True
+                    await menu.start(ctx)
+                except Exception:
+                    try:
+                        konten = link.content
+                        result = sauce.from_url(konten)
+                        hasil_saos = result.results
+                        menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
+                                        clear_reactions_after=True,
+                                        timeout=60.0)# bisa ditambah clear_reaction_after=True
+                        await menu.start(ctx)
+                    except Exception:
+                        await ctx.send("Hasil tidak ditemukan")
+        else:
+            try:
+                result = sauce.from_url(link)
+                hasil_saos = result.results
+                menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
+                                clear_reactions_after=True,
+                                timeout=60.0)# bisa ditambah clear_reaction_after=True
+                await menu.start(ctx)
+            except Exception:
+                await ctx.send("Hasil tidak ditemukan")
             
         
 

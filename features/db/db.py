@@ -21,11 +21,10 @@ def build():
         scriptexec(BUILD_PATH)
 
 def commit():
-    # print("commiting...")
+    print("Saving database...")
     cxn.commit()
 
 def autosave(sched):
-    print("Saving database...")
     sched.add_job(commit, CronTrigger(second=0))
 
 def close():

@@ -194,22 +194,22 @@ class Player:
         return self.yen, delta_yen_akhir, self.nadeC, delta_nadeC_akhir, self.items, delta_items
         
 
-class Fight:
-    def __init__(self, player, monster, ctx: Optional=None):
-        self.player = player
-        self.monster = monster
+# class Fight:
+#     def __init__(self, player, monster, ctx: Optional=None):
+#         self.player = player
+#         self.monster = monster
         
-    def PlayerVOneMonster(self, ctx):
-        embed = Embed(
-            title= ctx.author.name,
-            colour=ctx.author.colour
-        )
-        fields = [
-            (f"{ctx.author.name}", 
-             f"HP = {self.player.hp}\n\
-MP = {self.player.mp}\n\
-ATK = {}")
-        ]
+    # def PlayerVOneMonster(self, ctx):
+#         embed = Embed(
+#             title= ctx.author.name,
+#             colour=ctx.author.colour
+#         )
+#         fields = [
+#             (f"{ctx.author.name}", 
+#              f"HP = {self.player.hp}\n\
+# MP = {self.player.mp}\n\
+# ATK = {}")
+#         ]
         
     
         

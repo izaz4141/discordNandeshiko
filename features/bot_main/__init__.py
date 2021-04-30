@@ -5,6 +5,7 @@ from discord.ext.commands.errors import MissingPermissions, MissingRole
 from discord.errors import HTTPException, Forbidden, NotFound
 from urllib3.exceptions import MaxRetryError
 from requests.exceptions import SSLError
+from saucenao_api.errors import UnknownClientError, ShortLimitReachedError, LongLimitReachedError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 from time import time
@@ -193,6 +194,13 @@ class Bot(BotBase):
                 await ctx.send("Tidak memiliki authoritas")
             elif isinstance(exc.original, SSLError):
                 print(f"Halaman yang diakses {ctx.author.name} terblokir (coba pakai vpn)")
+                
+            elif isinstance(exc.original, UnknownClientError):
+                await ctx.send("Maaf! Hasil cari tidak ditemukan")
+            elif isinstance(exc.original, ShortLimitReachedError):
+                await ctx.send("Maaf! Aku sedang sibuk, coba beberapa saat lagi.")
+            elif isinstance(exc.original, LongLimitReachedError):
+                await ctx.send("Maaf! Limit sauce yang boleh dicari hari ini sudah tercapai")
                 
             else:
                 raise exc.original

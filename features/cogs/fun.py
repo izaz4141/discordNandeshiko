@@ -11,6 +11,7 @@ from pybooru import Danbooru, Moebooru
 from pygelbooru import Gelbooru
 from difflib import get_close_matches
 from saucenao_api import SauceNao
+
 import asyncio
 from ..db import db
 
@@ -874,9 +875,9 @@ class Fun(Cog):
             try:
                 link = await self.bot.wait_for("message", timeout=60, check=_check)
             except asyncio.TimeoutError:
-                await ctx.message.delete()
                 await msg.delete()
-            if link:
+                await ctx.send("Ih kacang")
+            if not link =="Takda":
                 try:
                     result = sauce.from_url(link.attachments[0].url)
                     hasil_saos = result.results
@@ -884,27 +885,23 @@ class Fun(Cog):
                                     clear_reactions_after=True,
                                     timeout=60.0)# bisa ditambah clear_reaction_after=True
                     await menu.start(ctx)
-                except Exception:
-                    try:
-                        konten = link.content
-                        result = sauce.from_url(konten)
-                        hasil_saos = result.results
-                        menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
-                                        clear_reactions_after=True,
-                                        timeout=60.0)# bisa ditambah clear_reaction_after=True
-                        await menu.start(ctx)
-                    except Exception:
-                        await ctx.send("Hasil tidak ditemukan")
+                except IndexError:
+                    konten = link.content
+                    result = sauce.from_url(konten)
+                    hasil_saos = result.results
+                    menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
+                                    clear_reactions_after=True,
+                                    timeout=60.0)# bisa ditambah clear_reaction_after=True
+                    await menu.start(ctx)
         else:
-            try:
-                result = sauce.from_url(link)
-                hasil_saos = result.results
-                menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
-                                clear_reactions_after=True,
-                                timeout=60.0)# bisa ditambah clear_reaction_after=True
-                await menu.start(ctx)
-            except Exception:
-                await ctx.send("Hasil tidak ditemukan")
+            result = sauce.from_url(link)
+            hasil_saos = result.results
+            menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
+                            clear_reactions_after=True,
+                            timeout=60.0)# bisa ditambah clear_reaction_after=True
+            await menu.start(ctx)
+        
+        
             
         
 

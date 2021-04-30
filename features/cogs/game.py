@@ -59,7 +59,7 @@ dungeon = {
     }
 }
 
-
+fightOneMonster = {}
 
 class Monster:
     def __init__(self, name, dungeon_place:dict, p_id):
@@ -196,139 +196,22 @@ class Player:
 
 class Fight:
     def __init__(self, player, monster, ctx: Optional=None):
-        global Fight
-        self.players = {}
-        self.monsters = {}
-        self.players[player.identity] = player
-        self.monsters[player.identity] = monster
+        self.player = player
+        self.monster = monster
         
-    
-    def User_Attack(self, p_id):
-        m_name = self.players[p_id].m_name
-        p_atk = 30 + self.players[p_id].strength * 3
-        p_luck = self.players[p_id].luck
-        m_def = 5 + self.monsters[p_id].strength * 1.5 + self.monsters[p_id].dexerity * 2
-        m_luck = self.monsters[p_id].luck
-        p_atk = p_atk * (randint(50, 150)/150)
-        
-        damage = (p_atk * (2*(randint(p_luck, 100)/100))) - (m_def * (1.4*(m_luck/100)) )
-        if damage <= 0:
-            damage = 1
-        self.monsters[p_id].hp += -damage
-        return damage
-    
-    def Monster_Attack(self, p_id):
-        m_name = self.players[p_id].m_name
-        m_atk = 30 + self.monsters[p_id].strength * 3
-        m_luck = self.monsters[p_id].luck
-        p_def = 5 + (self.players[p_id].strength * 1.5 + self.players[p_id].dexerity * 2)
-        p_luck = self.players[p_id].luck
-        m_atk = m_atk * (randint(50, 150)/150)
-        damage = (m_atk * (2*(randint(p_luck, 100)/100))) - (p_def * (1.4*(p_luck/100)) )
-        if damage <= 0:
-            damage = 1
-        self.players[p_id].hp += -damage
-        return damage
-        
-    def oneVone_Battle(self, ctx, p_id):
-        m_name = self.players[ctx.message.author.id].m_name
-        p_atk = 30 + self.players[ctx.message.author.id].strength * 3
-        p_def = 5 + (self.players[ctx.message.author.id].strength * 1.5 + self.players[ctx.message.author.id].dexerity * 2)
-        p_luck = self.players[ctx.message.author.id].luck
-        
-        m_atk = 30 + self.monsters[p_id].strength * 3
-        m_def = 5 + self.monsters[p_id].strength * 1.5 + self.monsters[p_id].dexerity * 2
-        m_luck = self.monsters[p_id].luck
-        
+    def PlayerVOneMonster(self, ctx):
         embed = Embed(
-            title= f"{ctx.author.display_name} VS {m_name}"
+            title= ctx.author.name,
+            colour=ctx.author.colour
         )
-        fields = (
-            (ctx.message.author.display_name, f"```HP = {self.players[ctx.message.author.id].hp}\n\
-MP = {self.players[ctx.message.author.id].mp}\n\
-ATK = {p_atk}\n\
-DEF = {p_def}"),
-            (self.monsters[p_id].name, f"```HP = {self.monsters[p_id].hp}\n\
-MP = {self.monsters[p_id].mp}\n\
-ATK = {m_atk}\n\
-DEF = {m_def}")
-        )
-        for name, value in fields:
-            embed.add_field(name=name, value=value, inline=False)
-            
-        return embed
+        fields = [
+            (f"{ctx.author.name}", 
+             f"HP = {self.player.hp}\n\
+MP = {self.player.mp}\n\
+ATK = {}")
+        ]
+        
     
-    def Battle_Response(self, user, p_dmg:Optional=0, m_dmg:Optional=0, p_act:str= "Berdiam", m_act:str= "Berdiam"):
-        p_id = user.id
-        m_name = self.players[p_id].m_name
-        p_atk = 30 + self.players[p_id].strength * 3
-        p_def = 5 + (self.players[p_id].strength * 1.5 + self.players[p_id].dexerity * 2)
-        p_luck = self.players[p_id].luck
-        
-        m_atk = 30 + self.monsters[p_id].strength * 3
-        m_def = 5 + self.monsters[p_id].strength * 1.5 + self.monsters[p_id].dexerity * 2
-        m_luck = self.monsters[p_id].luck
-        
-        embed = Embed(
-            title= f"{user.display_name} VS {m_name}",
-            description= f"{user.display_name} {p_act}\n{m_name} {m_act}"
-        )
-        if self.players[p_id].hp <= 0 and self.monsters[p_id].hp <=0:
-            inBattle[p_id] = False
-            fields = (
-                (user.display_name, f"```HP = {self.players[p_id].hp} {-m_dmg}\n\
-MP = {self.players[p_id].mp}\n\
-ATK = {p_atk}\n\
-DEF = {p_def}"),
-            (self.monsters[p_id].name, f"```HP = {self.monsters[p_id].hp} {-p_dmg}\n\
-MP = {self.monsters[p_id].mp}\n\
-ATK = {m_atk}\n\
-DEF = {m_def}"),
-            ("Hasil Pertandingan : **SERI**", "**")
-        )
-            
-        if self.players[p_id].hp <= 0:
-            inBattle[p_id] = False
-            fields = (
-                (user.display_name, f"```HP = {self.players[p_id].hp} {-m_dmg}\n\
-MP = {self.players[p_id].mp}\n\
-ATK = {p_atk}\n\
-DEF = {p_def}"),
-            (self.monsters[p_id].name, f"```HP = {self.monsters[p_id].hp} {-p_dmg}\n\
-MP = {self.monsters[p_id].mp}\n\
-ATK = {m_atk}\n\
-DEF = {m_def}"),
-            (f"Hasil Pertandingan : **{user.display_name} MENANG**", "**")
-        )
-            
-        if self.monsters[p_id].hp <=0:
-            inBattle[p_id] = False
-            fields = (
-                (user.display_name, f"```HP = {self.players[p_id].hp} {-m_dmg}\n\
-MP = {self.players[p_id].mp}\n\
-ATK = {p_atk}\n\
-DEF = {p_def}"),
-            (self.monsters[p_id].name, f"```HP = {self.monsters[p_id].hp} {-p_dmg}\n\
-MP = {self.monsters[p_id].mp}\n\
-ATK = {m_atk}\n\
-DEF = {m_def}"),
-            (f"Hasil Pertandingan : **{user.display_name} KALAH**", "**NOOB**")
-        )
-        else:
-            fields = (
-                (user.display_name, f"```HP = {self.players[p_id].hp} {-m_dmg}\n\
-MP = {self.players[p_id].mp}\n\
-ATK = {p_atk}\n\
-DEF = {p_def}"),
-            (self.monsters[p_id].name, f"```HP = {self.monsters[p_id].hp} {-p_dmg}\n\
-MP = {self.monsters[p_id].mp}\n\
-ATK = {m_atk}\n\
-DEF = {m_def}")
-        )
-        for name, value in fields:
-            embed.add_field(name=name, value=value, inline=False)
-            
-        return embed
         
         
 
@@ -401,23 +284,9 @@ class Game(Cog):
         elif dungeon_event == "Monster":
             dungeon_monster = choices([*dungeon_place["Monster"]])[0]
             await ctx.send(f"Seekor {dungeon_monster} lewat")
-            # p_hp, p_mp, p_str, p_int, p_dex, p_luck, p_items, p_statP, p_yen, p_nadeC, p_charas = db.record("SELECT HP, MP, Strength, Intelligence, Dexerity, Luck, Items, StatusPoint, Yen, Nadecoin, Charas FROM exp WHERE UserID = ?", ctx.message.author.id)
-            # p_id = ctx.message.author.id
-            # fight = Fight(Player(ctx.author.id, ctx), Monster(dungeon_monster, dungeon_place, ctx.author.id))
-            # global inBattle
-            # inBattle[p_id] = True
-            # embed = Fight(Player(ctx.author.id, ctx, m_name=dungeon_monster, d_name=dungeon_place_name), Monster(dungeon_monster, dungeon_place, ctx.author.id)).oneVone_Battle(ctx, ctx.message.author.id)
-            # msg = await ctx.send(embed=embed)
-            # fight.players[ctx.author.id].battle_id = msg.id
-            # for emoji in list(OPTIONS.keys()):
-            #     await msg.add_reaction(emoji)
-            # try:
-            #     await self.bot.wait_for("reaction_add", timeout=300.0, check=_check)
-            # except TimeoutError:
-            #     await ctx.send("Dikarenakan melebihi 5 menit, Pertandingan berakhir")
-            #     await msg.delete()
-            #     inBattle[ctx.message.author.id] = False
-            
+            # fightOneMonster[ctx.author.id] = Fight(Player(ctx.author.id), Monster(dungeon_monster, dungeon_place, ctx.author.id))
+            # embed, message_id = fightOneMonster[ctx.author.id].PlayerVOneMonster(ctx)
+            # await ctx.send(embed=embed)
                 
 
     
@@ -433,7 +302,8 @@ class Game(Cog):
     @Cog.listener()
     async def on_message(self, message):
         if not message.author.bot:
-            await self.process_xp(message)
+            if self.bot.ready:
+                await self.process_xp(message)
             
     # @Cog.listener()
     # async def on_reaction_add(self,reaction,user):

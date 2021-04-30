@@ -217,7 +217,7 @@ class Bot(BotBase):
             self.total_emojiss = []
             for g in self.guilds:
                 self.total_emojiss += g.emojis
-            minute = [29, 59]
+            minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
             self.scheculer.start()

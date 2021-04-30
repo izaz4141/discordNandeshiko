@@ -1,4 +1,4 @@
-from discord import Embed, File, Client, Intents
+from discord import Embed, File, Client, Intents, ActivityType, Activity
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import CommandNotFound, Context, BadArgument, MissingRequiredArgument, CommandOnCooldown, when_mentioned_or
 from discord.ext.commands.errors import MissingPermissions, MissingRole
@@ -140,7 +140,8 @@ class Bot(BotBase):
         if self.ready:
             await self.invoke(ctx)
         else:
-            await ctx.send("Bentar kak lagi siap - siap")
+            if not ctx.prefix is None:
+                await ctx.send("Bentar kak lagi siap - siap")
         
         
 
@@ -211,6 +212,7 @@ class Bot(BotBase):
     async def on_ready(self):
         if not self.ready:
             # self.guilds = await self.fetch_guilds(limit= 5)
+            await self.change_presence(activity= Activity(type=ActivityType.watching, name= "Yuru Camp △", details= "@Nandeshikyot help", state="Comfy"))
             self.guild = self.get_guild(605057520955818010) #KALAU HANYA SATU SERVER
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)

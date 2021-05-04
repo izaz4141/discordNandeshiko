@@ -828,7 +828,7 @@ class Fun(Cog):
             return [hasil_search.name]
     
     @command(name="tagsearch", aliases=["ts"])
-    async def gelbooru_tagSearch(self, ctx, term):
+    async def gelbooru_tagSearch(self, ctx, *, term):
         """Mencari tag pada situs danbooru dengan kata kunci eksak"""
         term = term.lower()
         charlist = []
@@ -846,7 +846,7 @@ class Fun(Cog):
         except TypeError:
             embed = Embed(
                 title= f"Hasil Search {term}",
-                description="```{hasil_search.name}```"
+                description=f"```{hasil_search.name}```"
             )
             await ctx.send(embed=embed)
             

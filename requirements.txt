@@ -20,6 +20,7 @@ defusedxml==0.6.0
 Deprecated==1.2.12
 discord==1.0.1
 discord.py==1.6.0
+dropbox==11.9.0
 entrypoints==0.3
 flake8==3.9.0
 furl==2.1.2

@@ -19,16 +19,13 @@ from apscheduler.triggers.cron import CronTrigger
 # system("git remote set_url origin https://github.com/izaz4141/discordNandeshiko.git")
 
 from ..cogs.help import Help
-from ..cloud.drive import *
+from ..cloud.dropbox import *
+from dropbox.exceptions import ApiError
 
-database_old = searchFile("name contains 'nandeshiko-database'")
-folder_database = searchFile("name contains 'discordNandeshiko'")
-if database_old == []:
-    print("Uploading database...")
-    uploadFile("nandeshiko-database.db", "./data/db/nandeshiko-database.db", "database/db", folder_database[0]["id"])
-else:
-    print("Downloading database...")
-    downloadFile(database_old[0]["id"], "./data/db/nandeshiko-database.db")
+try:
+    download_from_dropbox("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
+except ApiError:
+    backup("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
 
 
 
@@ -83,16 +80,8 @@ class Bot(BotBase):
             self.load_extension(f"features.cogs.{cog}")
             print(f" {cog} cog loaded")
             
-    async def update_db_intoCloud(self):
-        database_lama = searchFile("name contains 'nandeshiko-database'")
-        if database_lama == []:
-            print("First Push")
-            uploadFile("nandeshiko-database.db", "./data/db/nandeshiko-database.db", "database/db", folder_database[0]["id"])
-        else:
-            print("Deleting database...")
-            deleteFile(database_lama[0]["id"])
-            print("Uploading database...")
-            uploadFile("nandeshiko-database.db", "./data/db/nandeshiko-database.db", "database/db", folder_database[0]["id"])
+    def update_db_intoCloud(self):
+        backup("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
 
     def update_db(self):
         db.multiexec("INSERT OR IGNORE INTO guilds (GuildID) VALUES (?)", ((guild.id,) for guild in self.guilds))
@@ -253,7 +242,7 @@ class Bot(BotBase):
         if not message.author.bot:
             if message.content == "update db":
                 if message.author.id in OWNER_IDS:
-                    await self.update_db_intoCloud()
+                    self.update_db_intoCloud()
             
             if "nandeshi" in message.content :
                 total_emojis = self.total_emojiss

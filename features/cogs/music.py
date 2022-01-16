@@ -21,9 +21,8 @@ class Music(Cog):
     def __init__(self, bot):
         self.bot = bot 
         self.YDL_OPTIONS = {
-        'format': 'bestaudio[ext=webm]',
-        'noplaylist': False,
-        'audioquality' : 5
+        'format': 'bestaudio[ext=m4a]',
+        'noplaylist': False
         }
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         # self.FFMPEG_OPTIONS = {'options' : '-vn'}

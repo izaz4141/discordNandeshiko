@@ -21,11 +21,10 @@ class Music(Cog):
     def __init__(self, bot):
         self.bot = bot 
         self.YDL_OPTIONS = {
-        'format': 'bestaudio/best',
+        'format': 'bestaudio',
         'noplaylist': False,
         'extractaudio' : True,
-        'audioquality' : 0,
-        'audioformat' : 'mp3'
+        'audioquality' : 0
         }
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         self.song_queue = {}

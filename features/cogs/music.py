@@ -16,10 +16,20 @@ OPTIONS = {
     "5⃣": 4,
 }
 
+
 class Music(Cog):
     def __init__(self, bot):
         self.bot = bot 
-        self.YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'False'}
+        self.YDL_OPTIONS = {
+        'format': 'bestaudio/best',
+        'noplaylist': False,
+        'nocheckcertificate': True,
+        'quiet': True,
+        'no_warnings': True,
+        'extractaudio' : True,
+        'audioquality' : 5,
+        'audioformat' : 'opus'
+        }
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         self.song_queue = {}
         self.shuffle = {}
@@ -144,7 +154,7 @@ class Music(Cog):
                 return "playlist"
                             
     async def play_song(self, ctx, song):
-        ctx.voice_client.play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(song[1])), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
+        ctx.voice_client.play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
         ctx.voice_client.source.volume = 0.5
         self.np[ctx.guild.id] = song
         self.playing[ctx.guild.id] = True

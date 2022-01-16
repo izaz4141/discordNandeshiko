@@ -88,6 +88,10 @@ class Bot(BotBase):
 
         db.multiexec("INSERT OR IGNORE INTO exp (UserID,UserName) VALUES (?,?)", ((member.id, f"{member.name}#{member.discriminator}",) for guild in self.guilds for member in guild.members if not member.bot ))
         
+        # memb = {}
+        # for guild in self.guilds:
+            
+        
         members_past = db.column("SELECT UserID FROM exp")
         to_remove = []
         exist = []
@@ -244,7 +248,7 @@ class Bot(BotBase):
                 if message.author.id in OWNER_IDS:
                     self.update_db_intoCloud()
             
-            if "nandeshi" in message.content :
+            if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.total_emojiss
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis))])], weights= [1, 1, 2], k=1)[0])
                 

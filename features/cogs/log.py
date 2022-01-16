@@ -1,22 +1,57 @@
 from datetime import datetime
+import asyncio
 
-from discord import Embed
+from discord import Embed, Colour
 from discord.errors import Forbidden
 from discord.ext.commands import Cog
-from discord.ext.commands import command
+from discord.ext.commands import command, has_permissions
 
+from ..db import db
 
-
+PILIHAN = {
+    u"\u2705" : 0,
+    u"\U0001F6AB" : 1
+}
 
 class Log(Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.log = {}
         
-
+    @command(name="log_on")
+    @has_permissions(manage_messages=True)
+    async def log_on(self, ctx):
+        def _check(r, u):
+            return (
+                r.emoji in PILIHAN.keys()
+                and u == ctx.author
+                and r.message.id == msg.id
+            )
+        msg = await ctx.send("Apakah kakak ingin menghidupkan dan mengubah channel ini menjadi channel log?")
+        await msg.add_reaction(u"\u2705")
+        await msg.add_reaction(u"\U0001F6AB")
+        try:
+            reaction, _ = await self.bot.wait_for("reaction_add", timeout=60.0, check=_check)
+        except asyncio.TimeoutError:
+            await msg.delete()
+            await ctx.send("Perintah Log ON dibatalkan")
+        else:
+            if PILIHAN[reaction.emoji] == 0:
+                db.execute("UPDATE guilds set Leg = ? WHERE GuildID = ?", 'ON', ctx.guild.id)
+                db.execute("UPDATE guilds set LogChannel = ? WHERE GuildID = ?", ctx.channel.id, ctx.guild.id)
+                await ctx.send(f"Fungsi Log bot diaktifkan pada Channel {ctx.channel.name}")
+    
+    @command(name="log_off")
+    @has_permissions(manage_messages=True)
+    async def log_off(self,ctx):
+        db.execute("UPDATE guilds set Leg = ? WHERE GuildID = ?", 'OFF', ctx.guild.id)
+        await ctx.send("Mematikan fungsi log bot...")
+        
+        
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:
-            self.log_channel = self.bot.get_channel(823774055134920765)
+            # self.log_channel = self.bot.get_channel(823774055134920765)
             self.bot.cogs_ready.ready_up("log")
 
     @Cog.listener()
@@ -31,8 +66,14 @@ class Log(Cog):
 
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
-
-            await self.log_channel.send(embed=embed)
+            wic = []
+            for guild in self.bot.guilds:
+                if guild.get_member(before.id):
+                    wic.append(guild.id)
+            for gid in wic:
+                log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
+                if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
+                    await self.bot.get_channel(log_channel).send(embed=embed)
 
         if before.discriminator != after.discriminator:
             embed = Embed(title="Discriminator change",
@@ -45,18 +86,32 @@ class Log(Cog):
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
 
-            await self.log_channel.send(embed=embed)
+            wic = []
+            for guild in self.bot.guilds:
+                if guild.get_member(before.id):
+                    wic.append(guild.id)
+            for gid in wic:
+                log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
+                if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
+                    await self.bot.get_channel(log_channel).send(embed=embed)
 
         if before.avatar_url != after.avatar_url:
             embed = Embed(title="Avatar change",
                             description="New image is below, old to the right.",
-                            colour=self.log_channel.guild.get_member(after.id).colour,
+                            colour=Colour.dark_gold(),
                             timestamp=datetime.utcnow())
 
             embed.set_thumbnail(url=before.avatar_url)
             embed.set_image(url=after.avatar_url)
 
-            await self.log_channel.send(embed=embed)
+            wic = []
+            for guild in self.bot.guilds:
+                if guild.get_member(before.id):
+                    wic.append(guild.id)
+            for gid in wic:
+                log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
+                if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
+                    await self.bot.get_channel(log_channel).send(embed=embed)
 
     @Cog.listener()
     async def on_member_update(self, before, after):
@@ -71,7 +126,14 @@ class Log(Cog):
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
 
-            await self.log_channel.send(embed=embed)
+            wic = []
+            for guild in self.bot.guilds:
+                if guild.get_member(before.id):
+                    wic.append(guild.id)
+            for gid in wic:
+                log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
+                if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
+                    await self.bot.get_channel(log_channel).send(embed=embed)
 
         elif before.roles != after.roles:
             embed = Embed(title="Role updates",
@@ -84,7 +146,14 @@ class Log(Cog):
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
 
-            await self.log_channel.send(embed=embed)
+            wic = []
+            for guild in self.bot.guilds:
+                if guild.get_member(before.id):
+                    wic.append(guild.id)
+            for gid in wic:
+                log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
+                if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
+                    await self.bot.get_channel(log_channel).send(embed=embed)
 
     # @Cog.listener()
     # async def on_message_edit(self, before, after):

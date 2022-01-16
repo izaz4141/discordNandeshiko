@@ -23,12 +23,9 @@ class Music(Cog):
         self.YDL_OPTIONS = {
         'format': 'bestaudio/best',
         'noplaylist': False,
-        'nocheckcertificate': True,
-        'quiet': True,
-        'no_warnings': True,
         'extractaudio' : True,
-        'audioquality' : 5,
-        'audioformat' : 'opus'
+        'audioquality' : 0,
+        'audioformat' : 'mp3'
         }
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         self.song_queue = {}

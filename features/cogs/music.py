@@ -50,13 +50,10 @@ class Music(Cog):
                         await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
                         self.song_queue[ctx.guild.id].pop(0)
                     else:
-                        self.playing[ctx.guild.id] = False
-                        self.np[ctx.guild.id] = []
+                        await self.leave(ctx)
                     
                 except KeyError:
-                    self.repeat[ctx.guild.id] = False
-                    self.playing[ctx.guild.id] = False
-                    self.np[ctx.guild.id] = []
+                    await self.leave(ctx)
         except KeyError:
             try:
                 if self.repeat[ctx.guild.id] is True:
@@ -64,12 +61,9 @@ class Music(Cog):
                     await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
                     self.song_queue[ctx.guild.id].pop(0)
                 else:
-                    self.playing[ctx.guild.id] = False
-                    self.np[ctx.guild.id] = []
+                    await self.leave(ctx)
             except KeyError:
-                self.repeat[ctx.guild.id] = False
-                self.playing[ctx.guild.id] = False
-                self.np[ctx.guild.id] = []
+                await self.leave(ctx)
     
     async def choose_track(self, ctx, query):
         def _check(r, u):
@@ -150,7 +144,7 @@ class Music(Cog):
                 return "playlist"
                             
     async def play_song(self, ctx, song):
-        ctx.voice_client.play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
+        ctx.voice_client.play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(song[1])), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
         ctx.voice_client.source.volume = 0.5
         self.np[ctx.guild.id] = song
         self.playing[ctx.guild.id] = True

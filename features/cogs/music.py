@@ -24,7 +24,8 @@ class Music(Cog):
         'format': 'bestaudio',
         'noplaylist': False,
         'extractaudio' : True,
-        'audioquality' : 0
+        'audioquality' : 0,
+        'audioformat' : 'opus'
         }
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         self.song_queue = {}

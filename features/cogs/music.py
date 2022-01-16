@@ -24,15 +24,16 @@ class Music(Cog):
         'format': 'bestaudio',
         'noplaylist': False,
         'extractaudio' : True,
-        'audioquality' : 0,
-        'audioformat' : 'opus',
+        'audioquality' : 2,
+        'audioformat' : 'mp3',
         'nocheckcertificate': True,
         'ignoreerrors': False,
         'logtostderr': False,
         'quiet': True,
         'no_warnings': True,
         }
-        self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+        # self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+        self.FFMPEG_OPTIONS = {'options' : '-vn'}
         self.song_queue = {}
         self.shuffle = {}
         self.repeat = {}

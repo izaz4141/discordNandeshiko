@@ -154,7 +154,7 @@ class Music(Cog):
             track = info[OPTIONS[reaction.emoji]]
             with YoutubeDL(self.YDL_OPTIONS) as ydl:
                 try: 
-                    lagu = ydl.extract_info(f"{'https://www.youtube.com' + track['url_suffix']}", download=False)['entries'][0]
+                    lagu = ydl.extract_info(f"{'https://www.youtube.com' + track['url_suffix']}", download=False)
                 except Exception: 
                     return None
             return {'source': lagu['formats'][0]['url'], 'title': lagu['title']}
@@ -309,11 +309,6 @@ class Music(Cog):
 
         skip = await self.poll_song(ctx)
         if skip:
-            try:
-                if self.repeat[ctx.guild.id] is True:  
-                    self.song_queue[ctx.guild.id].append(self.np[ctx.guild.id])
-            except KeyError:
-                pass
             ctx.voice_client.stop()
             
     @command(name="skipto")
@@ -339,11 +334,6 @@ class Music(Cog):
         
         skip = await self.poll_song(ctx)
         if skip:
-            try:
-                if self.repeat[ctx.guild.id] is True:
-                    self.song_queue[ctx.guild.id].append(self.np[ctx.guild.id])
-            except KeyError:
-                self.repeat[ctx.guild.id] = False
             self.song_queue[ctx.guild.id].insert(0, self.song_queue[ctx.guild.id][number-1])
             self.song_queue[ctx.guild.id].pop(number)
             ctx.voice_client.stop()

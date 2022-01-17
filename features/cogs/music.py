@@ -206,10 +206,13 @@ class Music(Cog):
     async def join(self, ctx):
         if ctx.author.voice is None:
             return await ctx.send("Connect dulu ke voice channel ya kak")
-        elif self.playing[ctx.guild.id] is True and ctx.author.voice.channel.id != ctx.voice_client.channel.id:
-            await ctx.send("Ihh nanti aja ya kak, Nadeshiko lagi nyanyi")
-            return 69
-        elif ctx.voice_client is not None:
+        try:
+            if self.playing[ctx.guild.id] is True and ctx.author.voice.channel.id != ctx.voice_client.channel.id:
+                await ctx.send("Ihh nanti aja ya kak, Nadeshiko lagi nyanyi")
+                return 69
+        except KeyError:
+            pass
+        if ctx.voice_client is not None:
             await ctx.voice_client.disconnect()
 
         await ctx.author.voice.channel.connect()

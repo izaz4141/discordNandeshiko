@@ -161,6 +161,9 @@ class Music(Cog):
     async def join(self, ctx):
         if ctx.author.voice is None:
             return await ctx.send("Connect dulu ke voice channel ya kak")
+        elif self.playing[ctx.guild.id] is True and ctx.author.voice.channel.id != ctx.voice_client.channel.id:
+            await ctx.send("Ihh nanti aja ya kak, Nadeshiko lagi nyanyi")
+            return 69
         elif ctx.voice_client is not None:
             await ctx.voice_client.disconnect()
 
@@ -190,7 +193,9 @@ class Music(Cog):
         if ctx.voice_client is None:
             await self.join(ctx)
         elif ctx.author.voice.channel.id != ctx.voice_client.channel.id:
-            await self.join(ctx)
+            a = await self.join(ctx)
+            if a == 69:
+                return
         link = ["youtube.com/playlist?", "youtube.com/watch?", "https://youtu.be/"]
         # handle song where song isn't url
         if not any(url in song for url in link):
@@ -252,7 +257,7 @@ class Music(Cog):
             return await ctx.send("Masuk ke voice channel dulu ya kak")
 
         if ctx.author.voice.channel.id != ctx.voice_client.channel.id:
-            return await ctx.send("I am not currently playing any songs for you.")
+            return await ctx.send("Nadeshiko ga lagi nyanyi buat kakak")
 
         poll = discord.Embed(title=f"Vote to Skip Song by - {ctx.author.name}#{ctx.author.discriminator}", description="**80% of the voice channel must vote to skip for it to pass.**", colour=discord.Colour.blue())
         poll.add_field(name="Skip", value=":white_check_mark:")
@@ -298,8 +303,72 @@ class Music(Cog):
         await poll_msg.edit(embed=embed)
 
         if skip:
+            self.song_queue[ctx.guild.id].append(self.np[ctx.guild.id])
             ctx.voice_client.stop()
+            
+    @command(name="skipto")
+    async def skipto(self,ctx, *, number):
+        if not number.isnumeric():
+            return await ctx.send("Tolong masukkan nilai angka bulat ya kak")
+        number = int(number)
+        if not number <= len(self.song_queue[ctx.guild.id]):
+            return await ctx.send(f"?? Nggak ada antrian nomer {number} tuh")
+        if ctx.voice_client is None:
+            return await ctx.send("Dih orang Nadeshiko ga lagi nyanyi juga")
 
+        if ctx.author.voice is None:
+            return await ctx.send("Masuk ke voice channel dulu ya kak")
+
+        if ctx.author.voice.channel.id != ctx.voice_client.channel.id:
+            return await ctx.send("Nadeshiko ga lagi nyanyi buat kakak")
+        poll = discord.Embed(title=f"Vote to Skip Song by - {ctx.author.name}#{ctx.author.discriminator}", description="**80% of the voice channel must vote to skip for it to pass.**", colour=discord.Colour.blue())
+        poll.add_field(name="Skip", value=":white_check_mark:")
+        poll.add_field(name="Stay", value=":no_entry_sign:")
+        poll.set_footer(text="Voting ends in 15 seconds.")
+
+        poll_msg = await ctx.send(embed=poll) # only returns temporary message, we need to get the cached message to get the reactions
+        poll_id = poll_msg.id
+
+        await poll_msg.add_reaction(u"\u2705") # yes
+        await poll_msg.add_reaction(u"\U0001F6AB") # no
+        
+        await asyncio.sleep(15) # 15 seconds to vote
+
+        poll_msg = await ctx.channel.fetch_message(poll_id)
+        
+        votes = {u"\u2705": 0, u"\U0001F6AB": 0}
+        reacted = []
+
+        for reaction in poll_msg.reactions:
+            if reaction.emoji in [u"\u2705", u"\U0001F6AB"]:
+                async for user in reaction.users():
+                    if user.voice.channel.id == ctx.voice_client.channel.id and user.id not in reacted and not user.bot:
+                        if user.id in self.bot.owner_ids:
+                            votes[reaction.emoji] += 10
+                        else:
+                            votes[reaction.emoji] += 1
+                        reacted.append(user.id)
+
+        skip = False
+
+        if votes[u"\u2705"] > 0:
+            if votes[u"\U0001F6AB"] == 0 or votes[u"\u2705"] / (votes[u"\u2705"] + votes[u"\U0001F6AB"]) > 0.79: # 80% or higher
+                skip = True
+                embed = discord.Embed(title="Skip Successful", description="***Voting to skip the current song was succesful, skipping now.***", colour=discord.Colour.green())
+
+        if not skip:
+            embed = discord.Embed(title="Skip Failed", description="*Voting to skip the current song has failed.*\n\n**Voting failed, the vote requires at least 80% of the members to skip.**", colour=discord.Colour.red())
+
+        embed.set_footer(text="Voting has ended.")
+
+        await poll_msg.clear_reactions()
+        await poll_msg.edit(embed=embed)
+
+        if skip:
+            self.song_queue[ctx.guild.id].insert(0, self.song_queue[ctx.guild.id][number-1])
+            self.song_queue[ctx.guild.id].pop(number)
+            self.song_queue[ctx.guild.id].append(self.np[ctx.guild.id])
+            ctx.voice_client.stop()
 
     @command(name="pause")
     async def pause(self, ctx):

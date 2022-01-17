@@ -109,7 +109,7 @@ class Music(Cog):
             track = info[OPTIONS[reaction.emoji]]
             with YoutubeDL(self.YDL_OPTIONS) as ydl:
                 try: 
-                    lagu = ydl.extract_info("ytsearch:%s" % "https://www.youtube.com"+track['url_suffix'], download=False)['entries'][0]
+                    lagu = ydl.extract_info(f"{'https://www.youtube.com' + track['url_suffix']}", download=False)['entries'][0]
                 except Exception: 
                     return None
             return {'source': lagu['formats'][0]['url'], 'title': lagu['title']}
@@ -161,9 +161,6 @@ class Music(Cog):
     async def join(self, ctx):
         if ctx.author.voice is None:
             return await ctx.send("Connect dulu ke voice channel ya kak")
-        elif self.playing is True:
-            await ctx.send("Ihh nanti aja, Nadeshiko lagi nyanyi")
-            return 69
         elif ctx.voice_client is not None:
             await ctx.voice_client.disconnect()
 
@@ -193,9 +190,7 @@ class Music(Cog):
         if ctx.voice_client is None:
             await self.join(ctx)
         elif ctx.author.voice.channel.id != ctx.voice_client.channel.id:
-            a = await self.join(ctx)
-            if a == 69:
-                return
+            await self.join(ctx)
         link = ["youtube.com/playlist?", "youtube.com/watch?", "https://youtu.be/"]
         # handle song where song isn't url
         if not any(url in song for url in link):

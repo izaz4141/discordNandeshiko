@@ -161,10 +161,10 @@ class Music(Cog):
     async def join(self, ctx):
         if ctx.author.voice is None:
             return await ctx.send("Connect dulu ke voice channel ya kak")
-        if self.playing is True and ctx.author.voice.channel.id != ctx.voice_client.channel.id:
+        elif self.playing is True:
             await ctx.send("Ihh nanti aja, Nadeshiko lagi nyanyi")
-            return True
-        if ctx.voice_client is not None:
+            return 69
+        elif ctx.voice_client is not None:
             await ctx.voice_client.disconnect()
 
         await ctx.author.voice.channel.connect()
@@ -194,7 +194,7 @@ class Music(Cog):
             await self.join(ctx)
         elif ctx.author.voice.channel.id != ctx.voice_client.channel.id:
             a = await self.join(ctx)
-            if a is True:
+            if a == 69:
                 return
         link = ["youtube.com/playlist?", "youtube.com/watch?", "https://youtu.be/"]
         # handle song where song isn't url

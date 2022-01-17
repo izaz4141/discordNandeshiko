@@ -447,9 +447,12 @@ class Music(Cog):
             # if VC left by the user is not equal to the VC that bot is in? then return
             if voice.channel.id != before.channel.id:
                 return
-
-            # if VC has only 1 member (including the bot)
-            if len(voice.channel.members) <= 1:
+            not_bot = []
+            for member in voice.channel.members:
+                if not member.bot:
+                    not_bot.append(member)
+                    break
+            if len(not_bot) == 0:
 
                 self.timer[before.channel.guild.id] = 0
 
@@ -459,9 +462,13 @@ class Music(Cog):
                     await asyncio.sleep(1)
 
                     self.timer[before.channel.guild.id] += 1
-                    
+                    not_bot = []
+                    for member in voice.channel.members:
+                        if not member.bot:
+                            not_bot.append(member)
+                            break
                     # if vc has more than 1 member or bot is already disconnectd ? break
-                    if len(voice.channel.members) >= 2 or not voice.is_connected():
+                    if len(not_bot) >= 1 or not voice.is_connected():
                         break
 
                     # if bot has been alone in the VC for more than 60 seconds ? disconnect

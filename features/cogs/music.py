@@ -21,7 +21,7 @@ class Music(Cog):
     def __init__(self, bot):
         self.bot = bot 
         self.YDL_OPTIONS = {
-        'format': 'bestaudio[ext=m4a]',
+        'format': 'bestaudio[ext=webm]',
         'noplaylist': False
         }
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
@@ -31,6 +31,7 @@ class Music(Cog):
         self.repeat = {}
         self.np = {}
         self.playing = {}
+        self.timer = {}
 
 
     async def check_queue(self, ctx):
@@ -115,6 +116,8 @@ class Music(Cog):
 
     async def link_handler(self, ctx, song):
         if "youtube.com/playlist?" in song:
+            if not ctx.guild.id == 605057520955818010:
+                return False
             msg = await ctx.send("Ditemukan suatu playlist, mohon tunggu sampai seluruh playlist dimasukkan dalam antrian")
         with YoutubeDL(self.YDL_OPTIONS) as ydl:
             try: 
@@ -158,12 +161,16 @@ class Music(Cog):
     async def join(self, ctx):
         if ctx.author.voice is None:
             return await ctx.send("Connect dulu ke voice channel ya kak")
+        if self.playing is True and ctx.author.voice.channel.id != ctx.voice_client.channel.id:
+            await ctx.send("Ihh nanti aja, Nadeshiko lagi nyanyi")
+            return True
         if ctx.voice_client is not None:
             await ctx.voice_client.disconnect()
 
         await ctx.author.voice.channel.connect()
+        
 
-    @command(name="leave")
+    @command(name="leave", aliases=["disconnect"])
     async def leave(self, ctx):
         """Gunakan command ini untuk mereset cog musik apabila terjadi bug
         """
@@ -186,7 +193,9 @@ class Music(Cog):
         if ctx.voice_client is None:
             await self.join(ctx)
         elif ctx.author.voice.channel.id != ctx.voice_client.channel.id:
-            await self.join(ctx)
+            a = await self.join(ctx)
+            if a is True:
+                return
         link = ["youtube.com/playlist?", "youtube.com/watch?", "https://youtu.be/"]
         # handle song where song isn't url
         if not any(url in song for url in link):
@@ -199,8 +208,10 @@ class Music(Cog):
             result = await self.link_handler(ctx, song)
             if result == 'playlist':
                 return
-            if result is None:
-                return await ctx.send("Maaf kak, Nadeshiko tidak bisa menemukan lagu yang kakak maksud.")
+            elif result is None:
+                return await ctx.send("Maaf kak, Nadeshiko tidak bisa menemukan lagu yang kakak maksud")
+            elif result is False:
+                return await ctx.send("Maaf kak fitur menambahkan dari playlist dinonaktifkan di server kakak")
 
         try:
             if self.playing[ctx.guild.id] is True:
@@ -353,6 +364,51 @@ class Music(Cog):
         if number <= len(self.song_queue[ctx.guild.id]):
             await ctx.send(f"**{self.song_queue[ctx.guild.id][number-1][0]}** telah dihapus dari antrian")
             self.song_queue[ctx.guild.id].pop(number-1)
+            
+    @Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        
+        # if event is triggered by the bot? return
+        if member.bot:
+            return
+
+        # when before.channel != None that means user isnt joining a channel
+        if before.channel != None:
+            voice = discord.utils.get(self.bot.voice_clients , channel__guild__id = before.channel.guild.id)
+
+            # voice is voiceClient and if it's none? that means the bot is not in an y VC of the Guild that triggerd this event 
+            if voice == None:
+                return
+
+            # if VC left by the user is not equal to the VC that bot is in? then return
+            if voice.channel.id != before.channel.id:
+                return
+
+            # if VC has only 1 member (including the bot)
+            if len(voice.channel.members) <= 1:
+
+                self.timer[before.channel.guild.id] = 0
+
+                while True:
+                    # print("Time" , str(GUILD_VC_TIMER[before.channel.guild.id]) , "Total Members" , str(len(voice.channel.members)))
+
+                    await asyncio.sleep(1)
+
+                    self.timer[before.channel.guild.id] += 1
+                    
+                    # if vc has more than 1 member or bot is already disconnectd ? break
+                    if len(voice.channel.members) >= 2 or not voice.is_connected():
+                        break
+
+                    # if bot has been alone in the VC for more than 60 seconds ? disconnect
+                    if self.timer[before.channel.guild.id] >= 60:
+                        self.song_queue[member.guild.id] = []
+                        self.shuffle[member.guild.id] = False
+                        self.repeat[member.guild.id] = False
+                        self.np[member.guild.id] = []
+                        self.playing[member.guild.id] = False
+                        await voice.disconnect()
+                        return
 
     @Cog.listener()
     async def on_ready(self):

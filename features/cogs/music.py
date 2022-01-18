@@ -21,8 +21,21 @@ class Music(Cog):
     def __init__(self, bot):
         self.bot = bot 
         self.YDL_OPTIONS = {
-        'format': 'bestaudio[ext=webm]',
-        'noplaylist': False
+            'audioquality': 5,
+            'format': 'bestaudio[acodec=opus]',
+            'outtmpl': '{}',
+            'restrictfilenames': True,
+            'flatplaylist': True,
+            'nocheckcertificate': True,
+            'ignoreerrors': True,
+            'logtostderr': False,
+            "extractaudio": True,
+            "audioformat": "opus",
+            'quiet': True,
+            'no_warnings': True,
+            'default_search': 'auto',
+            # bind to ipv4 since ipv6 addresses cause issues sometimes
+            'source_address': '0.0.0.0'
         }
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         # self.FFMPEG_OPTIONS = {'options' : '-vn'}
@@ -152,9 +165,11 @@ class Music(Cog):
         else:
             await msg.delete()
             track = info[OPTIONS[reaction.emoji]]
-            with YoutubeDL(self.YDL_OPTIONS) as ydl:
+            ydl_format = self.YDL_OPTIONS.copy()
+            loop = self.bot.loop or asyncio.get_event_loop()
+            with YoutubeDL(ydl_format) as ydl:
                 try: 
-                    lagu = ydl.extract_info(f"{'https://www.youtube.com' + track['url_suffix']}", download=False)
+                    lagu = await loop.run_in_executor(None, lambda: ydl.extract_info(f"{'https://www.youtube.com' + track['url_suffix']}", download=False))
                 except Exception: 
                     return None
             return {'source': lagu['formats'][0]['url'], 'title': lagu['title']}
@@ -164,9 +179,11 @@ class Music(Cog):
             if not ctx.guild.id == 605057520955818010:
                 return False
             msg = await ctx.send("Ditemukan suatu playlist, mohon tunggu sampai seluruh playlist dimasukkan dalam antrian")
-        with YoutubeDL(self.YDL_OPTIONS) as ydl:
+        ydl_format = self.YDL_OPTIONS.copy()
+        loop = self.bot.loop or asyncio.get_event_loop()
+        with YoutubeDL(ydl_format) as ydl:
             try: 
-                info = ydl.extract_info(song, download=False)
+                info = await loop.run_in_executor(None, lambda: ydl.extract_info(song, download=False))
             except Exception: 
                 return None
         if not info['webpage_url_basename'] == "playlist":

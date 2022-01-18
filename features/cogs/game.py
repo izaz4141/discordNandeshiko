@@ -218,7 +218,6 @@ class Player:
 class Game(Cog):
     def __init__(self,bot):
         self.bot = bot
-        self.levelup_channel = self.bot.get_channel(823774055134920765)
         
     
 
@@ -236,7 +235,14 @@ class Game(Cog):
                     xp_to_add, new_level, (datetime.utcnow()+timedelta(seconds=45)).isoformat(), message.author.id)
 
         if new_level > lvl:
-            await self.levelup_channel.send(f"**{message.author.display_name}** telah mencapai level {new_level:,}, GJ")
+            wic = []
+            for guild in self.bot.guilds:
+                if guild.get_member(message.author.id):
+                    wic.append(guild.id)
+            for gid in wic:
+                log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
+                if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
+                    await self.bot.get_channel(log_channel).send(f"**{message.author.display_name}** telah mencapai level {new_level:,}, GJ")
             
     @command(name="dungeonlist", aliases=["dl"])
     async def dungeon_list(self, ctx):
@@ -296,7 +302,6 @@ class Game(Cog):
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:
-            self.levelup_channel = self.bot.get_channel(823774055134920765)
             self.bot.cogs_ready.ready_up("game")
 
     @Cog.listener()

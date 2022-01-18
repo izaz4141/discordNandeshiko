@@ -207,9 +207,20 @@ class Help(Cog):
         embed.set_author(icon_url=self.bot.get_user(self.bot.owner_ids[0]).avatar_url, name= f"{self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}")
         embed.set_thumbnail(url=ctx.guild.me.avatar_url)
         await ctx.send(embed=embed)
-
-
-
+        
+    @command(name="serverlist")
+    async def server_list(self,ctx):
+        embed = Embed(title= "Server List",
+                      colour= ctx.author.colour)
+        
+        servers = []
+        for guild in self.bot.guilds:
+            embed.add_field(name=guild.name,
+                            value= f"Members: {len(list(filter(lambda m: not m.bot, guild.members)))}\n\
+                                Bots: {len(list(filter(lambda m: m.bot, ctx.guild.members)))}")
+        embed.set_thumbnail(url=self.ctx.guild.me.avatar_url)
+        await ctx.send(embed=embed)
+            
     @Cog.listener()
     async def on_ready(self):
         self.bot.cogs_ready.ready_up("help")

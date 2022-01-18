@@ -1,7 +1,7 @@
 from discord import Embed, File, Client, Intents, ActivityType, Activity
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import CommandNotFound, Context, BadArgument, MissingRequiredArgument, CommandOnCooldown, when_mentioned_or
-from discord.ext.commands.errors import MissingPermissions, MissingRole
+from discord.ext.commands.errors import MissingPermissions, MissingRole, NSFWChannelRequired
 from discord.errors import HTTPException, Forbidden, NotFound
 from urllib3.exceptions import MaxRetryError
 from requests.exceptions import SSLError
@@ -179,7 +179,9 @@ class Bot(BotBase):
         elif isinstance(exc, MissingRole):
             await ctx.send(f"Maaf kakak tidak dapat mengakses perintah ini karena belum bergabung dalam **{exc.missing_role}**")
         
-        
+        elif isinstance(exc, NSFWChannelRequired):
+            await ctx.send(file= File('./data/image/pout.png'))
+            
         elif hasattr(exc, "original"):
             if isinstance(exc.original, HTTPException):
                 await ctx.send("Perasaanku tidak dapat disampaikan dengan kata - kata")

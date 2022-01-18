@@ -199,7 +199,6 @@ class Music(Cog):
             colour=ctx.author.colour,
             timestamp=dt.datetime.utcnow()
         )
-        embed.set_author(name="Hasil Cari")
         embed.set_footer(text=f"Invoked by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
 
         msg = await ctx.send(embed=embed)
@@ -343,11 +342,11 @@ class Music(Cog):
                     return await ctx.send(f"**{result['title']}** telah ditambahkan dalam antrian posisi: 1.")
         
             else:
-                await self.play_song(ctx, [result['title'], result['source'], format_durasi(result['duration']), result['thumbnail']])
+                await self.play_song(ctx, [result['title'], result['source'], result['duration'], result['thumbnail']])
                 await ctx.send(f"Now playing: **{result['title']}**")
             #     return await ctx.send("Sorry, I can only queue up to 10 songs, please wait for the current song to finish.")
         except KeyError:
-            await self.play_song(ctx, [result['title'], result['source'], format_durasi(result['duration']), result['thumbnail']])
+            await self.play_song(ctx, [result['title'], result['source'], result['duration'], result['thumbnail']])
             await ctx.send(f"Now playing: **{result['title']}**")
 
     @command(name="queue", aliases=["q"])

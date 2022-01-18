@@ -1,5 +1,6 @@
 import discord
 from discord.ext.commands import command, Cog
+from discord.ext.menus import MenuPages, ListPageSource
 
 import asyncio
 from youtube_dl import YoutubeDL
@@ -16,6 +17,35 @@ OPTIONS = {
     "5⃣": 4,
 }
 
+class IsiSearchTag(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=10)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*self.per_page) + 1
+        len_data = len(self.entries)
+        lagu = "\n".join([cr for cr in fields])
+        embed = discord.Embed(title=f"Antrian Musik:",
+                      description = f"{lagu}",
+                      colour=self.ctx.author.colour)
+        
+        # for name, value in fields:
+        #     embed.add_field(name=name,value=value,inline=False)
+
+        embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} lagu.")
+
+
+        return embed
+
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        for entry in entries:
+            fields.append(entry)
+
+        return await self.write_page(menu, fields)
 
 class Music(Cog):
     def __init__(self, bot):
@@ -69,10 +99,12 @@ class Music(Cog):
                         await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
                         self.song_queue[ctx.guild.id].pop(0)
                     else:
-                        await self.leave(ctx)
+                        if self.playing[ctx.guild.id] is True:
+                            await self.leave(ctx)
                     
                 except KeyError:
-                    await self.leave(ctx)
+                    if self.playing[ctx.guild.id] is True:
+                        await self.leave(ctx)
         except KeyError:
             try:
                 if self.repeat[ctx.guild.id] is True:
@@ -80,9 +112,11 @@ class Music(Cog):
                     await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
                     self.song_queue[ctx.guild.id].pop(0)
                 else:
-                    await self.leave(ctx)
+                    if self.playing[ctx.guild.id] is True:
+                            await self.leave(ctx)
             except KeyError:
-                await self.leave(ctx)
+                if self.playing[ctx.guild.id] is True:
+                        await self.leave(ctx)
                 
     async def poll_song(self,ctx):
         poll = discord.Embed(title=f"Vote to Skip Song by - {ctx.author.name}#{ctx.author.discriminator}", description="**80% of the voice channel must vote to skip for it to pass.**", colour=discord.Colour.blue())
@@ -172,7 +206,21 @@ class Music(Cog):
                     lagu = await loop.run_in_executor(None, lambda: ydl.extract_info(f"{'https://www.youtube.com' + track['url_suffix']}", download=False))
                 except Exception: 
                     return None
-            return {'source': lagu['formats'][0]['url'], 'title': lagu['title']}
+            durasi = lagu['duration']
+            if durasi >= 3600:
+                jam = durasi//3600
+                durasi = durasi%3600
+            if durasi >= 60:
+                menit = durasi//60
+                detik = durasi%60
+            else:
+                menit = 0
+                detik = durasi
+            if durasi >= 3600:
+                durasifor = f"{jam}:{menit}:{detik}"
+            else:
+                durasifor = f"{menit}:{detik}"
+            return {'source': lagu['formats'][0]['url'], 'title': lagu['title'], 'duration' : durasifor, 'thumbnail' : lagu['thumbnail']}
 
     async def link_handler(self, ctx, song):
         if "youtube.com/playlist?" in song:
@@ -187,12 +235,40 @@ class Music(Cog):
             except Exception: 
                 return None
         if not info['webpage_url_basename'] == "playlist":
-            return {'source': info['formats'][0]['url'], 'title': info['title']}
+            durasi = info['duration']
+            if durasi >= 3600:
+                jam = durasi//3600
+                durasi = durasi%3600
+            if durasi >= 60:
+                menit = durasi//60
+                detik = durasi%60
+            else:
+                menit = 0
+                detik = durasi
+            if durasi >= 3600:
+                durasifor = f"{jam}:{menit}:{detik}"
+            else:
+                durasifor = f"{menit}:{detik}"
+            return {'source': info['formats'][0]['url'], 'title': info['title'], 'duration' : durasifor, 'thumbnail' : info['thumbnail']}
         else:
             
             entries = []
             for entry in info['entries']:
-                entries.append([entry['title'], entry['formats'][0]['url']])
+                durasi = entry['duration']
+                if durasi >= 3600:
+                    jam = durasi//3600
+                    durasi = durasi%3600
+                if durasi >= 60:
+                    menit = durasi//60
+                    detik = durasi%60
+                else:
+                    menit = 0
+                    detik = durasi
+                if durasi >= 3600:
+                    durasifor = f"{jam}:{menit}:{detik}"
+                else:
+                    durasifor = f"{menit}:{detik}"
+                entries.append([entry['title'], entry['formats'][0]['url'], durasifor, entry['thumbnail']])
             try:
                 if self.playing[ctx.guild.id] is True:
                     for entry in entries:
@@ -227,7 +303,7 @@ class Music(Cog):
             if self.playing[ctx.guild.id] is True and ctx.author.voice.channel.id != ctx.voice_client.channel.id:
                 await ctx.send("Ihh nanti aja ya kak, Nadeshiko lagi nyanyi")
                 return 69
-        except KeyError:
+        except Exception:
             pass
         if ctx.voice_client is not None:
             await ctx.voice_client.disconnect()
@@ -282,12 +358,11 @@ class Music(Cog):
             if self.playing[ctx.guild.id] is True:
                 try:
                     queue_len = len(self.song_queue[ctx.guild.id])
+                    self.song_queue[ctx.guild.id].append([result['title'], result['source']], result['duration'], result['thumbnail'])
+                    return await ctx.send(f"**{result['title']}** telah ditambahkan dalam antrian posisi: {queue_len+1}.")
                 except KeyError:
                     self.song_queue[ctx.guild.id] = [[result['title'], result['source']]]
                     return await ctx.send(f"**{result['title']}** telah ditambahkan dalam antrian posisi: 1.")
-                if queue_len < 10:
-                    self.song_queue[ctx.guild.id].append([result['title'], result['source']])
-                    return await ctx.send(f"**{result['title']}** telah ditambahkan dalam antrian posisi: {queue_len+1}.")
         
             else:
                 await self.play_song(ctx, [result['title'], result['source']])
@@ -304,14 +379,15 @@ class Music(Cog):
                 return await ctx.send("Tidak ada lagu dalam antrian")
         except KeyError:
             return await ctx.send("Tidak ada lagu dalam antrian")
-        embed = discord.Embed(title="Song Queue", description="", colour=discord.Colour.dark_gold())
-        i = 1
-        for song in self.song_queue[ctx.guild.id]:
-            embed.description += f"{i}) {song[0]}\n"
-
-            i += 1
-
-        await ctx.send(embed=embed)
+        queue = []
+        for i, title in enumerate(self.song_queue[ctx.guild.id]):
+            
+                
+            queue.append(f"**{i+1:3d}**)  {title[0]} ({title[2]})")
+        menu = MenuPages(source=IsiSearchTag(ctx, queue),
+                         clear_reactions_after=True,
+                         timeout=60.0)# bisa ditambah clear_reaction_after=True
+        await menu.start(ctx)
 
     @command(name="skip")
     async def skip(self, ctx):
@@ -377,7 +453,13 @@ class Music(Cog):
     @command(name="np")
     async def np(self,ctx):
         if not self.np[ctx.guild.id] == []:
-            await ctx.send(f"Now playing: **{self.np[ctx.guild.id][0]}**")
+            embed = discord.Embed(
+                title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
+                description= f"Duration = <{self.np[ctx.guild.id][2]}>\nVolume = <{ctx.voice_client.source.volume}>",
+                colour= discord.Colour.dark_orange()
+            )
+            embed.set_thumbnail(url=self.np[ctx.guild.id][3])
+            await ctx.send(embed=embed)
         else:
             await ctx.send("Nadeshiko sedang tidak menyanyi")
     
@@ -409,11 +491,29 @@ class Music(Cog):
             
     @command(name="remove")
     async def remove(self, ctx, number):
+        if not number.isnumeric():
+            return await ctx.send("Tolong masukkan nilai angka bulat ya kak")
         number = int(number)
         if number <= len(self.song_queue[ctx.guild.id]):
             await ctx.send(f"**{self.song_queue[ctx.guild.id][number-1][0]}** telah dihapus dari antrian")
             self.song_queue[ctx.guild.id].pop(number-1)
-            
+    
+    @command(name="volume", aliases=["vol"])
+    async def vol_control(self,ctx, *, number):
+        """Kontrol volume dengan settingan maksimal 100
+
+        Args:
+            number (int): Nilai volume
+        """
+        if not number.isnumeric():
+            return await ctx.send("Tolong masukkan nilai angka bulat ya kak")
+        number = int(number)
+        if number >= 100:
+            number = 100
+        ctx.voice_client.source.volume = number/100
+        await ctx.send("Oke, kusesuaiin ya volumenya~")
+        
+         
     @Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         
@@ -465,6 +565,7 @@ class Music(Cog):
                         self.playing[member.guild.id] = False
                         await voice.disconnect()
                         return
+    
 
     @Cog.listener()
     async def on_ready(self):

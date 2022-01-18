@@ -239,6 +239,15 @@ class Bot(BotBase):
 
         else:
             print("bot reconnected")
+    
+    async def act(self, message, emoji):
+            webhook = await message.channel.create_webhook(name=message.author.name)
+            await webhook.send(
+                str(emoji), username=message.author.name, avatar_url=message.author.avatar_url)
+
+            webhooks = await message.channel.webhooks()
+            for webhook in webhooks:
+                    await webhook.delete()
 
     @client.event
     async def on_message(self, message):
@@ -296,7 +305,7 @@ class Bot(BotBase):
                     print_emoji = " ".join(ass)
                     try:
                         await message.delete()
-                        await message.channel.send(print_emoji)
+                        await self.act(message, print_emoji)
                         # print(f"{time()-sa}")
 
                     except NotFound:

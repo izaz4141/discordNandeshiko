@@ -358,7 +358,7 @@ class Music(Cog):
             if self.playing[ctx.guild.id] is True:
                 try:
                     queue_len = len(self.song_queue[ctx.guild.id])
-                    self.song_queue[ctx.guild.id].append([result['title'], result['source']], result['duration'], result['thumbnail'])
+                    self.song_queue[ctx.guild.id].append([result['title'], result['source']], result['duration'], result['thumbnail']])
                     return await ctx.send(f"**{result['title']}** telah ditambahkan dalam antrian posisi: {queue_len+1}.")
                 except KeyError:
                     self.song_queue[ctx.guild.id] = [[result['title'], result['source']]]

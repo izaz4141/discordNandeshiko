@@ -98,7 +98,7 @@ class Nirvana(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
             dojin_pages = str(dojin_d.total_pages)
             dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {
@@ -127,7 +127,7 @@ class Nirvana(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
             dojin_pages = str(dojin_d.total_pages)
             dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {
@@ -156,7 +156,7 @@ class Nirvana(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
             dojin_pages = str(dojin_d.total_pages)
             dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {
@@ -185,7 +185,7 @@ class Nirvana(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
             dojin_pages = str(dojin_d.total_pages)
             dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {
@@ -214,7 +214,7 @@ class Nirvana(Cog):
             dojin_lang = dojin.lang
             dojin_cover = dojin.cover
             dojin_title = dojin.title
-            dojin_d = nhen._get_doujin(dojin_id)
+            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
             dojin_pages = str(dojin_d.total_pages)
             dojin_tags = dojin_d.tags #list
             kamus_hen[i] = {

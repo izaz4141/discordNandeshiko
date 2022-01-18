@@ -23,6 +23,8 @@ class Developer(Cog):
         
     @command(name="leaveguild")
     async def leave_guild(self, ctx, guild_name):
+        if not ctx.author.id in self.bot.owner_ids:
+            return
         guild = get(self.bot.guilds, name=guild_name)
         if guild is None:
             return ctx.send("Lapor, Tidak ada server dengan nama itu Komandan!")

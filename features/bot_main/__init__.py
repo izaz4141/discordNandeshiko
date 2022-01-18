@@ -211,9 +211,6 @@ class Bot(BotBase):
             self.guild = self.get_guild(605057520955818010) #KALAU HANYA SATU SERVER
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)
-            self.total_emojiss = []
-            for g in self.guilds:
-                self.total_emojiss += g.emojis
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))

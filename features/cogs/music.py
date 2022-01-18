@@ -267,10 +267,10 @@ class Music(Cog):
                 return "playlist"
                             
     async def play_song(self, ctx, song):
-        try:
-            ctx.voice_client.play(PCMVolumeTransformer(FFmpegOpusAudio.from_probe(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
-        except Exception:
-            ctx.voice_client.play(PCMVolumeTransformer(FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
+        # try:
+        #     ctx.voice_client.play(PCMVolumeTransformer(FFmpegOpusAudio.from_probe(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
+        # except Exception:
+        ctx.voice_client.play(PCMVolumeTransformer(FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
         ctx.voice_client.source.volume = 0.5
         self.np[ctx.guild.id] = song
         self.playing[ctx.guild.id] = True

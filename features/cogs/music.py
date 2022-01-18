@@ -1,6 +1,7 @@
-import discord
+from discord import Embed, Colour, PCMVolumeTransformer, FFmpegOpusAudio, FFmpegPCMAudio
 from discord.ext.commands import command, Cog
 from discord.ext.menus import MenuPages, ListPageSource
+from discord.utils import get
 
 import asyncio
 from youtube_dl import YoutubeDL
@@ -43,7 +44,7 @@ class IsiSearchTag(ListPageSource):
         offset = (menu.current_page*self.per_page) + 1
         len_data = len(self.entries)
         lagu = "\n".join([cr for cr in fields])
-        embed = discord.Embed(title=f"Antrian Musik:",
+        embed = Embed(title=f"Antrian Musik:",
                       description = f"{lagu}",
                       colour=self.ctx.author.colour)
         
@@ -135,7 +136,7 @@ class Music(Cog):
                         await self.leave(ctx)
                 
     async def poll_song(self,ctx):
-        poll = discord.Embed(title=f"Vote to Skip Song by - {ctx.author.name}#{ctx.author.discriminator}", description="**80% of the voice channel must vote to skip for it to pass.**", colour=discord.Colour.blue())
+        poll = Embed(title=f"Vote to Skip Song by - {ctx.author.name}#{ctx.author.discriminator}", description="**80% of the voice channel must vote to skip for it to pass.**", colour= Colour.blue())
         poll.add_field(name="Skip", value=":white_check_mark:")
         poll.add_field(name="Stay", value=":no_entry_sign:")
         poll.set_footer(text="Voting ends in 15 seconds.")
@@ -168,10 +169,10 @@ class Music(Cog):
         if votes[u"\u2705"] > 0:
             if votes[u"\U0001F6AB"] == 0 or votes[u"\u2705"] / (votes[u"\u2705"] + votes[u"\U0001F6AB"]) > 0.79: # 80% or higher
                 skip = True
-                embed = discord.Embed(title="Skip Successful", description="***Voting to skip the current song was succesful, skipping now.***", colour=discord.Colour.green())
+                embed = Embed(title="Skip Successful", description="***Voting to skip the current song was succesful, skipping now.***", colour= Colour.green())
 
         if not skip:
-            embed = discord.Embed(title="Skip Failed", description="*Voting to skip the current song has failed.*\n\n**Voting failed, the vote requires at least 80% of the members to skip.**", colour=discord.Colour.red())
+            embed = Embed(title="Skip Failed", description="*Voting to skip the current song has failed.*\n\n**Voting failed, the vote requires at least 80% of the members to skip.**", colour= Colour.red())
 
         embed.set_footer(text="Voting has ended.")
 
@@ -188,7 +189,7 @@ class Music(Cog):
             )
             
         info = YoutubeSearch(query, max_results=5).to_dict()
-        embed = discord.Embed(
+        embed = Embed(
             title="Pilih Lagu",
             description=(
                 "\n".join(
@@ -266,7 +267,10 @@ class Music(Cog):
                 return "playlist"
                             
     async def play_song(self, ctx, song):
-        ctx.voice_client.play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
+        try:
+            ctx.voice_client.play(PCMVolumeTransformer(FFmpegOpusAudio.from_probe(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
+        except Exception:
+            ctx.voice_client.play(PCMVolumeTransformer(FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
         ctx.voice_client.source.volume = 0.5
         self.np[ctx.guild.id] = song
         self.playing[ctx.guild.id] = True
@@ -429,10 +433,10 @@ class Music(Cog):
     @command(name="np")
     async def np(self,ctx):
         if not self.np[ctx.guild.id] == []:
-            embed = discord.Embed(
+            embed = Embed(
                 title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
                 description= f"Duration<{self.np[ctx.guild.id][2]}>\nVolume<{ctx.voice_client.source.volume}>",
-                colour= discord.Colour.dark_orange()
+                colour= Colour.dark_orange()
             )
             embed.set_thumbnail(url=self.np[ctx.guild.id][3])
             await ctx.send(embed=embed)
@@ -499,7 +503,7 @@ class Music(Cog):
 
         # when before.channel != None that means user isnt joining a channel
         if before.channel != None:
-            voice = discord.utils.get(self.bot.voice_clients , channel__guild__id = before.channel.guild.id)
+            voice = get(self.bot.voice_clients , channel__guild__id = before.channel.guild.id)
 
             # voice is voiceClient and if it's none? that means the bot is not in an y VC of the Guild that triggerd this event 
             if voice == None:

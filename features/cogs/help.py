@@ -1,9 +1,10 @@
 from discord.ext.commands import Cog, command
 from discord.ext.menus import MenuPages, ListPageSource
 from discord.utils import get
-from discord import Embed
+from discord import Embed, File
 from typing import Optional
 
+Forbidden_Cog = ["developer"]
 
 def syntax(command):
     cmd_and_alias = " | ".join([str(command), *command.aliases])
@@ -19,9 +20,10 @@ def syntax(command):
 
 
 class HelpMenu(ListPageSource):
-    def __init__(self, ctx, data, cmd):
+    def __init__(self, ctx, data, cmd, owner_ids):
         self.ctx = ctx
         self.cmd = cmd
+        self.owner_ids = owner_ids
 
         super().__init__(data, per_page=3)
 
@@ -54,7 +56,11 @@ class HelpMenu(ListPageSource):
             
             elif value == '':
                 value = "Tidak ada perintah dalam Cog ini"
-            fields.append((name, value))
+            if name.lower() in Forbidden_Cog:
+                if self.ctx.author.id in self.owner_ids:
+                    fields.append((name, value))
+            else:
+                fields.append((name, value))
         for name, value in fields:
             embed.add_field(name=name, value=value, inline=False)
 
@@ -122,6 +128,10 @@ class Help(Cog):
         await ctx.send(embed=embed)
         
     async def cog_help(self, ctx, cog):
+        if cog.lower() in Forbidden_Cog :
+            if not ctx.author.id in self.bot.owner_ids:
+                await ctx.send("Kakak tau perintah ini dari siapa? 🔪🔪🔪")
+                return await ctx.send(file= File('./data/image/smiring.jpg'))
         cog_command = []
         for comand in list(self.bot.commands):
             if comand.cog_name.lower() == cog.lower():
@@ -141,7 +151,7 @@ class Help(Cog):
         ```help fun```
         """
         if cmd is None:
-            menu = MenuPages(source=HelpMenu(ctx, list(self.bot.cogs.keys()), list(self.bot.commands)),
+            menu = MenuPages(source=HelpMenu(ctx, list(self.bot.cogs.keys()), list(self.bot.commands), self.bot.owner_ids),
                             #  delete_message_after=True,
                             clear_reactions_after= True,
                              timeout=60.0)# bisa ditambah clear_reaction_after=True
@@ -208,18 +218,6 @@ class Help(Cog):
         embed.set_thumbnail(url=ctx.guild.me.avatar_url)
         await ctx.send(embed=embed)
         
-    @command(name="serverlist")
-    async def server_list(self,ctx):
-        embed = Embed(title= "Server List",
-                      colour= ctx.author.colour)
-        
-        servers = []
-        for guild in self.bot.guilds:
-            embed.add_field(name=guild.name,
-                            value= f"Members: {len(list(filter(lambda m: not m.bot, guild.members)))}\n\
-                                Bots: {len(list(filter(lambda m: m.bot, guild.members)))}")
-        embed.set_thumbnail(url=ctx.guild.me.avatar_url)
-        await ctx.send(embed=embed)
             
     @Cog.listener()
     async def on_ready(self):

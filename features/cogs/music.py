@@ -17,6 +17,21 @@ OPTIONS = {
     "5⃣": 4,
 }
 
+def format_durasi(durasi:int):
+    if durasi >= 3600:
+        jam = durasi//3600
+        durasi = durasi%3600
+    if durasi >= 60:
+        menit = durasi//60
+        detik = durasi%60
+    else:
+        menit = 0
+        detik = durasi
+    if durasi >= 3600:
+        return f"{jam}:{menit}:{detik}"
+    else:
+        return f"{menit}:{detik}"
+
 class IsiSearchTag(ListPageSource):
     def __init__(self, ctx, data):
         self.ctx = ctx
@@ -206,21 +221,8 @@ class Music(Cog):
                     lagu = await loop.run_in_executor(None, lambda: ydl.extract_info(f"{'https://www.youtube.com' + track['url_suffix']}", download=False))
                 except Exception: 
                     return None
-            durasi = lagu['duration']
-            if durasi >= 3600:
-                jam = durasi//3600
-                durasi = durasi%3600
-            if durasi >= 60:
-                menit = durasi//60
-                detik = durasi%60
-            else:
-                menit = 0
-                detik = durasi
-            if durasi >= 3600:
-                durasifor = f"{jam}:{menit}:{detik}"
-            else:
-                durasifor = f"{menit}:{detik}"
-            return {'source': lagu['formats'][0]['url'], 'title': lagu['title'], 'duration' : durasifor, 'thumbnail' : lagu['thumbnail']}
+            durasi = format_durasi(lagu['duration'])
+            return {'source': lagu['formats'][0]['url'], 'title': lagu['title'], 'duration' : durasi, 'thumbnail' : lagu['thumbnail']}
 
     async def link_handler(self, ctx, song):
         if "youtube.com/playlist?" in song:
@@ -235,40 +237,14 @@ class Music(Cog):
             except Exception: 
                 return None
         if not info['webpage_url_basename'] == "playlist":
-            durasi = info['duration']
-            if durasi >= 3600:
-                jam = durasi//3600
-                durasi = durasi%3600
-            if durasi >= 60:
-                menit = durasi//60
-                detik = durasi%60
-            else:
-                menit = 0
-                detik = durasi
-            if durasi >= 3600:
-                durasifor = f"{jam}:{menit}:{detik}"
-            else:
-                durasifor = f"{menit}:{detik}"
-            return {'source': info['formats'][0]['url'], 'title': info['title'], 'duration' : durasifor, 'thumbnail' : info['thumbnail']}
+            durasi = format_durasi(info['duration'])
+            return {'source': info['formats'][0]['url'], 'title': info['title'], 'duration' : durasi, 'thumbnail' : info['thumbnail']}
         else:
             
             entries = []
             for entry in info['entries']:
-                durasi = entry['duration']
-                if durasi >= 3600:
-                    jam = durasi//3600
-                    durasi = durasi%3600
-                if durasi >= 60:
-                    menit = durasi//60
-                    detik = durasi%60
-                else:
-                    menit = 0
-                    detik = durasi
-                if durasi >= 3600:
-                    durasifor = f"{jam}:{menit}:{detik}"
-                else:
-                    durasifor = f"{menit}:{detik}"
-                entries.append([entry['title'], entry['formats'][0]['url'], durasifor, entry['thumbnail']])
+                durasi = format_durasi(entry['duration'])
+                entries.append([entry['title'], entry['formats'][0]['url'], durasi, entry['thumbnail']])
             try:
                 if self.playing[ctx.guild.id] is True:
                     for entry in entries:
@@ -358,7 +334,8 @@ class Music(Cog):
             if self.playing[ctx.guild.id] is True:
                 try:
                     queue_len = len(self.song_queue[ctx.guild.id])
-                    self.song_queue[ctx.guild.id].append([result['title'], result['source'], result['duration'], result['thumbnail']])
+                    durasi = format_durasi(result['duration'])
+                    self.song_queue[ctx.guild.id].append([result['title'], result['source'], durasi, result['thumbnail']])
                     return await ctx.send(f"**{result['title']}** telah ditambahkan dalam antrian posisi: {queue_len+1}.")
                 except KeyError:
                     self.song_queue[ctx.guild.id] = [[result['title'], result['source']]]
@@ -369,7 +346,7 @@ class Music(Cog):
                 await ctx.send(f"Now playing: **{result['title']}**")
             #     return await ctx.send("Sorry, I can only queue up to 10 songs, please wait for the current song to finish.")
         except KeyError:
-            await self.play_song(ctx, [result['title'], result['source']])
+            await self.play_song(ctx, [result['title'], result['source'], format_durasi(result['duration']), result['thumbnail']])
             await ctx.send(f"Now playing: **{result['title']}**")
 
     @command(name="queue", aliases=["q"])

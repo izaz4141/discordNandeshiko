@@ -217,8 +217,8 @@ class Help(Cog):
         for guild in self.bot.guilds:
             embed.add_field(name=guild.name,
                             value= f"Members: {len(list(filter(lambda m: not m.bot, guild.members)))}\n\
-                                Bots: {len(list(filter(lambda m: m.bot, ctx.guild.members)))}")
-        embed.set_thumbnail(url=self.ctx.guild.me.avatar_url)
+                                Bots: {len(list(filter(lambda m: m.bot, guild.members)))}")
+        embed.set_thumbnail(url=ctx.guild.me.avatar_url)
         await ctx.send(embed=embed)
             
     @Cog.listener()

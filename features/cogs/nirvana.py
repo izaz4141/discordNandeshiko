@@ -1,6 +1,8 @@
 from NHentai import NHentai
+import asyncio
+
 from discord.ext.menus import MenuPages, ListPageSource
-from discord.ext.commands import Cog, CheckFailure, command
+from discord.ext.commands import Cog, CheckFailure, command, is_nsfw
 from discord import Embed
 
 nhen = NHentai()
@@ -84,10 +86,12 @@ class Nirvana(Cog):
         self.bot = bot
         
     @command(name="berandasurga", aliases=["bs"])
+    @is_nsfw()
     async def Nhen_Home(self, ctx):
         """Mengintip pintu surga"""
         kamus_hen = {}
-        home = nhen.get_pages(page=1)
+        loop = self.bot.loop or asyncio.get_event_loop()
+        home = await loop.run_in_executor(None, lambda: nhen.get_pages(page=1))
         for i in range(len(home.doujins)):
             dojin = home.doujins[i]
             dojin_id = dojin.id
@@ -111,10 +115,12 @@ class Nirvana(Cog):
         await menu.start(ctx)
         
     @command(name="mencarisurgap", aliases=["msp"])
+    @is_nsfw()
     async def Nhen_searchP(self, ctx, *, kata_kunci):
         """Mencari surga yang paling atas"""
         kamus_hen = {}
-        hasil = nhen.search(query=kata_kunci, sort="popular")
+        loop = self.bot.loop or asyncio.get_event_loop()
+        hasil = await loop.run_in_executor(None, lambda: nhen.search(query=kata_kunci, sort="popular"))
         for i in range(len(hasil.doujins)):
             dojin = hasil.doujins[i]
             dojin_id = dojin.id
@@ -138,10 +144,12 @@ class Nirvana(Cog):
         await menu.start(ctx)
         
     @command(name="mencarisurgaw", aliases=["msw"])
+    @is_nsfw()
     async def Nhen_searchPW(self, ctx, *, kata_kunci):
         """Mencari surga yang ramai minggu ini"""
         kamus_hen = {}
-        hasil = nhen.search(query=kata_kunci, sort="popular-week")
+        loop = self.bot.loop or asyncio.get_event_loop()
+        hasil = await loop.run_in_executor(None, lambda: nhen.search(query=kata_kunci, sort="popular-week"))
         for i in range(len(hasil.doujins)):
             dojin = hasil.doujins[i]
             dojin_id = dojin.id
@@ -165,10 +173,12 @@ class Nirvana(Cog):
         await menu.start(ctx)
         
     @command(name="mencarisurgat", aliases=["mst"])
+    @is_nsfw()
     async def Nhen_searchPT(self, ctx, *, kata_kunci):
         """Mencari surga yang ramai hari ini"""
         kamus_hen = {}
-        hasil = nhen.search(query=kata_kunci, sort="popular-today")
+        loop = self.bot.loop or asyncio.get_event_loop()
+        hasil = await loop.run_in_executor(None, lambda: nhen.search(query=kata_kunci, sort="popular-today"))
         for i in range(len(hasil.doujins)):
             dojin = hasil.doujins[i]
             dojin_id = dojin.id
@@ -192,10 +202,12 @@ class Nirvana(Cog):
         await menu.start(ctx)
         
     @command(name="mencarisurga", aliases=["msl"])
+    @is_nsfw()
     async def Nhen_searchPL(self, ctx, *, kata_kunci):
         """Mencari surga yang baru saja dibentuk"""
         kamus_hen = {}
-        hasil = nhen.search(query=kata_kunci)
+        loop = self.bot.loop or asyncio.get_event_loop()
+        hasil = await loop.run_in_executor(None, lambda: nhen.search(query=kata_kunci))
         for i in range(len(hasil.doujins)):
             dojin = hasil.doujins[i]
             dojin_id = dojin.id
@@ -219,9 +231,11 @@ class Nirvana(Cog):
         await menu.start(ctx)
         
     @command(name="infosurga", aliases=["is"])
+    @is_nsfw()
     async def Doujin_Info(self, ctx, *, doujin_id):
         """Melihat ingfo surga dengan kode tertentu"""
-        dojin = nhen._get_doujin(doujin_id)
+        loop = self.bot.loop or asyncio.get_event_loop()
+        dojin = await loop.run_in_executor(None, lambda: nhen._get_doujin(doujin_id))
         dojin_id = dojin.id
         dojin_title = dojin.title
         dojin_title2 = dojin.secondary_title
@@ -264,9 +278,11 @@ class Nirvana(Cog):
         await ctx.send(embed=embed)
         
     @command(name="infosurgarandom", aliases=["isr"])
+    @is_nsfw()
     async def Doujin_Info_Random(self, ctx):
         """Melihat ingfo surga yang belum dijelajahi sebelumnya"""
-        dojin = nhen.get_random()
+        loop = self.bot.loop or asyncio.get_event_loop()
+        dojin = await loop.run_in_executor(None, lambda: nhen.get_random())
         dojin_id = dojin.id
         dojin_title = dojin.title
         dojin_title2 = dojin.secondary_title
@@ -309,9 +325,11 @@ class Nirvana(Cog):
         await ctx.send(embed=embed)
         
     @command(name="bacakitab", aliases=["bk"])
+    @is_nsfw()
     async def Baca_Doujin(self, ctx, *, rahasia_dunia):
         """Mengintip Pintu Surga Menuju Kenikmatan Tak Terbatas (ada passwordnya)"""
-        dojin = nhen._get_doujin(rahasia_dunia)
+        loop = self.bot.loop or asyncio.get_event_loop()
+        dojin = await loop.run_in_executor(None, lambda: nhen._get_doujin(rahasia_dunia))
         dojin_imgs = dojin.images
         menu = MenuPages(source=IsiSurga(ctx, dojin_imgs),
                         delete_message_after=True,

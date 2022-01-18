@@ -18,6 +18,7 @@ OPTIONS = {
 }
 
 def format_durasi(durasi:int):
+    durasi = int(durasi)
     if durasi >= 3600:
         jam = durasi//3600
         durasi = durasi%3600
@@ -342,7 +343,7 @@ class Music(Cog):
                     return await ctx.send(f"**{result['title']}** telah ditambahkan dalam antrian posisi: 1.")
         
             else:
-                await self.play_song(ctx, [result['title'], result['source']])
+                await self.play_song(ctx, [result['title'], result['source'], format_durasi(result['duration']), result['thumbnail']])
                 await ctx.send(f"Now playing: **{result['title']}**")
             #     return await ctx.send("Sorry, I can only queue up to 10 songs, please wait for the current song to finish.")
         except KeyError:

@@ -245,12 +245,9 @@ class Bot(BotBase):
     async def on_message(self, message):
         
         if not message.author.bot:
-            
-            
             if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.total_emojiss
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis))])], weights= [1, 1, 2], k=1)[0])
-            
             else:
                 await self.process_commands(message)
             

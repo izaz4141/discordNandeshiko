@@ -1,6 +1,9 @@
-from discord.ext.commands import Cog, command
+from discord.ext.commands import Cog, command, is_owner
 from discord.utils import get
 from discord import Embed
+
+from os import execv, getenv
+from sys import executable, argv
 
 
 class Developer(Cog):
@@ -30,6 +33,24 @@ class Developer(Cog):
             return ctx.send("Lapor, Tidak ada server dengan nama itu Komandan!")
         await guild.leave() # Guild found
         await ctx.send(f"Nadeshiko meninggalkan **{guild.name}**!")
+        
+    @command(name="fullrestart")
+    async def full_restart(self,ctx):
+        if not ctx.author.id in self.bot.owner_ids:
+            return
+        await ctx.send("Restarting bot...")
+        execv(executable, ['python'] + argv)
+        
+    @command(name="test")
+    @is_owner()
+    async def test(self,ctx):
+        DIS_TOKEN = getenv('DIS_TOKEN')
+        return await ctx.send(DIS_TOKEN)
+    
+    @command(name= "upload db")
+    @is_owner()
+    async def upload_db(self,ctx):
+        self.bot.update_db_intoCloud()
         
     @Cog.listener()
     async def on_message(self, message):

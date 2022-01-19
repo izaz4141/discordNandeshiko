@@ -567,19 +567,25 @@ class Music(Cog):
     async def on_reaction_add(self, reaction, user):
         if user.bot:
             return
-        if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
-            if reaction.message.id == self.np_id[reaction.message.guild.id]:
-                if not self.np == []:
-                    await self.button_control(reaction, user)
+        try:
+            if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
+                if reaction.message.id == self.np_id[reaction.message.guild.id]:
+                    if not self.np == []:
+                        await self.button_control(reaction, user)
+        except AttributeError:
+            return
                     
     @Cog.listener()
     async def on_reaction_remove(self, reaction, user):
         if user.bot:
             return
-        if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
-            if reaction.message.id == self.np_id[reaction.message.guild.id]:
-                if not self.np == []:
-                    await self.button_control(reaction, user)
+        try:
+            if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
+                if reaction.message.id == self.np_id[reaction.message.guild.id]:
+                    if not self.np == []:
+                        await self.button_control(reaction, user)
+        except AttributeError:
+            return
                     
     async def button_control(self, reaction, user):
         if reaction.emoji == "⏮️":

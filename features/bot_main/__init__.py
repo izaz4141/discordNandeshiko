@@ -243,7 +243,7 @@ class Bot(BotBase):
     @client.event
     async def on_message(self, message):
         if not message.author.bot:
-            if message.author.id in self.bot.owner_ids:
+            if message.author.id in self.owner_ids:
                 if message.content == "update db" :
                     self.update_db_intoCloud()
             if "nandeshi" in message.content or "nadeshi" in message.content:

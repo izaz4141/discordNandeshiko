@@ -565,6 +565,8 @@ class Music(Cog):
     # Button control on now playing embed
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
+        if user.bot:
+            return
         if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
             if reaction.message.id == self.np_id[reaction.message.guild.id]:
                 if not self.np == []:

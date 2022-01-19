@@ -44,7 +44,7 @@ class Developer(Cog):
     @command(name="test")
     @is_owner()
     async def test(self,ctx):
-        DIS_TOKEN = getenv('DIS_TOKEN')
+        DIS_TOKEN = getenv('DIS_KEY')
         return await ctx.send(DIS_TOKEN)
     
     @command(name= "upload db")

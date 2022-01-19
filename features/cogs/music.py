@@ -596,7 +596,7 @@ class Music(Cog):
                         if reaction.message.guild.voice_client.is_paused():
                             reaction.message.guild.voice_client.resume()
                             msg = await reaction.message.channel.send("Lagu diteruskan")
-                        if not reaction.message.guild.voice_client.is_paused():
+                        elif not reaction.message.guild.voice_client.is_paused():
                             reaction.message.guild.voice_client.pause()
                             msg = await reaction.message.channel.send("Lagu telah dijeda")
                         await asyncio.sleep(5)

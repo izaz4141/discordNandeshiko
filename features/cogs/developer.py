@@ -2,7 +2,7 @@ from discord.ext.commands import Cog, command, is_owner
 from discord.utils import get
 from discord import Embed
 
-from os import execv, getenv
+from os import execv
 from sys import executable, argv
 
 
@@ -40,23 +40,6 @@ class Developer(Cog):
             return
         await ctx.send("Restarting bot...")
         execv(executable, ['python'] + argv)
-        
-    @command(name="test")
-    @is_owner()
-    async def test(self,ctx):
-        DIS_TOKEN = getenv('DIS_KEY')
-        return await ctx.send(DIS_TOKEN)
-    
-    @command(name= "upload db")
-    @is_owner()
-    async def upload_db(self,ctx):
-        self.bot.update_db_intoCloud()
-        
-    @Cog.listener()
-    async def on_message(self, message):
-        if message.author.id in self.bot.owner_ids:
-            if message.content == "update db" :
-                self.bot.update_db_intoCloud()
         
 
     @Cog.listener()

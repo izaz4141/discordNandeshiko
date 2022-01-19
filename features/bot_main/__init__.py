@@ -10,6 +10,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 from time import time
 from glob import glob
+from os import getenv
 from random import choices, randint
 from asyncio import sleep
 from apscheduler.triggers.cron import CronTrigger
@@ -120,9 +121,7 @@ class Bot(BotBase):
 
         print("running setup")
         self.setup()
-        
-        with open("features/bot_main/token", "r", encoding = "utf-8") as tf:
-            self.TOKEN = tf.read()
+        self.TOKEN = getenv('DIS_KEY')
 
         print("running bot...")
         super().run(self.TOKEN, reconnect=True)
@@ -243,10 +242,12 @@ class Bot(BotBase):
 
     @client.event
     async def on_message(self, message):
-        
         if not message.author.bot:
+            if message.author.id in self.bot.owner_ids:
+                if message.content == "update db" :
+                    self.update_db_intoCloud()
             if "nandeshi" in message.content or "nadeshi" in message.content:
-                total_emojis = self.total_emojiss
+                total_emojis = self.emojis
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis))])], weights= [1, 1, 2], k=1)[0])
             else:
                 await self.process_commands(message)

@@ -3,11 +3,13 @@ import dropbox
 from dropbox.files import WriteMode
 from dropbox.exceptions import ApiError, AuthError
 
+from os import getenv
+
 # Add OAuth2 access token here.
 # You can generate one for yourself in the App Console.
 # See <https://blogs.dropbox.com/developers/2014/05/generate-an-access-token-for-your-own-account/>
 
-TOKEN = "jLMxq7XJeHUAAAAAAAAAAe3ddfZrPUZqXWvou3GhmmlEGFqvdJYR-_uFXvFSMN4b"
+TOKEN = getenv('DROPBOX_KEY')
 
 # LOCALFILE = 'tohoerr.png'
 # BACKUPPATH = '/toho-err.png'

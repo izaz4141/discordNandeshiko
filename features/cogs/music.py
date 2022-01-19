@@ -389,7 +389,7 @@ class Music(Cog):
         if ctx.author.voice.channel.id != ctx.voice_client.channel.id:
             return await ctx.send("Nadeshiko ga lagi nyanyi buat kakak")
 
-        skip, poll_msg = await self.poll_song(ctx.user, ctx.channel)
+        skip, poll_msg = await self.poll_song(ctx.author, ctx.channel)
         if skip:
             ctx.voice_client.stop()
         await asyncio.sleep(4)
@@ -416,7 +416,7 @@ class Music(Cog):
         if ctx.author.voice.channel.id != ctx.voice_client.channel.id:
             return await ctx.send("Nadeshiko ga lagi nyanyi buat kakak")
         
-        skip, poll_msg = await self.poll_song(ctx.user, ctx.channel)
+        skip, poll_msg = await self.poll_song(ctx.author, ctx.channel)
         if skip:
             self.song_queue[ctx.guild.id].insert(0, self.song_queue[ctx.guild.id][number-1])
             self.song_queue[ctx.guild.id].pop(number)
@@ -571,7 +571,7 @@ class Music(Cog):
             if reaction.message.id == self.np_id[reaction.message.guild.id]:
                 if not self.np == []:
                     if reaction.emoji == "⏮️":
-                        skip, poll_msg = await self.poll(user, reaction.message.channel)
+                        skip, poll_msg = await self.poll_song(user, reaction.message.channel)
                         if skip:
                             self.song_queue[reaction.message.guild.id].insert(0, self.song_queue[reaction.message.guild.id][len(self.song_queue[reaction.message.guild.id])-1])
                             self.song_queue[reaction.message.guild.id].pop(len(self.song_queue[reaction.message.guild.id])-1)
@@ -615,7 +615,7 @@ class Music(Cog):
                         await asyncio.sleep(4)
                         await msg.delete()
                     if reaction.emoji == "⏭️":
-                        skip, poll_msg = await self.poll(user, reaction.message.channel)
+                        skip, poll_msg = await self.poll_song(user, reaction.message.channel)
                         if skip:
                             reaction.message.guild.voice_client.stop()
                         await asyncio.sleep(4)

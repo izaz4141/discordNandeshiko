@@ -562,7 +562,7 @@ class Music(Cog):
                         self.playing[member.guild.id] = False
                         await voice.disconnect()
                         return
-    
+    # Button control on now playing embed
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
         if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:

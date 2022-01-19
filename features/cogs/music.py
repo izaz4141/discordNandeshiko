@@ -570,56 +570,67 @@ class Music(Cog):
         if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
             if reaction.message.id == self.np_id[reaction.message.guild.id]:
                 if not self.np == []:
-                    if reaction.emoji == "⏮️":
-                        skip, poll_msg = await self.poll_song(user, reaction.message.channel)
-                        if skip:
-                            self.song_queue[reaction.message.guild.id].insert(0, self.song_queue[reaction.message.guild.id][len(self.song_queue[reaction.message.guild.id])-1])
-                            self.song_queue[reaction.message.guild.id].pop(len(self.song_queue[reaction.message.guild.id])-1)
-                            reaction.message.guild.voice_client.stop()
-                        await asyncio.sleep(4)
-                        await poll_msg.delete()
-    
-                    if reaction.emoji == "🔀":
-                        try:
-                            if self.shuffle[reaction.message.guild.id] is False:
-                                self.shuffle[reaction.message.guild.id] = True
-                                msg = await reaction.message.channel.send("Mode shuffle diaktifkan")
-                            else:
-                                self.shuffle[reaction.message.guild.id] = False
-                                msg =await reaction.message.channel.send("Mode shuffle dimatikan")
-                        except KeyError:
-                            self.shuffle[reaction.message.guild.id] = True
-                            msg = await reaction.message.channel.send("Mode shuffle diaktifkan")
-                        await asyncio.sleep(4)
-                        await msg.delete()
-                    if reaction.emoji == "⏯️":
-                        if reaction.message.guild.voice_client.is_paused():
-                            reaction.message.guild.voice_client.resume()
-                            msg = await reaction.message.channel.send("Lagu diteruskan")
-                        elif not reaction.message.guild.voice_client.is_paused():
-                            reaction.message.guild.voice_client.pause()
-                            msg = await reaction.message.channel.send("Lagu telah dijeda")
-                        await asyncio.sleep(5)
-                        await msg.delete()
-                    if reaction.emoji == "🔁":
-                        try:
-                            if self.repeat[reaction.message.guild.id] is False:
-                                self.repeat[reaction.message.guild.id] = True
-                                msg = await reaction.message.channel.send("Mode repeat diaktifkan")
-                            else:
-                                self.repeat[reaction.message.guild.id] = False
-                                msg = await reaction.message.channel.send("Mode repeat dimatikan")
-                        except KeyError:
-                            self.repeat[reaction.message.guild.id] = True
-                            msg = await reaction.message.channel.send("Mode repeat diaktifkan")
-                        await asyncio.sleep(4)
-                        await msg.delete()
-                    if reaction.emoji == "⏭️":
-                        skip, poll_msg = await self.poll_song(user, reaction.message.channel)
-                        if skip:
-                            reaction.message.guild.voice_client.stop()
-                        await asyncio.sleep(4)
-                        await poll_msg.delete()
+                    await self.button_control(reaction, user)
+                    
+    @Cog.listener()
+    async def on_reaction_remove(self, reaction, user):
+        if user.bot:
+            return
+        if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
+            if reaction.message.id == self.np_id[reaction.message.guild.id]:
+                if not self.np == []:
+                    await self.button_control(reaction, user)
+                    
+    async def button_control(self, reaction, user):
+        if reaction.emoji == "⏮️":
+            skip, poll_msg = await self.poll_song(user, reaction.message.channel)
+            if skip:
+                self.song_queue[reaction.message.guild.id].insert(0, self.song_queue[reaction.message.guild.id][len(self.song_queue[reaction.message.guild.id])-1])
+                self.song_queue[reaction.message.guild.id].pop(len(self.song_queue[reaction.message.guild.id])-1)
+                reaction.message.guild.voice_client.stop()
+            await asyncio.sleep(4)
+            await poll_msg.delete()
+        if reaction.emoji == "🔀":
+            try:
+                if self.shuffle[reaction.message.guild.id] is False:
+                    self.shuffle[reaction.message.guild.id] = True
+                    msg = await reaction.message.channel.send("Mode shuffle diaktifkan")
+                else:
+                    self.shuffle[reaction.message.guild.id] = False
+                    msg =await reaction.message.channel.send("Mode shuffle dimatikan")
+            except KeyError:
+                self.shuffle[reaction.message.guild.id] = True
+                msg = await reaction.message.channel.send("Mode shuffle diaktifkan")
+            await asyncio.sleep(4)
+            await msg.delete()
+        if reaction.emoji == "⏯️":
+            if reaction.message.guild.voice_client.is_paused():
+                reaction.message.guild.voice_client.resume()
+                msg = await reaction.message.channel.send("Lagu diteruskan")
+            elif not reaction.message.guild.voice_client.is_paused():
+                reaction.message.guild.voice_client.pause()
+                msg = await reaction.message.channel.send("Lagu telah dijeda")
+            await asyncio.sleep(5)
+            await msg.delete()
+        if reaction.emoji == "🔁":
+            try:
+                if self.repeat[reaction.message.guild.id] is False:
+                    self.repeat[reaction.message.guild.id] = True
+                    msg = await reaction.message.channel.send("Mode repeat diaktifkan")
+                else:
+                    self.repeat[reaction.message.guild.id] = False
+                    msg = await reaction.message.channel.send("Mode repeat dimatikan")
+            except KeyError:
+                self.repeat[reaction.message.guild.id] = True
+                msg = await reaction.message.channel.send("Mode repeat diaktifkan")
+            await asyncio.sleep(4)
+            await msg.delete()
+        if reaction.emoji == "⏭️":
+            skip, poll_msg = await self.poll_song(user, reaction.message.channel)
+            if skip:
+                reaction.message.guild.voice_client.stop()
+            await asyncio.sleep(4)
+            await poll_msg.delete()
 
     @Cog.listener()
     async def on_ready(self):

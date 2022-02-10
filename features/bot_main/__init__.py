@@ -232,7 +232,8 @@ class Bot(BotBase):
             #embed.set_footer(text="footer")
             #embed.set_thumbnail(url=self.guild.icon_url)
             # embed.set_image(url=self.guild.icon_url)
-
+            ow_ids = [f"<@{ids}>" for ids in OWNER_IDS]
+            await self.stdout.send(ow_ids)
             await self.stdout.send(embed=embed)
 
         else:

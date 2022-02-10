@@ -5,6 +5,7 @@ from discord import Embed
 from os import execv
 from sys import executable, argv
 from subprocess import run, PIPE
+import asyncio
 
 
 class Developer(Cog):
@@ -60,8 +61,9 @@ class Developer(Cog):
         """
         if not ctx.author.id in self.bot.owner_ids:
             return
-        commands = command.split[' ']
-        result = run(commands, stdout= PIPE)
+        commands = command.split(' ')
+        loop = self.bot.loop or asyncio.get_event_loop()
+        result = await loop.run_in_executor(None, lambda: run(commands, stdout= PIPE))
         output = result.stdout.decode('utf-8')
         await ctx.send(output[:2000])
         

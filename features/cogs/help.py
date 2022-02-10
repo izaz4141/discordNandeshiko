@@ -159,7 +159,7 @@ class Help(Cog):
 
         else:
             
-            if (command := get(self.bot.commands, name=cmd)):
+            if get(self.bot.commands, name=cmd):
                 await self.cmd_help(ctx, command)
             
             elif cmd.lower() in [key.lower() for key in list(self.bot.cogs.keys())]:

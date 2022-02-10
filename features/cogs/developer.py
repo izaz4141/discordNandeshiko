@@ -13,6 +13,8 @@ class Developer(Cog):
         
     @command(name="serverlist")
     async def server_list(self,ctx):
+        """Menampilkan seluruh server yang Nadeshiko masuki
+        """
         if not ctx.author.id in self.bot.owner_ids:
             return
         embed = Embed(title= "Server List",
@@ -27,6 +29,11 @@ class Developer(Cog):
         
     @command(name="leaveguild")
     async def leave_guild(self, ctx, guild_name):
+        """Meninggalkan server berdasar nama servernya
+
+        Args:
+            guild_name (str): Nama server yang ingin ditinggalkan
+        """
         if not ctx.author.id in self.bot.owner_ids:
             return
         guild = get(self.bot.guilds, name=guild_name)
@@ -36,19 +43,26 @@ class Developer(Cog):
         await ctx.send(f"Nadeshiko meninggalkan **{guild.name}**!")
         
     @command(name="fullrestart")
-    async def full_restart(self,ctx):
+    async def full_restart(self, ctx):
+        """Restart bot dengan menjalankan launcher
+        """
         if not ctx.author.id in self.bot.owner_ids:
             return
         await ctx.send("Restarting bot...")
         execv(executable, ['python'] + argv)
         
     @command(name="terminal")
-    async def terminal(self,ctx, command):
+    async def terminal(self, ctx, command):
+        """Menjalankan command terminal
+
+        Args:
+            command (str): Command yang ingin dijalankan
+        """
         if not ctx.author.id in self.bot.owner_ids:
             return
         result = run(command, stdout= PIPE)
         output = result.stdout.decode('utf-8')
-        await ctx.send(output)
+        await ctx.send(output[:2000])
         
 
     @Cog.listener()

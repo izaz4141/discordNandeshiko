@@ -29,7 +29,7 @@ class Developer(Cog):
         await ctx.send(embed=embed)
         
     @command(name="leaveguild")
-    async def leave_guild(self, ctx, guild_name):
+    async def leave_guild(self, ctx, *, guild_name):
         """Meninggalkan server berdasar nama servernya
 
         Args:
@@ -53,7 +53,7 @@ class Developer(Cog):
         execv(executable, ['python'] + argv)
         
     @command(name="terminal")
-    async def terminal(self, ctx, command):
+    async def terminal(self, ctx, *, command):
         """Menjalankan command terminal
 
         Args:

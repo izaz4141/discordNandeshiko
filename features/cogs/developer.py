@@ -4,6 +4,7 @@ from discord import Embed
 
 from os import execv
 from sys import executable, argv
+from subprocess import run, PIPE
 
 
 class Developer(Cog):
@@ -40,6 +41,14 @@ class Developer(Cog):
             return
         await ctx.send("Restarting bot...")
         execv(executable, ['python'] + argv)
+        
+    @command(name="terminal")
+    async def terminal(self,ctx, command):
+        if not ctx.author.id in self.bot.owner_ids:
+            return
+        result = run(command, stdout= PIPE)
+        output = result.stdout.decode('utf-8')
+        await ctx.send(output)
         
 
     @Cog.listener()

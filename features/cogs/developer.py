@@ -60,7 +60,8 @@ class Developer(Cog):
         """
         if not ctx.author.id in self.bot.owner_ids:
             return
-        result = run(command, stdout= PIPE)
+        commands = command.split[' ']
+        result = run(commands, stdout= PIPE)
         output = result.stdout.decode('utf-8')
         await ctx.send(output[:2000])
         

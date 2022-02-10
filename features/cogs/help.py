@@ -158,8 +158,8 @@ class Help(Cog):
             await menu.start(ctx)
 
         else:
-            
-            if get(self.bot.commands, name=cmd):
+            command = get(self.bot.commands, name=cmd)
+            if command is True:
                 await self.cmd_help(ctx, command)
             
             elif cmd.lower() in [key.lower() for key in list(self.bot.cogs.keys())]:

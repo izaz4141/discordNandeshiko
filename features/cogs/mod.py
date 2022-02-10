@@ -27,7 +27,8 @@ class BannedUser(Converter):
 
         banned = [e.user for e in await ctx.guild.bans()]
         if banned:
-            if (user := find(lambda u: str(u) == arg, banned)) is not None:
+            user = find(lambda u: str(u))
+            if (user == arg, banned) is not None:
                 return user
             else:
                 raise BadArgument

@@ -12,7 +12,7 @@ class Chat(Cog):
     def __init__(self,bot):
         self.bot = bot
     
-    @command(name="chat")
+    @command(name="chat", aliases=["c"])
     async def chatting(self, ctx, *, query):
         cbot = ChatBot( name= "Nadeshiko",
                         read_only= True,
@@ -32,7 +32,7 @@ class Chat(Cog):
             if bot_response.text =="waktu":
                 jam = datetime.now().strftime('%I:%M %p')
                 waktu = [f"Sekarang pukul {jam} Kak.", f"Ini jam {jam}"]
-                response = choices(waktu)
+                response = choices(waktu)[0]
                 await ctx.send(response)
             elif bot_response.text == "help":
                 await Help(self.bot).cmd_help(ctx, get(self.bot.commands, name="help"))

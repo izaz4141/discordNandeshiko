@@ -249,7 +249,7 @@ class Bot(BotBase):
                     self.update_db_intoCloud()
             if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.emojis
-                await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis))])], weights= [1, 1, 2], k=1)[0])
+                await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis)-1)])], weights= [1, 1, 2], k=1)[0])
                 
             await self.process_commands(message)
             

@@ -26,6 +26,10 @@ class Misc(Cog):
     async def change_prefix_error(self, ctx, exc):
         if isinstance(exc, CheckFailure):
             await ctx.send("Kakak tidak berhak melakukan perintah itu")
+            
+    @Cog.listener()
+    async def on_guild_join(self, guild):
+        self.bot.update_db()
 
     @Cog.listener()
     async def on_ready(self):

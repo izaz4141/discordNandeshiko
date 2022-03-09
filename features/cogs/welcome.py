@@ -14,8 +14,10 @@ class Welcome(Cog):
 
     @Cog.listener()
     async def on_member_join(self, member):
-        db.execute("INSERT INTO exp (UserID) VALUES (?)", member.id)
-        await self.bot.get_channel(752543820402655312).send(f"Selamat datang ke dalam **{member.guild.name}** {member.mention}!\nSemoga Betah")
+        self.bot.update_db()
+        if db.field("SELECT Welcome FROM guilds WHERE GuildID = ?", member.guild.id) == 'ON':
+            welchann = db.field("SELECT WelChannel FROM guilds WHERE GuildID = ?", member.guild.id)
+            await self.bot.get_channel(welchann).send(f"Selamat datang ke dalam **{member.guild.name}** {member.mention}!\nSemoga Betah")
         #untuk dm try:
         #  await member.send(text)
         # except Forbidden: 
@@ -25,8 +27,10 @@ class Welcome(Cog):
 
     @Cog.listener()
     async def on_member_remove(self, member):
-        db.execute("DELETE FROM exp WHERE (UserID) = (?)", member.id)
-        await self.bot.get_channel(752543820402655312).send(f"**{member.display_name}** telah meninggalkan **{member.guild.name}** Press F")
+        self.bot.update_db()
+        if db.field("SELECT Welcome FROM guilds WHERE GuildID = ?", member.guild.id) == 'ON':
+            welchann = db.field("SELECT WelChannel FROM guilds WHERE GuildID = ?", member.guild.id)
+            await self.bot.get_channel(welchann).send(f"**{member.display_name}** telah meninggalkan **{member.guild.name}** Press F")
 
 
 def setup(bot):

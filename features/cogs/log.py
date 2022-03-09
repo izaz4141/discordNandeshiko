@@ -18,34 +18,6 @@ class Log(Cog):
         self.bot = bot
         self.log = {}
         
-    @command(name="log_on")
-    @has_permissions(manage_messages=True)
-    async def log_on(self, ctx):
-        def _check(r, u):
-            return (
-                r.emoji in PILIHAN.keys()
-                and u == ctx.author
-                and r.message.id == msg.id
-            )
-        msg = await ctx.send("Apakah kakak ingin menghidupkan dan mengubah channel ini menjadi channel log?")
-        await msg.add_reaction(u"\u2705")
-        await msg.add_reaction(u"\U0001F6AB")
-        try:
-            reaction, _ = await self.bot.wait_for("reaction_add", timeout=60.0, check=_check)
-        except asyncio.TimeoutError:
-            await msg.delete()
-            await ctx.send("Perintah Log ON dibatalkan")
-        else:
-            if PILIHAN[reaction.emoji] == 0:
-                db.execute("UPDATE guilds set Leg = ? WHERE GuildID = ?", 'ON', ctx.guild.id)
-                db.execute("UPDATE guilds set LogChannel = ? WHERE GuildID = ?", ctx.channel.id, ctx.guild.id)
-                await ctx.send(f"Fungsi Log bot diaktifkan pada Channel {ctx.channel.name}")
-    
-    @command(name="log_off")
-    @has_permissions(manage_messages=True)
-    async def log_off(self,ctx):
-        db.execute("UPDATE guilds set Leg = ? WHERE GuildID = ?", 'OFF', ctx.guild.id)
-        await ctx.send("Mematikan fungsi log bot...")
         
         
     @Cog.listener()

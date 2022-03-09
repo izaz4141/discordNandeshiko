@@ -87,7 +87,7 @@ class Misc(Cog):
                 
     @command(name="welcome_off")
     @has_permissions(manage_messages=True)
-    async def log_off(self,ctx):
+    async def welcome_off(self,ctx):
         db.execute("UPDATE guilds set Welcome = ? WHERE GuildID = ?", 'OFF', ctx.guild.id)
         await ctx.send("Mematikan fungsi Welcome bot...")
             

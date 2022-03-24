@@ -883,13 +883,6 @@ class Fun(Cog):
                     await ctx.send("Ih kacang")
             if not link =="Takda":
                 try:
-                    benar_img = False
-                    for forma in img_format:
-                        if forma in link.attachments[0].filename:
-                            benar_img = True
-                    if not benar_img is False:
-                        await ctx.send("Maaf kak Nadeshiko tidak bisa mencari saus untuk file tersebut")
-                        return
                     result = sauce.from_url(link.attachments[0].url)
                     hasil_saos = result.results
                     menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),

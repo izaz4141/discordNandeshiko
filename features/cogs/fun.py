@@ -863,19 +863,13 @@ class Fun(Cog):
             img_format = ["jpg", "png", "gif", "jpeg"]
             if ctx.message.reference:
                 link = await ctx.fetch_message(id=ctx.message.reference.message_id)
-                try:
-                    for forma in img_format:
-                        if forma in link.attachments[0]:
-                            link = link.attachments[0]
-                except IndexError:
-                    pass
             else:
                 def _check(m):
                     if m.author == ctx.author:
                         
                         for forma in img_format:
                             try:
-                                if forma in m.attachments[0]:
+                                if forma in m.attachments[0].filename:
                                     return True
                             except IndexError:
                                 if forma in m.content:
@@ -889,7 +883,14 @@ class Fun(Cog):
                     await ctx.send("Ih kacang")
             if not link =="Takda":
                 try:
-                    result = sauce.from_url(link.url)
+                    benar_img = False
+                    for forma in img_format:
+                        if forma in link.attachments[0].filename:
+                            benar_img = True
+                    if not benar_img is False:
+                        await ctx.send("Maaf kak Nadeshiko tidak bisa mencari saus untuk file tersebut")
+                        return
+                    result = sauce.from_url(link.attachments[0].url)
                     hasil_saos = result.results
                     menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
                                     clear_reactions_after=True,

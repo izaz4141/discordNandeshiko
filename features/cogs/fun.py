@@ -860,26 +860,36 @@ class Fun(Cog):
         Jika link tidak dikirim bersamaan dengan command, gambar juga dapat dikirim setelah command
         """
         if link == "Takda":
-            def _check(m):
-                if m.author == ctx.author:
-                    
-                    for forma in img_format:
-                        try:
-                            if forma in m.attachments[0].url:
-                                return True
-                        except IndexError:
-                            if forma in m.content:
-                                return True
-            msg = await ctx.send("Kirim gambar kak")
             img_format = ["jpg", "png", "gif", "jpeg"]
-            try:
-                link = await self.bot.wait_for("message", timeout=60, check=_check)
-            except asyncio.TimeoutError:
-                await msg.delete()
-                await ctx.send("Ih kacang")
+            if ctx.message.reference:
+                link = await ctx.fetch_message(id=ctx.message.reference.message_id)
+                try:
+                    for forma in img_format:
+                        if forma in link.attachments[0]:
+                            link = link.attachments[0]
+                except IndexError:
+                    pass
+            else:
+                def _check(m):
+                    if m.author == ctx.author:
+                        
+                        for forma in img_format:
+                            try:
+                                if forma in m.attachments[0]:
+                                    return True
+                            except IndexError:
+                                if forma in m.content:
+                                    return True
+                msg = await ctx.send("Kirim gambar kak")
+                
+                try:
+                    link = await self.bot.wait_for("message", timeout=60, check=_check)
+                except asyncio.TimeoutError:
+                    await msg.delete()
+                    await ctx.send("Ih kacang")
             if not link =="Takda":
                 try:
-                    result = sauce.from_url(link.attachments[0].url)
+                    result = sauce.from_url(link.url)
                     hasil_saos = result.results
                     menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
                                     clear_reactions_after=True,

@@ -13,7 +13,7 @@ from urllib3 import PoolManager
 import shutil
 # Import Module
 from PIL import Image
-from os import remove
+import os
 
 
 OPTIONS = {
@@ -144,7 +144,7 @@ class Music(Cog):
                         while True:
                             if self.fu[ctx.guild.id] is True:
                                 break
-                            asyncio.sleep(1)
+                            await asyncio.sleep(1)
                             self.timer[ctx.guild.id] += 1
                             if self.timer[ctx.guild.id] >= 60:
                                 if self.playing[ctx.guild.id] is True:
@@ -154,7 +154,7 @@ class Music(Cog):
                         while True:
                             if self.fu[ctx.guild.id] is True:
                                 break
-                            asyncio.sleep(1)
+                            await asyncio.sleep(1)
                             self.timer[ctx.guild.id] += 1
                             if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
                                 await self.leave(ctx)
@@ -168,7 +168,7 @@ class Music(Cog):
                     while True:
                         if self.fu[ctx.guild.id] is True:
                             break
-                        asyncio.sleep(1)
+                        await asyncio.sleep(1)
                         self.timer[ctx.guild.id] += 1
                         if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
                             await self.leave(ctx)
@@ -176,7 +176,7 @@ class Music(Cog):
                 while True:
                     if self.fu[ctx.guild.id] is True:
                         break
-                    asyncio.sleep(1)
+                    await asyncio.sleep(1)
                     self.timer[ctx.guild.id] += 1
                     if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id]:
                         await self.leave(ctx)
@@ -314,6 +314,8 @@ class Music(Cog):
                             
     async def download_image(self, url, file_path, file_name):
         full_path = file_path + file_name + '.jpg'
+        curdir = os.path.abspath(os.curdir)
+        print(f"path sekarang: {curdir}")
         loop = self.bot.loop or asyncio.get_event_loop()
         with open(full_path, 'wb') as out:
             r = await loop.run_in_executor(None, lambda: urlp.request('GET', url, preload_content=False))
@@ -368,7 +370,7 @@ class Music(Cog):
                 img = img.convert('RGB')
                 # call function
                 red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
-                remove(f"./data/temp/{file_name}.jpg")
+                os.remove(f"./data/temp/{file_name}.jpg")
                 
                 embed = Embed(
                     title= f"Now playing: **{self.np[ctx.guild.id][0]}**",

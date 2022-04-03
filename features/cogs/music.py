@@ -314,8 +314,6 @@ class Music(Cog):
                             
     async def download_image(self, url, file_path, file_name):
         full_path = file_path + file_name + '.jpg'
-        curdir = os.path.abspath(os.curdir)
-        print(f"path sekarang: {curdir}")
         loop = self.bot.loop or asyncio.get_event_loop()
         with open(full_path, 'wb') as out:
             r = await loop.run_in_executor(None, lambda: urlp.request('GET', url, preload_content=False))
@@ -362,15 +360,15 @@ class Music(Cog):
                     vol_lv.append(BAR[1])
                 file_name = "Music-Cover" + str(random.randint(1, 101))
                 loop = self.bot.loop or asyncio.get_event_loop()
-                await self.download_image(self.np[ctx.guild.id][3], "./data/temp/", file_name)
+                await self.download_image(self.np[ctx.guild.id][3], "./data/music-Cover/", file_name)
                 
                 # Read Image
-                img = Image.open(f"./data/temp/{file_name}.jpg")
+                img = Image.open(f"./data/music-Cover/{file_name}.jpg")
                 # Convert Image into RGB
                 img = img.convert('RGB')
                 # call function
                 red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
-                os.remove(f"./data/temp/{file_name}.jpg")
+                os.remove(f"./data/music-Cover/{file_name}.jpg")
                 
                 embed = Embed(
                     title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
@@ -554,15 +552,15 @@ class Music(Cog):
                 vol_lv.append(BAR[1])
             file_name = "Music-Cover" + str(random.randint(1, 101))
             loop = self.bot.loop or asyncio.get_event_loop()
-            await self.download_image(self.np[ctx.guild.id][3], "./data/temp/", file_name)
+            await self.download_image(self.np[ctx.guild.id][3], "./data/music-Cover/", file_name)
             
             # Read Image
-            img = Image.open(f"./data/temp/{file_name}.jpg")
+            img = Image.open(f"./data/music-Cover/{file_name}.jpg")
             # Convert Image into RGB
             img = img.convert('RGB')
             # call function
             red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
-            remove(f"./data/temp/{file_name}.jpg")
+            os.remove(f"./data/music-Cover/{file_name}.jpg")
             embed = Embed(
                 title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
                 description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume}』\n..:.. ━━━━⬤─────── {self.np[ctx.guild.id][2]}",

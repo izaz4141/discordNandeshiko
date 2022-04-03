@@ -48,7 +48,7 @@ class Info(Cog):
                     ]
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
-        embed.set_thumbnail(url=target.avatar_url)
+        embed.set_thumbnail(url=target.avatar.url)
         await ctx.send(embed=embed)
         
     @command(name="avatar")
@@ -61,7 +61,7 @@ class Info(Cog):
         """
         target = target or ctx.author
         embed = Embed(colour= target.colour)
-        embed.set_image(url= target.avatar_url)
+        embed.set_image(url= target.avatar.url)
         await ctx.send(embed= embed)
 
     @command(name="serverinfo", aliases=["guildinfo", "si", "gi"])

@@ -25,7 +25,7 @@ class Developer(Cog):
         for guild in self.bot.guilds:
             embed.add_field(name=guild.name,
                             value= f"Members: {len(list(filter(lambda m: not m.bot, guild.members)))}\nBots: {len(list(filter(lambda m: m.bot, guild.members)))}")
-        embed.set_thumbnail(url=ctx.guild.me.avatar_url)
+        embed.set_thumbnail(url=ctx.guild.me.avatar.url)
         await ctx.send(embed=embed)
         
     @command(name="leaveguild")

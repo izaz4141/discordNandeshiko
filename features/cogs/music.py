@@ -1,3 +1,4 @@
+from email.errors import FirstHeaderLineIsContinuationDefect
 from discord import Embed, Colour, PCMVolumeTransformer, FFmpegOpusAudio, FFmpegPCMAudio
 from discord.ext.commands import command, Cog
 from discord.ext.menus import MenuPages, ListPageSource
@@ -8,6 +9,11 @@ from youtube_dl import YoutubeDL
 from youtube_search import YoutubeSearch
 import datetime as dt
 import random
+from urllib3 import PoolManager
+import shutil
+# Import Module
+from PIL import Image
+from os import remove
 
 
 OPTIONS = {
@@ -25,6 +31,13 @@ BUTTON = {
     "🔁" : 'repeat',
     "⏭️" : 'next'
 }
+
+BAR = {
+    0 : "▮",
+    1 : "▯"
+}
+
+urlp = PoolManager()
 
 def format_durasi(durasi:int):
     durasi = int(durasi)
@@ -101,8 +114,8 @@ class Music(Cog):
         self.playing = {}
         self.timer = {}
         self.np_id = {}
-
-
+        self.fu = {}
+        
     async def check_queue(self, ctx):
         try:
             if len(self.song_queue[ctx.guild.id]) > 0:
@@ -119,18 +132,32 @@ class Music(Cog):
                 except KeyError:
                     self.shuffle[ctx.guild.id] = False
             else:
+                self.fu[ctx.guild.id] = False
+                self.timer[ctx.guild.id] = 0
                 try:
                     if self.repeat[ctx.guild.id] is True:
+                        self.playing[ctx.guild.id] = True
                         self.song_queue[ctx.guild.id] = [self.np[ctx.guild.id]]
                         await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
                         self.song_queue[ctx.guild.id].pop(0)
                     else:
-                        if self.playing[ctx.guild.id] is True:
-                            await self.leave(ctx)
+                        while True:
+                            if self.fu[ctx.guild.id] is True:
+                                break
+                            asyncio.sleep(1)
+                            self.timer[ctx.guild.id] += 1
+                            if self.timer[ctx.guild.id] >= 60:
+                                if self.playing[ctx.guild.id] is True:
+                                    await self.leave(ctx)
                     
                 except KeyError:
-                    if self.playing[ctx.guild.id] is True:
-                        await self.leave(ctx)
+                        while True:
+                            if self.fu[ctx.guild.id] is True:
+                                break
+                            asyncio.sleep(1)
+                            self.timer[ctx.guild.id] += 1
+                            if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
+                                await self.leave(ctx)
         except KeyError:
             try:
                 if self.repeat[ctx.guild.id] is True:
@@ -138,10 +165,20 @@ class Music(Cog):
                     await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
                     self.song_queue[ctx.guild.id].pop(0)
                 else:
-                    if self.playing[ctx.guild.id] is True:
+                    while True:
+                        if self.fu[ctx.guild.id] is True:
+                            break
+                        asyncio.sleep(1)
+                        self.timer[ctx.guild.id] += 1
+                        if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
                             await self.leave(ctx)
             except KeyError:
-                if self.playing[ctx.guild.id] is True:
+                while True:
+                    if self.fu[ctx.guild.id] is True:
+                        break
+                    asyncio.sleep(1)
+                    self.timer[ctx.guild.id] += 1
+                    if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id]:
                         await self.leave(ctx)
                 
     async def poll_song(self, user, channel):
@@ -186,7 +223,7 @@ class Music(Cog):
         embed.set_footer(text="Voting has ended.")
 
         await poll_msg.clear_reactions()
-        await poll_msg.edit(embed=embed)
+        await poll_msg.edit(embed= embed, delete_after= 5)
         return skip, poll_msg
     
     async def choose_track(self, ctx, query):
@@ -209,14 +246,14 @@ class Music(Cog):
             colour=ctx.author.colour,
             timestamp=dt.datetime.utcnow()
         )
-        embed.set_footer(text=f"Invoked by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=f"Invoked by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
 
         msg = await ctx.send(embed=embed)
         for emoji in list(OPTIONS.keys())[:min(len(info), len(OPTIONS))]:
             await msg.add_reaction(emoji)
 
         try:
-            reaction, _ = await self.bot.wait_for("reaction_add", timeout=60.0, check=_check)
+            reaction, _ = await self.bot.wait_for("reaction_add", timeout=15.0, check=_check)
         except asyncio.TimeoutError:
             await msg.delete()
             await ctx.message.delete()
@@ -275,14 +312,74 @@ class Music(Cog):
                 await ctx.send(f"{len(entries)} lagu dari {info['title']} berhasil ditambahkan")
                 return "playlist"
                             
+    async def download_image(self, url, file_path, file_name):
+        full_path = file_path + file_name + '.jpg'
+        loop = self.bot.loop or asyncio.get_event_loop()
+        with open(full_path, 'wb') as out:
+            r = await loop.run_in_executor(None, lambda: urlp.request('GET', url, preload_content=False))
+            shutil.copyfileobj(r, out)
+            r.release_conn()
+    def most_common_used_color(self, img):
+        # Get width and height of Image
+        width, height = img.size
+
+        # Initialize Variable
+        r_total = 0
+        g_total = 0
+        b_total = 0
+
+        count = 0
+
+        # Iterate through each pixel
+        for x in range(0, width):
+            for y in range(0, height):
+                # r,g,b value of pixel
+                r, g, b = img.getpixel((x, y))
+
+                r_total += r
+                g_total += g
+                b_total += b
+                count += 1
+
+        return (round(r_total/count), round(g_total/count), round(b_total/count))
     async def play_song(self, ctx, song):
         # try:
         #     ctx.voice_client.play(PCMVolumeTransformer(FFmpegOpusAudio.from_probe(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
         # except Exception:
         ctx.voice_client.play(PCMVolumeTransformer(FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
-        ctx.voice_client.source.volume = 0.5
         self.np[ctx.guild.id] = song
         self.playing[ctx.guild.id] = True
+        self.fu[ctx.guild.id] = True
+        try:
+            np_id = self.np_id[ctx.guild.id][0]
+            if isinstance(np_id, int):
+                vol_lv = []
+                for i in range(round(ctx.voice_client.source.volume*10)):
+                    vol_lv.append(BAR[0])
+                for i in range(10-round(ctx.voice_client.source.volume*10)):
+                    vol_lv.append(BAR[1])
+                file_name = "Music-Cover" + str(random.randint(1, 101))
+                loop = self.bot.loop or asyncio.get_event_loop()
+                await self.download_image(self.np[ctx.guild.id][3], "./data/temp/", file_name)
+                
+                # Read Image
+                img = Image.open(f"./data/temp/{file_name}.jpg")
+                # Convert Image into RGB
+                img = img.convert('RGB')
+                # call function
+                red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
+                remove(f"./data/temp/{file_name}.jpg")
+                
+                embed = Embed(
+                    title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
+                    description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume}』\n..:.. ━━━━⬤─────── {self.np[ctx.guild.id][2]}",
+                    colour= Colour.from_rgb(red, green, blue)
+                )
+                embed.set_image(url=self.np[ctx.guild.id][3])
+                np_msg = await self.bot.get_channel(self.np_id[ctx.guild.id][1]).fetch_message(np_id)
+                await np_msg.edit(embed=embed)
+        except Exception:
+            return
 
     @command(name="join")
     async def join(self, ctx):
@@ -309,7 +406,9 @@ class Music(Cog):
             self.shuffle[ctx.guild.id] = False
             self.repeat[ctx.guild.id] = False
             self.np[ctx.guild.id] = []
+            self.np_id[ctx.guild.id] = []
             self.playing[ctx.guild.id] = False
+            self.timer[ctx.guild.id] = 0
             return await ctx.voice_client.disconnect()
 
         await ctx.send("Nadeshiko tidak sedang berada dalam voice channel")
@@ -446,14 +545,30 @@ class Music(Cog):
     @command(name="np")
     async def np(self,ctx):
         if not self.np[ctx.guild.id] == []:
+            vol_lv = []
+            for i in range(round(ctx.voice_client.source.volume*10)):
+                vol_lv.append(BAR[0])
+            for i in range(10-round(ctx.voice_client.source.volume*10)):
+                vol_lv.append(BAR[1])
+            file_name = "Music-Cover" + str(random.randint(1, 101))
+            loop = self.bot.loop or asyncio.get_event_loop()
+            await self.download_image(self.np[ctx.guild.id][3], "./data/temp/", file_name)
+            
+            # Read Image
+            img = Image.open(f"./data/temp/{file_name}.jpg")
+            # Convert Image into RGB
+            img = img.convert('RGB')
+            # call function
+            red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
+            remove(f"./data/temp/{file_name}.jpg")
             embed = Embed(
                 title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
-                description= f"Duration<{self.np[ctx.guild.id][2]}>\nVolume<{ctx.voice_client.source.volume}>",
-                colour= Colour.dark_orange()
+                description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume}』\n..:.. ━━━━⬤─────── {self.np[ctx.guild.id][2]}",
+                colour= Colour.from_rgb(red, green, blue)
             )
-            embed.set_thumbnail(url=self.np[ctx.guild.id][3])
+            embed.set_image(url=self.np[ctx.guild.id][3])
             msg = await ctx.send(embed=embed)
-            self.np_id[ctx.guild.id] = msg.id
+            self.np_id[ctx.guild.id] = [msg.id, msg.channel.id]
             for emoji in list(BUTTON.keys()):
                 await msg.add_reaction(emoji)
             
@@ -514,8 +629,10 @@ class Music(Cog):
     @Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         
+        
+        
         # if event is triggered by the bot? return
-        if member.bot:
+        if member.bot and member.id != member.guild.me.id:
             return
 
         # when before.channel != None that means user isnt joining a channel
@@ -559,7 +676,9 @@ class Music(Cog):
                         self.shuffle[member.guild.id] = False
                         self.repeat[member.guild.id] = False
                         self.np[member.guild.id] = []
+                        self.np_id[member.guild.id] = []
                         self.playing[member.guild.id] = False
+                        self.timer[member.guild.id] = 0
                         await voice.disconnect()
                         return
     # Button control on now playing embed
@@ -569,10 +688,10 @@ class Music(Cog):
             return
         try:
             if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
-                if reaction.message.id == self.np_id[reaction.message.guild.id]:
+                if reaction.message.id == self.np_id[reaction.message.guild.id][0]:
                     if not self.np == []:
                         await self.button_control(reaction, user)
-        except AttributeError:
+        except (AttributeError, KeyError):
             return
                     
     @Cog.listener()
@@ -581,10 +700,10 @@ class Music(Cog):
             return
         try:
             if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
-                if reaction.message.id == self.np_id[reaction.message.guild.id]:
+                if reaction.message.id == self.np_id[reaction.message.guild.id][0]:
                     if not self.np == []:
                         await self.button_control(reaction, user)
-        except AttributeError:
+        except (AttributeError, KeyError):
             return
                     
     async def button_control(self, reaction, user):

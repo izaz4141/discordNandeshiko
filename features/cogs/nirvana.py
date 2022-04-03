@@ -273,7 +273,7 @@ class Nirvana(Cog):
             embed.add_field(name=name, value=value, inline=inline)
             
         embed.set_image(url=dojin_img)
-        embed.set_footer(text=dojin_id, icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=dojin_id, icon_url=ctx.author.avatar.url)
         
         await ctx.send(embed=embed)
         
@@ -320,7 +320,7 @@ class Nirvana(Cog):
             embed.add_field(name=name, value=value, inline=inline)
             
         embed.set_image(url=dojin_img)
-        embed.set_footer(text=dojin_id, icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=dojin_id, icon_url=ctx.author.avatar.url)
         
         await ctx.send(embed=embed)
         

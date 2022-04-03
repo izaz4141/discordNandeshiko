@@ -46,7 +46,7 @@ class HelpMenu(ListPageSource):
                     break
             if beneer is True:
                 cog_command[cmdcog_name].append(syntax(comand))
-        embed.set_thumbnail(url=self.ctx.guild.me.avatar_url)
+        embed.set_thumbnail(url=self.ctx.guild.me.avatar.url)
         embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} Cog.")
         fields = []
         for name, value in zip(list(cog_command.keys()), list(cog_command.values())):
@@ -89,7 +89,7 @@ class HelpCogMenu(ListPageSource):
                       description="Selamat datang ke Menu Help Campers!",
                       colour=self.ctx.author.colour)
 
-        embed.set_thumbnail(url=self.ctx.guild.me.avatar_url)
+        embed.set_thumbnail(url=self.ctx.guild.me.avatar.url)
         embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} perintah.")
 
         for name, value in fields:
@@ -200,8 +200,8 @@ class Help(Cog):
         fields = [
             ("Invite Link", "https://bit.ly/3sTBi5K")
         ]
-        embed.set_author(icon_url=self.bot.get_user(self.bot.owner_ids[0]).avatar_url, name= f"{self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}")
-        embed.set_thumbnail(url=ctx.guild.me.avatar_url)
+        embed.set_author(icon_url=self.bot.get_user(self.bot.owner_ids[0]).avatar.url, name= f"{self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}")
+        embed.set_thumbnail(url=ctx.guild.me.avatar.url)
         for name, value in fields:
             embed.add_field(name=name, value=value)
         await ctx.send(embed=embed)
@@ -214,8 +214,8 @@ class Help(Cog):
             description= "https://bit.ly/3sTBi5K",
             colour = ctx.author.colour
         )
-        embed.set_author(icon_url=self.bot.get_user(self.bot.owner_ids[0]).avatar_url, name= f"{self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}")
-        embed.set_thumbnail(url=ctx.guild.me.avatar_url)
+        embed.set_author(icon_url=self.bot.get_user(self.bot.owner_ids[0]).avatar.url, name= f"{self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}")
+        embed.set_thumbnail(url=ctx.guild.me.avatar.url)
         await ctx.send(embed=embed)
         
             

@@ -1,4 +1,5 @@
-from discord import Embed, File, Client, Intents, ActivityType, Activity
+from discord import Embed, File, Intents, ActivityType, Activity
+from discord import Bot as BotClient
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import CommandNotFound, Context, BadArgument, MissingRequiredArgument, CommandOnCooldown, when_mentioned_or
 from discord.ext.commands.errors import MissingPermissions, MissingRole, NSFWChannelRequired
@@ -32,10 +33,11 @@ except ApiError:
 
 from ..db import db
 
-client = Client()
-intents = Intents.default()
-intents.members = True
-intents.presences = True
+client = BotClient()
+intents = Intents.all()
+# intents.members = True
+# intents.presences = True
+# intents.message_content = True
 # PREFIX = "+"
 OWNER_IDS = [343962708166574090]
 COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
@@ -228,7 +230,7 @@ class Bot(BotBase):
             #fields = [("Status", "Nandeshikyot Now Online", True)]
             #for name, value, inline in fields:
             #    embed.add_field(name=name, value=value, inline=inline)
-            embed.set_author(name=self.guild.me.display_name, icon_url=self.guild.me.avatar_url)
+            embed.set_author(name=self.guild.me.display_name, icon_url=self.guild.me.avatar.url)
             #embed.set_footer(text="footer")
             #embed.set_thumbnail(url=self.guild.icon_url)
             # embed.set_image(url=self.guild.icon_url)

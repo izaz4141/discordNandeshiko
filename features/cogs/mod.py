@@ -51,7 +51,7 @@ class Mod(Cog):
                             colour=0xDD2222,
                             timestamp=datetime.utcnow())
 
-                embed.set_thumbnail(url=target.avatar_url)
+                embed.set_thumbnail(url=target.avatar.url)
 
                 fields = [("Keluarga kita, ", f"{target.name} a.k.a. {target.display_name}", False),
                         ("disuru", message.author.display_name, False),
@@ -88,7 +88,7 @@ class Mod(Cog):
                             colour=0xDD2222,
                             timestamp=datetime.utcnow())
 
-                embed.set_thumbnail(url=target.avatar_url)
+                embed.set_thumbnail(url=target.avatar.url)
 
                 fields = [("Keluarga kita, ", f"{target.name} a.k.a. {target.display_name}", False),
                         ("disuru", message.author.display_name, False),
@@ -130,7 +130,7 @@ class Mod(Cog):
                             colour=0xDD2222,
                             timestamp=datetime.utcnow())
 
-                embed.set_thumbnail(url=target.avatar_url)
+                embed.set_thumbnail(url=target.avatar.url)
 
                 fields = [("Member", target.name, False),
                         ("Actioned by", ctx.author.display_name, False),
@@ -179,7 +179,7 @@ class Mod(Cog):
     #                             colour=0xDD2222,
     #                             timestamp=datetime.utcnow())
 
-    #                 embed.set_thumbnail(url=target.avatar_url)
+    #                 embed.set_thumbnail(url=target.avatar.url)
 
     #                 fields = [("Member", target.display_name, False),
     #                         ("Actioned by", message.author.display_name, False),
@@ -231,7 +231,7 @@ class Mod(Cog):
     #                         colour=0xDD2222,
     #                         timestamp=datetime.utcnow())
 
-    #             embed.set_thumbnail(url=target.avatar_url)
+    #             embed.set_thumbnail(url=target.avatar.url)
 
     #             fields = [("Member", target.display_name, False),
     #                     ("Reason", reason, False)]

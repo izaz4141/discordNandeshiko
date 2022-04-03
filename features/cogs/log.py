@@ -38,6 +38,7 @@ class Log(Cog):
 
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
+            embed.set_footer(text=f"Invoked by {before.name + '#' + before.discriminator}")
             wic = []
             for guild in self.bot.guilds:
                 if guild.get_member(before.id):
@@ -57,7 +58,7 @@ class Log(Cog):
 
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
-
+            embed.set_footer(text=f"Invoked by {before.name + '#' + before.discriminator}")
             wic = []
             for guild in self.bot.guilds:
                 if guild.get_member(before.id):
@@ -67,15 +68,15 @@ class Log(Cog):
                 if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
                     await self.bot.get_channel(log_channel).send(embed=embed)
 
-        if before.avatar_url != after.avatar_url:
+        if before.avatar.url != after.avatar.url:
             embed = Embed(title="Avatar change",
                             description="New image is below, old to the right.",
                             colour=Colour.dark_gold(),
                             timestamp=datetime.utcnow())
 
-            embed.set_thumbnail(url=before.avatar_url)
-            embed.set_image(url=after.avatar_url)
-
+            embed.set_thumbnail(url=before.avatar.url)
+            embed.set_image(url=after.avatar.url)
+            embed.set_footer(text=f"Invoked by {before.name + '#' + before.discriminator}")
             wic = []
             for guild in self.bot.guilds:
                 if guild.get_member(before.id):
@@ -97,15 +98,11 @@ class Log(Cog):
 
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
-
-            wic = []
-            for guild in self.bot.guilds:
-                if guild.get_member(before.id):
-                    wic.append(guild.id)
-            for gid in wic:
-                log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
-                if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
-                    await self.bot.get_channel(log_channel).send(embed=embed)
+            embed.set_footer(text=f"Invoked by {before.name + '#' + before.discriminator}")
+            gid = before.guild.id
+            log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
+            if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
+                await self.bot.get_channel(log_channel).send(embed=embed)
 
         elif before.roles != after.roles:
             embed = Embed(title="Role updates",
@@ -117,15 +114,11 @@ class Log(Cog):
 
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
-
-            wic = []
-            for guild in self.bot.guilds:
-                if guild.get_member(before.id):
-                    wic.append(guild.id)
-            for gid in wic:
-                log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
-                if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
-                    await self.bot.get_channel(log_channel).send(embed=embed)
+            embed.set_footer(text=f"Invoked by {before.name + '#' + before.discriminator}")
+            gid = before.guild.id
+            log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
+            if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
+                await self.bot.get_channel(log_channel).send(embed=embed)
 
     # @Cog.listener()
     # async def on_message_edit(self, before, after):

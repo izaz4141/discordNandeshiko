@@ -5,11 +5,11 @@ from discord.errors import HTTPException, Forbidden
 from discord.ext.menus import MenuPages, ListPageSource
 from typing import Optional
 from aiohttp import request
-from jikanpy import Jikan
-from datetime import datetime
+# from jikanpy import Jikan
+# from datetime import datetime
 from pybooru import Danbooru, Moebooru
 from pygelbooru import Gelbooru
-from difflib import get_close_matches
+# from difflib import get_close_matches
 from saucenao_api import SauceNao
 
 import asyncio

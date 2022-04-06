@@ -166,7 +166,8 @@ def update_embed(embed: Embed, guess: str) -> Embed:
     puzzle_id = int(embed.footer.text.split()[1])
     answer = popular_words[puzzle_id]
     colored_word = generate_colored_word(guess, answer)
-    empty_slot = generate_blanks()
+    n = len(answer)
+    empty_slot = generate_blanks(n)
     # replace the first blank with the colored word
     embed.description = embed.description.replace(empty_slot, colored_word, 1)
     # check for game over

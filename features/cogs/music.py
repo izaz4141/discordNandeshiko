@@ -378,7 +378,7 @@ class Music(Cog):
                 
                 embed = Embed(
                     title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
-                    description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━━━⬤────────────────── {self.np[ctx.guild.id][2]}",
+                    description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━⬤───────────── {self.np[ctx.guild.id][2]}",
                     colour= Colour.from_rgb(red, green, blue)
                 )
                 embed.set_image(url=self.np[ctx.guild.id][3])
@@ -570,7 +570,7 @@ class Music(Cog):
             os.remove(f"./data/music-Cover/{file_name}.jpg")
             embed = Embed(
                 title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
-                description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━━━⬤────────────────── {self.np[ctx.guild.id][2]}",
+                description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━⬤───────────── {self.np[ctx.guild.id][2]}",
                 colour= Colour.from_rgb(red, green, blue)
             )
             embed.set_image(url=self.np[ctx.guild.id][3])

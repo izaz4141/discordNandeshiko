@@ -23,6 +23,7 @@ from apscheduler.triggers.cron import CronTrigger
 from ..cogs.help import Help
 from ..cloud.dropbox import *
 from dropbox.exceptions import ApiError
+from ..games.wordle import process_message_as_guess
 
 try:
     download_from_dropbox("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
@@ -252,6 +253,9 @@ class Bot(BotBase):
             if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.emojis
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis)-1)])], weights= [1, 1, 2], k=1)[0])
+            
+            if message.reference:
+                await process_message_as_guess(self, message)
                 
             await self.process_commands(message)
             

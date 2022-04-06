@@ -115,6 +115,7 @@ class Music(Cog):
         self.timer = {}
         self.np_id = {}
         self.fu = {}
+        self.volume = {}
         
     async def check_queue(self, ctx):
         try:
@@ -342,11 +343,16 @@ class Music(Cog):
                 count += 1
 
         return (round(r_total/count), round(g_total/count), round(b_total/count))
-    async def play_song(self, ctx, song):
+    async def play_song(self, ctx, song, volume= 0.5):
         # try:
         #     ctx.voice_client.play(PCMVolumeTransformer(FFmpegOpusAudio.from_probe(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
         # except Exception:
-        ctx.voice_client.play(PCMVolumeTransformer(FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
+        try:
+            if isinstance(self.volume[ctx.guild.id], float):
+                volume = self.volume[ctx.guild.id]
+        except Exception:
+            pass
+        ctx.voice_client.play(PCMVolumeTransformer(FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS), volume=volume), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
         self.np[ctx.guild.id] = song
         self.playing[ctx.guild.id] = True
         self.fu[ctx.guild.id] = True
@@ -372,7 +378,7 @@ class Music(Cog):
                 
                 embed = Embed(
                     title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
-                    description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume}』\n..:.. ━━━━⬤─────── {self.np[ctx.guild.id][2]}",
+                    description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━━━⬤────────────────── {self.np[ctx.guild.id][2]}",
                     colour= Colour.from_rgb(red, green, blue)
                 )
                 embed.set_image(url=self.np[ctx.guild.id][3])
@@ -409,6 +415,7 @@ class Music(Cog):
             self.np_id[ctx.guild.id] = []
             self.playing[ctx.guild.id] = False
             self.timer[ctx.guild.id] = 0
+            self.volume[ctx.guild.id] = 0.5
             return await ctx.voice_client.disconnect()
 
         await ctx.send("Nadeshiko tidak sedang berada dalam voice channel")
@@ -563,7 +570,7 @@ class Music(Cog):
             os.remove(f"./data/music-Cover/{file_name}.jpg")
             embed = Embed(
                 title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
-                description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume}』\n..:.. ━━━━⬤─────── {self.np[ctx.guild.id][2]}",
+                description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━━━⬤────────────────── {self.np[ctx.guild.id][2]}",
                 colour= Colour.from_rgb(red, green, blue)
             )
             embed.set_image(url=self.np[ctx.guild.id][3])
@@ -623,6 +630,7 @@ class Music(Cog):
         if number >= 100:
             number = 100
         ctx.voice_client.source.volume = number/100
+        self.volume[ctx.guild.id] = number/100
         await ctx.send("Oke, kusesuaiin ya volumenya~")
         
          
@@ -679,6 +687,7 @@ class Music(Cog):
                         self.np_id[member.guild.id] = []
                         self.playing[member.guild.id] = False
                         self.timer[member.guild.id] = 0
+                        self.volume[member.guild.id] = 0.5
                         await voice.disconnect()
                         return
     # Button control on now playing embed

@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog, command, BadArgument, cooldown, BucketType
 from random import choice, randint
-from discord import Member, Embed, Client
+from discord import Member, Embed
 from discord.errors import HTTPException, Forbidden
 from discord.ext.menus import MenuPages, ListPageSource
 from typing import Optional
@@ -11,6 +11,13 @@ from pybooru import Danbooru, Moebooru
 from pygelbooru import Gelbooru
 # from difflib import get_close_matches
 from saucenao_api import SauceNao
+from ..games.wordle import (
+    # daily_puzzle_id,
+    # generate_info_embed,
+    generate_puzzle_embed,
+    # process_message_as_guess,
+    random_puzzle_id,
+)
 
 import asyncio
 from ..db import db
@@ -385,6 +392,14 @@ class Fun(Cog):
         rolls = [randint(1, value) for i in range(dice)]
         await ctx.send(" + ".join([str(r) for r in rolls]) + f" = {sum(rolls)}")
     
+    @command(name="wordle")
+    async def wordle_indo(self,ctx):
+        """Memulai game Wordle
+        
+        untuk menjawab, reply ke embed Nandeshikyot
+        """
+        embed = generate_puzzle_embed(ctx.author, random_puzzle_id())
+        await ctx.reply(embed=embed)
     
     @command(name="bilang")
     async def say(self, ctx, *, message):
@@ -904,9 +919,7 @@ class Fun(Cog):
                             clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
             await menu.start(ctx)
-        
-        
-            
+     
         
 
     @Cog.listener()

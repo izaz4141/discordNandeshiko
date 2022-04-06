@@ -147,8 +147,8 @@ def generate_puzzle_embed(user: User, puzzle_id: int) -> Embed:
     embed.description = "\n".join([generate_blanks(n)] * 6)
     embed.set_author(name=user.name, icon_url=user.display_avatar.url)
     embed.set_footer(
-        text=f"ID: {puzzle_id} ︱ To play, use the command /play!\n"
-        "To guess, reply to this message with a word."
+        text=f"ID: {puzzle_id}\n"
+        "Untuk menebak, balas pesan ini!"
     )
     return embed
 
@@ -269,9 +269,9 @@ async def process_message_as_guess(
         embed.author.name != message.author.name
         or embed.author.icon_url != message.author.display_avatar.url
     ):
-        reply = "Start a new game with /play"
+        reply = "Hanya orang yang memulai game yang dapat menebak."
         if embed.author:
-            reply = f"This game was started by {embed.author.name}. " + reply
+            reply = f"Game ini dimulai oleh {embed.author.name}. " + reply
         await message.reply(reply, delete_after=5)
         try:
             await message.delete(delay=5)

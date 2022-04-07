@@ -877,7 +877,7 @@ class Fun(Cog):
         if link == "Takda":
             img_format = ["jpg", "png", "gif", "jpeg"]
             if ctx.message.reference:
-                link = await ctx.fetch_message(id=ctx.message.reference.message_id)
+                link = await ctx.fetch_message(ctx.message.reference.message_id)
             else:
                 def _check(m):
                     if m.author == ctx.author:

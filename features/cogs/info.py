@@ -71,7 +71,7 @@ class Info(Cog):
                       colour=ctx.guild.owner.colour,
                       timestamp=datetime.utcnow())
 
-        embed.set_thumbnail(url=ctx.guild.icon_url)
+        embed.set_thumbnail(url=ctx.guild.icon.url)
 
         statuses = [len(list(filter(lambda m: str(m.status) == "online", ctx.guild.members))),
                     len(list(filter(lambda m: str(m.status) == "idle", ctx.guild.members))),

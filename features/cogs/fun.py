@@ -392,9 +392,9 @@ class Fun(Cog):
         rolls = [randint(1, value) for i in range(dice)]
         await ctx.send(" + ".join([str(r) for r in rolls]) + f" = {sum(rolls)}")
     
-    @command(name="wordle")
+    @command(name="katapan")
     async def wordle_indo(self,ctx):
-        """Memulai game Wordle
+        """Memulai game Wordle Indonesia
         
         untuk menjawab, reply ke embed Nandeshikyot
         """

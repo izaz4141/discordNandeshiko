@@ -213,6 +213,11 @@ class Bot(BotBase):
             self.guild = self.get_guild(605057520955818010) #KALAU HANYA SATU SERVER
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)
+            self.totalE = []
+            for guild in self.guilds:
+                if not guild.name == "wo1" and not guild.name == "wo2":
+                    for i in range(len(guild.emojis)-1):
+                        self.totalE.append(guild.emojis[i])
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
@@ -251,7 +256,7 @@ class Bot(BotBase):
                 if message.content == "update db" :
                     self.update_db_intoCloud()
             if "nandeshi" in message.content or "nadeshi" in message.content:
-                total_emojis = self.emojis
+                total_emojis = self.totalE
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis)-1)])], weights= [1, 1, 2], k=1)[0])
             
             if message.reference:

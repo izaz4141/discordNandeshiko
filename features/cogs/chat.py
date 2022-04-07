@@ -20,7 +20,7 @@ class Chat(Cog):
             content (str): Inquiries
         """
         try:
-            prom = self.base_data + self.history[ctx.user.id]
+            prom = self.base_data + self.history[ctx.author.id]
         except Exception:
             prom = self.base_data
         nama = ctx.author.name

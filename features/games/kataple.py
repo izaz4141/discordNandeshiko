@@ -3,8 +3,8 @@ from discord import Embed, User, Message
 import datetime
 import random
 
-popular_words = open("./data/kamus/word_5_popular.txt").read().splitlines()
-all_words = set(word.strip() for word in open("./data/kamus/word_5_all.txt"))
+popular_words = open("./data/kamus/kata_4.txt").read().splitlines()
+all_words = set(word.strip() for word in open("./data/kamus/kata_4.txt"))
 
 EMOJI_CODES = {
     "green": {

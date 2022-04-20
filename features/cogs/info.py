@@ -65,32 +65,34 @@ class Info(Cog):
         await ctx.send(embed= embed)
 
     @command(name="serverinfo", aliases=["guildinfo", "si", "gi"])
-    async def server_info(self, ctx):
+    async def server_info(self, ctx, guild = False):
         """Menampilkan info server"""
+        if guild is False:
+            guild = ctx.guild
         embed = Embed(title="Server information",
-                      colour=ctx.guild.owner.colour,
+                      colour=guild.owner.colour,
                       timestamp=datetime.utcnow())
 
-        embed.set_thumbnail(url=ctx.guild.icon.url)
+        embed.set_thumbnail(url=guild.icon.url)
 
-        statuses = [len(list(filter(lambda m: str(m.status) == "online", ctx.guild.members))),
-                    len(list(filter(lambda m: str(m.status) == "idle", ctx.guild.members))),
-                    len(list(filter(lambda m: str(m.status) == "dnd", ctx.guild.members))),
-                    len(list(filter(lambda m: str(m.status) == "offline", ctx.guild.members)))]
+        statuses = [len(list(filter(lambda m: str(m.status) == "online", guild.members))),
+                    len(list(filter(lambda m: str(m.status) == "idle", guild.members))),
+                    len(list(filter(lambda m: str(m.status) == "dnd", guild.members))),
+                    len(list(filter(lambda m: str(m.status) == "offline", guild.members)))]
 
         fields = [("ID", ctx.guild.id, True),
                 ("Owner", ctx.guild.owner, False),
                 ("Region", ctx.guild.region, True),
                 ("Created at", ctx.guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), False),
-                ("Members", len(ctx.guild.members), True),
-                ("Humans", len(list(filter(lambda m: not m.bot, ctx.guild.members))), True),
-                ("Bots", len(list(filter(lambda m: m.bot, ctx.guild.members))), True),
-                ("Banned members", len(await ctx.guild.bans()), True),
-                ("Invites", len(await ctx.guild.invites()), True),
-                ("Text channels", len(ctx.guild.text_channels), True),
-                ("Voice channels", len(ctx.guild.voice_channels), True),
-                ("Categories", len(ctx.guild.categories), True),
-                ("Roles", len(ctx.guild.roles), True),
+                ("Members", len(guild.members), True),
+                ("Humans", len(list(filter(lambda m: not m.bot, guild.members))), True),
+                ("Bots", len(list(filter(lambda m: m.bot, guild.members))), True),
+                ("Banned members", len(await guild.bans()), True),
+                ("Invites", len(await guild.invites()), True),
+                ("Text channels", len(guild.text_channels), True),
+                ("Voice channels", len(guild.voice_channels), True),
+                ("Categories", len(guild.categories), True),
+                ("Roles", len(guild.roles), True),
                 ("Statuses", f"🟢 {statuses[0]} 🟠 {statuses[1]} 🔴 {statuses[2]} ⚪ {statuses[3]}", True),
                 ("\u200b", "\u200b", True)]
 

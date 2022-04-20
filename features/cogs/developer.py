@@ -7,6 +7,8 @@ from sys import executable, argv
 from subprocess import run, PIPE
 import asyncio
 
+from ..cogs.info import server_info
+
 
 class Developer(Cog):
     def __init__(self,bot):
@@ -27,6 +29,23 @@ class Developer(Cog):
                             value= f"Members: {len(list(filter(lambda m: not m.bot, guild.members)))}\nBots: {len(list(filter(lambda m: m.bot, guild.members)))}")
         embed.set_thumbnail(url=ctx.guild.me.avatar.url)
         await ctx.send(embed=embed)
+        
+    @command(name="server_info")
+    async def ser_inf(self, ctx, *, nama):
+        """Memberikan info server dengan input nama
+
+        Args:
+            nama (str): Nama Server
+        """
+        servers = {}
+        for guild in self.bot.guilds:
+            servers[guild.name] = guild.id
+        if not nama in servers.keys():
+            return ctx.send(f"Maaf kak server dengan nama {nama} tidak ditemukan...")
+        server = self.bot.get_guild(servers[nama])
+        await server_info(ctx, guild= server)
+        
+        
         
     @command(name="leaveguild")
     async def leave_guild(self, ctx, *, guild_name):

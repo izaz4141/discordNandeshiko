@@ -14,7 +14,7 @@ class Chat(Cog):
         self.history = {}
     @command(name="chat", aliases=["c"])
     async def chat(self, ctx, *, content):
-        """Chatting With Nandeshikyot
+        """Chatting With Nandeshikyot (deprecated/need money)
 
         Args:
             content (str): Inquiries

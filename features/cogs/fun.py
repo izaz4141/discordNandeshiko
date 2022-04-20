@@ -11,13 +11,7 @@ from pybooru import Danbooru, Moebooru
 from pygelbooru import Gelbooru
 # from difflib import get_close_matches
 from saucenao_api import SauceNao
-from ..games.wordle import (
-    # daily_puzzle_id,
-    # generate_info_embed,
-    generate_puzzle_embed,
-    # process_message_as_guess,
-    random_puzzle_id,
-)
+from ..games import wordle, kataple
 
 import asyncio
 from ..db import db
@@ -371,17 +365,21 @@ class Fun(Cog):
     @command(name="luck")
     @cooldown(3, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
     async def luck(self, ctx):
+        """Meramalkan keberuntunganmu hari ini
+
+        Mungkin terdapat suatu mekanisme rahasia?
+        """
         luck = randint(1,100)
         if luck <= 30:
-            await ctx.send('Haha ampas')
+            await ctx.send(f'{luck}! Haha ampas')
         elif luck <= 50:
-            await ctx.send('Mayan lucknya, 50% berhasil. Sisa 50%nya lagi diisi dengan semangat aja!')
+            await ctx.send(f'{luck}! Mayan lucknya, 50% berhasil. Sisa 50%nya lagi diisi dengan semangat aja!')
         elif luck <= 80:
-            await ctx.send('Kalau dihitung dari pergerakan bintang dan snezhnaya keberuntungan kaka hari ini BAIK!! :thumbsup:')
+            await ctx.send(f'{luck}! Kalau dihitung dari pergerakan bintang dan snezhnaya keberuntungan kaka hari ini BAIK!! :thumbsup:')
         elif luck <= 99:
-            await ctx.send('Enaknyaa~ aku juga pengen laksek... bagi dong ka lucknya!')
+            await ctx.send(f'{luck}! Enaknyaa~ aku juga pengen laksek... bagi dong ka lucknya!')
         elif luck == 100:
-            await ctx.send("(0 o 0 ) Gila beuhh")
+            await ctx.send(f"{luck}! (0 o 0 ) Gila beuhh")
         db.execute("UPDATE exp SET Luck = ? WHERE UserID = ?", luck, ctx.author.id)
             
         
@@ -392,13 +390,22 @@ class Fun(Cog):
         rolls = [randint(1, value) for i in range(dice)]
         await ctx.send(" + ".join([str(r) for r in rolls]) + f" = {sum(rolls)}")
     
-    @command(name="katapan")
+    @command(name="kataple")
     async def wordle_indo(self,ctx):
         """Memulai game Wordle Indonesia
         
         untuk menjawab, reply ke embed Nandeshikyot
         """
-        embed = generate_puzzle_embed(ctx.author, random_puzzle_id())
+        embed = kataple.generate_puzzle_embed(ctx.author, kataple.random_puzzle_id())
+        await ctx.reply(embed=embed)
+        
+    @command(name="wordle")
+    async def wordle_indo(self,ctx):
+        """Memulai game Wordle
+        
+        untuk menjawab, reply ke embed Nandeshikyot
+        """
+        embed = wordle.generate_puzzle_embed(ctx.author, wordle.random_puzzle_id())
         await ctx.reply(embed=embed)
     
     @command(name="bilang")
@@ -427,12 +434,12 @@ class Fun(Cog):
 
     @command(name="danbooru")
     async def danbooru_postList(self, ctx, *, tagss):
-        """Mencari gambar/video dengan tag yang diberikan (random) (maksimal 2 tags)
+        """Mencari gambar/video dengan tag yang diberikan (random) (maksimal 1 tags)
         Dapat dicari kombinasi tag dengan pemisah ^
         Spasi otomatis dikonversi ke underscore (untuk kemudahan)
         
         Contoh:
-        ```danbooru large breasts^breast grab```
+        ```danbooru large breasts```
         """
         tagss = " ".join("_".join(tagss.split(" ")).split("^"))
         tagss = tagss.lower()
@@ -489,12 +496,12 @@ class Fun(Cog):
             
     @command(name= "safebooru")
     async def safebooru_postList(self, ctx, *, tagss):
-        """Mencari gambar/video dengan tag yang diberikan (random) (maksimal 2 tags)
+        """Mencari gambar/video dengan tag yang diberikan (random) (maksimal 1 tags)
         Dapat dicari kombinasi tag dengan pemisah ^
         Spasi otomatis dikonversi ke underscore (untuk kemudahan)
         
         Contoh:
-        ```safebooru large breasts^breast grab```
+        ```safebooru breast grab```
         """
         tagss = " ".join("_".join(tagss.split(" ")).split("^"))
         tagss = tagss.lower()

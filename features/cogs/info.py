@@ -72,8 +72,10 @@ class Info(Cog):
         embed = Embed(title="Server information",
                       colour=guild.owner.colour,
                       timestamp=datetime.utcnow())
-
-        embed.set_thumbnail(url=guild.icon.url)
+        try:
+            embed.set_thumbnail(url=guild.icon.url)
+        except Exception:
+            pass
 
         statuses = [len(list(filter(lambda m: str(m.status) == "online", guild.members))),
                     len(list(filter(lambda m: str(m.status) == "idle", guild.members))),
@@ -87,7 +89,7 @@ class Info(Cog):
                 ("Members", len(guild.members), True),
                 ("Humans", len(list(filter(lambda m: not m.bot, guild.members))), True),
                 ("Bots", len(list(filter(lambda m: m.bot, guild.members))), True),
-                ("Banned members", len(await guild.bans()), True),
+                ("Banned members", len(guild.bans()), True),
                 ("Invites", len(await guild.invites()), True),
                 ("Text channels", len(guild.text_channels), True),
                 ("Voice channels", len(guild.voice_channels), True),

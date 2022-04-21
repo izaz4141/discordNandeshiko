@@ -43,7 +43,7 @@ class Developer(Cog):
         if not nama in servers.keys():
             return ctx.send(f"Maaf kak server dengan nama {nama} tidak ditemukan...")
         server = self.bot.get_guild(servers[nama])
-        await Info(self).server_info(ctx, guild= server)
+        await Info(self).server_info(ctx=ctx, guild= server)
         
         
         

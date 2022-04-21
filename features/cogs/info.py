@@ -3,6 +3,8 @@ from discord import Member, Embed
 from typing import Optional
 from datetime import datetime
 
+
+
 class Info(Cog):
     def __init__(self,bot):
         self.bot = bot
@@ -65,10 +67,10 @@ class Info(Cog):
         await ctx.send(embed= embed)
 
     @command(name="serverinfo", aliases=["guildinfo", "si", "gi"])
-    async def server_info(self, ctx, guild = False):
+    async def server_info(self, ctx):
         """Menampilkan info server"""
-        if guild is False:
-            guild = ctx.guild
+        
+        guild = ctx.guild
         embed = Embed(title="Server information",
                       colour=guild.owner.colour,
                       timestamp=datetime.utcnow())
@@ -82,10 +84,10 @@ class Info(Cog):
                     len(list(filter(lambda m: str(m.status) == "dnd", guild.members))),
                     len(list(filter(lambda m: str(m.status) == "offline", guild.members)))]
 
-        fields = [("ID", ctx.guild.id, True),
-                ("Owner", ctx.guild.owner, False),
-                ("Region", ctx.guild.region, True),
-                ("Created at", ctx.guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), False),
+        fields = [("ID", guild.id, True),
+                ("Owner", guild.owner, False),
+                ("Region", guild.region, True),
+                ("Created at", guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), False),
                 ("Members", len(guild.members), True),
                 ("Humans", len(list(filter(lambda m: not m.bot, guild.members))), True),
                 ("Bots", len(list(filter(lambda m: m.bot, guild.members))), True),

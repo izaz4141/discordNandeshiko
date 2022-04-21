@@ -5,6 +5,7 @@ from discord import Embed
 from os import execv
 from sys import executable, argv
 from subprocess import run, PIPE
+from datetime import datetime
 import asyncio
 
 from ..cogs.info import Info
@@ -41,9 +42,40 @@ class Developer(Cog):
         for guild in self.bot.guilds:
             servers[guild.name] = guild.id
         if not nama in servers.keys():
-            return ctx.send(f"Maaf kak server dengan nama {nama} tidak ditemukan...")
-        server = self.bot.get_guild(servers[nama])
-        await Info(self).server_info(ctx=ctx, guild= server)
+            return await ctx.send(f"Maaf kak server dengan nama {nama} tidak ditemukan...")
+        guild = self.bot.get_guild(servers[nama])
+        embed = Embed(title="Server information",
+                      colour=guild.owner.colour,
+                      timestamp=datetime.utcnow())
+        try:
+            embed.set_thumbnail(url=guild.icon.url)
+        except Exception:
+            pass
+
+        statuses = [len(list(filter(lambda m: str(m.status) == "online", guild.members))),
+                    len(list(filter(lambda m: str(m.status) == "idle", guild.members))),
+                    len(list(filter(lambda m: str(m.status) == "dnd", guild.members))),
+                    len(list(filter(lambda m: str(m.status) == "offline", guild.members)))]
+
+        fields = [("ID", guild.id, True),
+                ("Owner", guild.owner, False),
+                ("Region", guild.region, True),
+                ("Created at", guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), False),
+                ("Members", len(guild.members), True),
+                ("Humans", len(list(filter(lambda m: not m.bot, guild.members))), True),
+                ("Bots", len(list(filter(lambda m: m.bot, guild.members))), True),
+                ("Banned members", len(await guild.bans().flatten()), True),
+                ("Invites", len(await guild.invites()), True),
+                ("Text channels", len(guild.text_channels), True),
+                ("Voice channels", len(guild.voice_channels), True),
+                ("Categories", len(guild.categories), True),
+                ("Roles", len(guild.roles), True),
+                ("Statuses", f"🟢 {statuses[0]} 🟠 {statuses[1]} 🔴 {statuses[2]} ⚪ {statuses[3]}", True),
+                ("\u200b", "\u200b", True)]
+
+        for name, value, inline in fields:
+            embed.add_field(name=name, value=value, inline=inline)
+        await ctx.send(embed=embed)
         
         
         

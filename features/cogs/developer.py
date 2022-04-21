@@ -7,7 +7,7 @@ from sys import executable, argv
 from subprocess import run, PIPE
 import asyncio
 
-from ..cogs.info import server_info
+from ..cogs.info import Info
 
 
 class Developer(Cog):
@@ -43,7 +43,7 @@ class Developer(Cog):
         if not nama in servers.keys():
             return ctx.send(f"Maaf kak server dengan nama {nama} tidak ditemukan...")
         server = self.bot.get_guild(servers[nama])
-        await server_info(ctx, guild= server)
+        await Info(self).server_info(ctx, guild= server)
         
         
         

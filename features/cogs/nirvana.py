@@ -1,11 +1,9 @@
-from NHentai import NHentai
+from hentai import Hentai, Utils, Sort
 import asyncio
 
 from discord.ext.menus import MenuPages, ListPageSource
 from discord.ext.commands import Cog, CheckFailure, command, is_nsfw
 from discord import Embed
-
-nhen = NHentai()
 
 class IsiNHenHome(ListPageSource):
     def __init__(self, ctx, data):
@@ -24,6 +22,8 @@ class IsiNHenHome(ListPageSource):
         fields = [
             ("Bahasa", self.entries[menu.current_page]['language']),
             ("Jumlah Halaman", self.entries[menu.current_page]["pages"]),
+            ("Jumlah Favorit", self.entries[menu.current_page]["favorites"]),
+            ("Artists", ', '.join(str(artis) for artis in self.entries[menu.current_page]["artists"])),
             ("Tags", ', '.join(str(tag) for tag in self.entries[menu.current_page]['tags']))
         ]
         
@@ -91,26 +91,34 @@ class Nirvana(Cog):
         """Mengintip pintu surga"""
         kamus_hen = {}
         loop = self.bot.loop or asyncio.get_event_loop()
-        home = await loop.run_in_executor(None, lambda: nhen.get_pages(page=1))
-        for i in range(len(home.doujins)):
-            dojin = home.doujins[i]
+        homepage = await loop.run_in_executor(None, lambda: Utils.get_homepage())
+        home = [dojon for dojon in list(homepage.popular_now)] + [doujan for doujan in list(homepage.new_uploads)]
+        for i in range(len(home)):
+            dojin = home[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.lang
+            dojin_lang = dojin.language[0].name
             dojin_cover = dojin.cover
-            dojin_title = dojin.title
-            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
-            dojin_pages = str(dojin_d.total_pages)
-            dojin_tags = dojin_d.tags #list
+            dojin_title = dojin.json['title']['pretty']
+            dojin_pages = dojin.json['num_pages']
+            dojin_fav = dojin.json['num_favorites']
+            dojin_artists = []
+            for artis in dojin.artists:
+                dojin_artists.append(artis.name)
+            dojin_tags = []
+            for tag in dojin.tag:
+                dojin_tags.append(tag.name) #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
                 "pages" : dojin_pages,
-                "image_url" : dojin_cover
+                "image_url" : dojin_cover,
+                "favorites" : dojin_fav,
+                "artists" : dojin_artists
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
-                        delete_message_after=True,
+                        # delete_message_after=True,
                         timeout=60.0)# bisa ditambah clear_reaction_after=True
         await menu.start(ctx)
         
@@ -120,26 +128,75 @@ class Nirvana(Cog):
         """Mencari surga yang paling atas"""
         kamus_hen = {}
         loop = self.bot.loop or asyncio.get_event_loop()
-        hasil = await loop.run_in_executor(None, lambda: nhen.search(query=kata_kunci, sort="popular"))
-        for i in range(len(hasil.doujins)):
-            dojin = hasil.doujins[i]
+        results = []
+        for n in range(1,3):
+            results.append(await loop.run_in_executor(None, lambda: Utils.search_by_query(query= kata_kunci, page= n, sort= Sort.Popular)))
+        
+        for i in range(len(results.doujins)):
+            dojin = results[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.lang
+            dojin_lang = dojin.language[0].name
             dojin_cover = dojin.cover
-            dojin_title = dojin.title
-            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
-            dojin_pages = str(dojin_d.total_pages)
-            dojin_tags = dojin_d.tags #list
+            dojin_title = dojin.json['title']['pretty']
+            dojin_pages = dojin.json['num_pages']
+            dojin_fav = dojin.json['num_favorites']
+            dojin_artists = []
+            for artis in dojin.artists:
+                dojin_artists.append(artis.name)
+            dojin_tags = []
+            for tag in dojin.tag:
+                dojin_tags.append(tag.name) #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
                 "pages" : dojin_pages,
-                "image_url" : dojin_cover
+                "image_url" : dojin_cover,
+                "favorites" : dojin_fav,
+                "artists" : dojin_artists
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
-                        delete_message_after=True,
+                        # delete_message_after=True,
+                        timeout=60.0)# bisa ditambah clear_reaction_after=True
+        await menu.start(ctx)
+        
+    @command(name="mencarisurgam", aliases=["msm"])
+    @is_nsfw()
+    async def Nhen_searchPM(self, ctx, *, kata_kunci):
+        """Mencari surga yang ramai bulan ini"""
+        kamus_hen = {}
+        loop = self.bot.loop or asyncio.get_event_loop()
+        results = []
+        for n in range(1,3):
+            results.append(await loop.run_in_executor(None, lambda: Utils.search_by_query(query= kata_kunci, page= n, sort= Sort.PopularMonth)))
+        
+        for i in range(len(results.doujins)):
+            dojin = results[i]
+            dojin_id = dojin.id
+            dojin_lang = dojin.language[0].name
+            dojin_cover = dojin.cover
+            dojin_title = dojin.json['title']['pretty']
+            dojin_pages = dojin.json['num_pages']
+            dojin_fav = dojin.json['num_favorites']
+            dojin_artists = []
+            for artis in dojin.artists:
+                dojin_artists.append(artis.name)
+            dojin_tags = []
+            for tag in dojin.tag:
+                dojin_tags.append(tag.name) #list
+            kamus_hen[i] = {
+                "name" : dojin_title,
+                "id" : dojin_id,
+                "language" : dojin_lang,
+                "tags" : dojin_tags,
+                "pages" : dojin_pages,
+                "image_url" : dojin_cover,
+                "favorites" : dojin_fav,
+                "artists" : dojin_artists
+            }
+        menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
+                        # delete_message_after=True,
                         timeout=60.0)# bisa ditambah clear_reaction_after=True
         await menu.start(ctx)
         
@@ -149,26 +206,36 @@ class Nirvana(Cog):
         """Mencari surga yang ramai minggu ini"""
         kamus_hen = {}
         loop = self.bot.loop or asyncio.get_event_loop()
-        hasil = await loop.run_in_executor(None, lambda: nhen.search(query=kata_kunci, sort="popular-week"))
-        for i in range(len(hasil.doujins)):
-            dojin = hasil.doujins[i]
+        results = []
+        for n in range(1,3):
+            results.append(await loop.run_in_executor(None, lambda: Utils.search_by_query(query= kata_kunci, page= n, sort= Sort.PopularWeek)))
+        
+        for i in range(len(results.doujins)):
+            dojin = results[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.lang
+            dojin_lang = dojin.language[0].name
             dojin_cover = dojin.cover
-            dojin_title = dojin.title
-            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
-            dojin_pages = str(dojin_d.total_pages)
-            dojin_tags = dojin_d.tags #list
+            dojin_title = dojin.json['title']['pretty']
+            dojin_pages = dojin.json['num_pages']
+            dojin_fav = dojin.json['num_favorites']
+            dojin_artists = []
+            for artis in dojin.artists:
+                dojin_artists.append(artis.name)
+            dojin_tags = []
+            for tag in dojin.tag:
+                dojin_tags.append(tag.name) #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
                 "pages" : dojin_pages,
-                "image_url" : dojin_cover
+                "image_url" : dojin_cover,
+                "favorites" : dojin_fav,
+                "artists" : dojin_artists
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
-                        delete_message_after=True,
+                        # delete_message_after=True,
                         timeout=60.0)# bisa ditambah clear_reaction_after=True
         await menu.start(ctx)
         
@@ -178,26 +245,36 @@ class Nirvana(Cog):
         """Mencari surga yang ramai hari ini"""
         kamus_hen = {}
         loop = self.bot.loop or asyncio.get_event_loop()
-        hasil = await loop.run_in_executor(None, lambda: nhen.search(query=kata_kunci, sort="popular-today"))
-        for i in range(len(hasil.doujins)):
-            dojin = hasil.doujins[i]
+        results = []
+        for n in range(1,3):
+            results.append(await loop.run_in_executor(None, lambda: Utils.search_by_query(query= kata_kunci, page= n, sort= Sort.PopularToday)))
+        
+        for i in range(len(results.doujins)):
+            dojin = results[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.lang
+            dojin_lang = dojin.language[0].name
             dojin_cover = dojin.cover
-            dojin_title = dojin.title
-            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
-            dojin_pages = str(dojin_d.total_pages)
-            dojin_tags = dojin_d.tags #list
+            dojin_title = dojin.json['title']['pretty']
+            dojin_pages = dojin.json['num_pages']
+            dojin_fav = dojin.json['num_favorites']
+            dojin_artists = []
+            for artis in dojin.artists:
+                dojin_artists.append(artis.name)
+            dojin_tags = []
+            for tag in dojin.tag:
+                dojin_tags.append(tag.name) #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
                 "pages" : dojin_pages,
-                "image_url" : dojin_cover
+                "image_url" : dojin_cover,
+                "favorites" : dojin_fav,
+                "artists" : dojin_artists
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
-                        delete_message_after=True,
+                        # delete_message_after=True,
                         timeout=60.0)# bisa ditambah clear_reaction_after=True
         await menu.start(ctx)
         
@@ -207,26 +284,36 @@ class Nirvana(Cog):
         """Mencari surga yang baru saja dibentuk"""
         kamus_hen = {}
         loop = self.bot.loop or asyncio.get_event_loop()
-        hasil = await loop.run_in_executor(None, lambda: nhen.search(query=kata_kunci))
-        for i in range(len(hasil.doujins)):
-            dojin = hasil.doujins[i]
+        results = []
+        for n in range(1,3):
+            results.append(await loop.run_in_executor(None, lambda: Utils.search_by_query(query= kata_kunci, page= n, sort= Sort.Date)))
+        
+        for i in range(len(results.doujins)):
+            dojin = results[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.lang
+            dojin_lang = dojin.language[0].name
             dojin_cover = dojin.cover
-            dojin_title = dojin.title
-            dojin_d = await loop.run_in_executor(None, lambda: nhen._get_doujin(dojin_id))
-            dojin_pages = str(dojin_d.total_pages)
-            dojin_tags = dojin_d.tags #list
+            dojin_title = dojin.json['title']['pretty']
+            dojin_pages = dojin.json['num_pages']
+            dojin_fav = dojin.json['num_favorites']
+            dojin_artists = []
+            for artis in dojin.artists:
+                dojin_artists.append(artis.name)
+            dojin_tags = []
+            for tag in dojin.tag:
+                dojin_tags.append(tag.name) #list
             kamus_hen[i] = {
                 "name" : dojin_title,
                 "id" : dojin_id,
                 "language" : dojin_lang,
                 "tags" : dojin_tags,
                 "pages" : dojin_pages,
-                "image_url" : dojin_cover
+                "image_url" : dojin_cover,
+                "favorites" : dojin_fav,
+                "artists" : dojin_artists
             }
         menu = MenuPages(source=IsiNHenHome(ctx, kamus_hen),
-                        delete_message_after=True,
+                        # delete_message_after=True,
                         timeout=60.0)# bisa ditambah clear_reaction_after=True
         await menu.start(ctx)
         
@@ -235,26 +322,39 @@ class Nirvana(Cog):
     async def Doujin_Info(self, ctx, *, doujin_id):
         """Melihat ingfo surga dengan kode tertentu"""
         loop = self.bot.loop or asyncio.get_event_loop()
-        dojin = await loop.run_in_executor(None, lambda: nhen._get_doujin(doujin_id))
+        dojin = await loop.run_in_executor(None, lambda: Hentai(int(doujin_id)))
+        if not Hentai.exists(dojin.id):
+            return await ctx.send("Maaf kak surga yang kakak cari tidak ada..")
         dojin_id = dojin.id
-        dojin_title = dojin.title
-        dojin_title2 = dojin.secondary_title
-        dojin_pages = str(dojin.total_pages)
-        dojin_tags = dojin.tags #list
-        dojin_artists = dojin.artists
-        dojin_langs = dojin.languages
-        dojin_ctg = dojin.categories
-        dojin_charas = dojin.characters
-        dojin_pard = dojin.parodies
-        dojin_grups = dojin.groups
-        dojin_img = dojin.images[0]
-        
-        
-            
+        dojin_langs = []
+        for lang in dojin.language:
+            dojin_langs.append(lang.name)
+        dojin_img = dojin.cover
+        dojin_title = dojin.json['title']['pretty']
+        dojin_pages = dojin.json['num_pages']
+        dojin_fav = dojin.json['num_favorites']
+        dojin_artists = []
+        for artis in dojin.artists:
+            dojin_artists.append(artis.name)
+        dojin_tags = []
+        for tag in dojin.tag:
+            dojin_tags.append(tag.name) #list
+        dojin_ctg = []
+        for ctg in dojin.category:
+            dojin_ctg.append(ctg.name)
+        dojin_charas = []
+        for chara in dojin.character:
+            dojin_charas.append(chara.name)
+        dojin_pard = []
+        for pard in dojin.parody:
+            dojin_pard.append(pard.name)
+        dojin_grups = []
+        for grup in dojin.group:
+            dojin_grups.append(grup.name)
         
         embed = Embed(
             title= dojin_title,
-            description= dojin_title2 + "\n\nTotal Halaman : " + dojin_pages,
+            description= "Favorite : " + dojin_fav + "\nTotal Halaman : " + dojin_pages,
             colour= ctx.author.colour
         )
         fields = [
@@ -282,26 +382,37 @@ class Nirvana(Cog):
     async def Doujin_Info_Random(self, ctx):
         """Melihat ingfo surga yang belum dijelajahi sebelumnya"""
         loop = self.bot.loop or asyncio.get_event_loop()
-        dojin = await loop.run_in_executor(None, lambda: nhen.get_random())
+        dojin = await loop.run_in_executor(None, lambda: Utils.get_random_hentai())
         dojin_id = dojin.id
-        dojin_title = dojin.title
-        dojin_title2 = dojin.secondary_title
-        dojin_pages = str(dojin.total_pages)
-        dojin_tags = dojin.tags #list
-        dojin_artists = dojin.artists
-        dojin_langs = dojin.languages
-        dojin_ctg = dojin.categories
-        dojin_charas = dojin.characters
-        dojin_pard = dojin.parodies
-        dojin_grups = dojin.groups
-        dojin_img = dojin.images[0]
-        
-        
-            
+        dojin_langs = []
+        for lang in dojin.language:
+            dojin_langs.append(lang.name)
+        dojin_img = dojin.cover
+        dojin_title = dojin.json['title']['pretty']
+        dojin_pages = dojin.json['num_pages']
+        dojin_fav = dojin.json['num_favorites']
+        dojin_artists = []
+        for artis in dojin.artists:
+            dojin_artists.append(artis.name)
+        dojin_tags = []
+        for tag in dojin.tag:
+            dojin_tags.append(tag.name) #list
+        dojin_ctg = []
+        for ctg in dojin.category:
+            dojin_ctg.append(ctg.name)
+        dojin_charas = []
+        for chara in dojin.character:
+            dojin_charas.append(chara.name)
+        dojin_pard = []
+        for pard in dojin.parody:
+            dojin_pard.append(pard.name)
+        dojin_grups = []
+        for grup in dojin.group:
+            dojin_grups.append(grup.name)
         
         embed = Embed(
             title= dojin_title,
-            description= dojin_title2 + "\n\nTotal Halaman : " + dojin_pages,
+            description= "Favorite : " + dojin_fav + "\nTotal Halaman : " + dojin_pages,
             colour= ctx.author.colour
         )
         fields = [
@@ -329,10 +440,12 @@ class Nirvana(Cog):
     async def Baca_Doujin(self, ctx, *, rahasia_dunia):
         """Mengintip Pintu Surga Menuju Kenikmatan Tak Terbatas (ada passwordnya)"""
         loop = self.bot.loop or asyncio.get_event_loop()
-        dojin = await loop.run_in_executor(None, lambda: nhen._get_doujin(rahasia_dunia))
-        dojin_imgs = dojin.images
+        dojin = await loop.run_in_executor(None, lambda: Hentai(int(rahasia_dunia)))
+        dojin_imgs = []
+        for img in dojin.pages:
+            dojin_imgs.append(img.url)
         menu = MenuPages(source=IsiSurga(ctx, dojin_imgs),
-                        delete_message_after=True,
+                        # delete_message_after=True,
                         timeout=120.0)# bisa ditambah clear_reaction_after=True
         await menu.start(ctx)
         
@@ -340,8 +453,6 @@ class Nirvana(Cog):
     async def on_ready(self):
         if not self.bot.ready:
             self.bot.cogs_ready.ready_up("nirvana")
-
-
-
+            
 def setup(bot):
     bot.add_cog(Nirvana(bot))

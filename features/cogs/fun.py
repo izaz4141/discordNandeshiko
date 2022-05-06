@@ -400,7 +400,7 @@ class Fun(Cog):
         await ctx.reply(embed=embed)
         
     @command(name="wordle")
-    async def wordle_indo(self,ctx):
+    async def wordle(self,ctx):
         """Memulai game Wordle
         
         untuk menjawab, reply ke embed Nandeshikyot

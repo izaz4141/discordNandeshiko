@@ -194,7 +194,7 @@ class Help(Cog):
         """Segalanya Tentang Nandeshikyot-bot!"""
         embed = Embed(
             title= "About Nandeshikyot-bot",
-            description = f"Dibuat Oleh: {self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}",
+            description = f"Dibuat Oleh: {self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}\nFacebook: https://web.facebook.com/Glicole/",
             colour= ctx.author.colour
         )
         fields = [

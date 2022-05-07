@@ -62,15 +62,24 @@ class Info(Cog):
             target (Member): mention member
         """
         target = target or ctx.author
-        embed = Embed(colour= target.colour)
+        embed = Embed()
         embed.set_image(url= target.avatar.url)
         await ctx.send(embed= embed)
 
     @command(name="serverinfo", aliases=["guildinfo", "si", "gi"])
-    async def server_info(self, ctx):
+    async def server_info(self, ctx, *, nama="Takda"):
         """Menampilkan info server"""
         
-        guild = ctx.guild
+        if ctx.author.id in self.bot.owner_ids and not nama == "Takda":
+            servers = {}
+            for guild in self.bot.guilds:
+                servers[guild.name] = guild.id
+            if not nama in servers.keys():
+                return await ctx.send(f"Maaf kak server dengan nama {nama} tidak ditemukan...")
+            guild = self.bot.get_guild(servers[nama])
+        else:
+            guild = ctx.guild
+        
         embed = Embed(title="Server information",
                       colour=guild.owner.colour,
                       timestamp=datetime.utcnow())

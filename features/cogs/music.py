@@ -366,15 +366,15 @@ class Music(Cog):
                     vol_lv.append(BAR[1])
                 file_name = "Music-Cover" + str(random.randint(1, 101))
                 loop = self.bot.loop or asyncio.get_event_loop()
-                await self.download_image(self.np[ctx.guild.id][3], "./data/music-Cover/", file_name)
+                await self.download_image(self.np[ctx.guild.id][3], "./data/temp-image/", file_name)
                 
                 # Read Image
-                img = Image.open(f"./data/music-Cover/{file_name}.jpg")
+                img = Image.open(f"./data/temp-image/{file_name}.jpg")
                 # Convert Image into RGB
                 img = img.convert('RGB')
                 # call function
                 red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
-                os.remove(f"./data/music-Cover/{file_name}.jpg")
+                os.remove(f"./data/temp-image/{file_name}.jpg")
                 
                 embed = Embed(
                     title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
@@ -559,15 +559,15 @@ class Music(Cog):
                 vol_lv.append(BAR[1])
             file_name = "Music-Cover" + str(random.randint(1, 101))
             loop = self.bot.loop or asyncio.get_event_loop()
-            await self.download_image(self.np[ctx.guild.id][3], "./data/music-Cover/", file_name)
+            await self.download_image(self.np[ctx.guild.id][3], "./data/temp-image/", file_name)
             
             # Read Image
-            img = Image.open(f"./data/music-Cover/{file_name}.jpg")
+            img = Image.open(f"./data/temp-image/{file_name}.jpg")
             # Convert Image into RGB
             img = img.convert('RGB')
             # call function
             red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
-            os.remove(f"./data/music-Cover/{file_name}.jpg")
+            os.remove(f"./data/temp-image/{file_name}.jpg")
             embed = Embed(
                 title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
                 description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━⬤───────────── {self.np[ctx.guild.id][2]}",

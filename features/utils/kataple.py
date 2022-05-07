@@ -143,7 +143,7 @@ def generate_puzzle_embed(user: User, puzzle_id: int) -> Embed:
         nextcord.Embed: The embed to be sent
     """
     n = len(popular_words[puzzle_id])
-    embed = Embed(title="Wordle Clone")
+    embed = Embed(title="Kataple")
     embed.description = "\n".join([generate_blanks(n)] * 6)
     embed.set_author(name=user.name, icon_url=user.display_avatar.url)
     embed.set_footer(

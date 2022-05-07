@@ -149,7 +149,7 @@ class Nirvana(Cog):
         for i in range(len(results)):
             dojin = results[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.language[0].name
+            dojin_lang = [dojin.language[i].name for i in range(len(dojin.language))]
             dojin_cover = dojin.cover
             dojin_title = dojin.json['title']['pretty']
             dojin_pages = dojin.num_pages
@@ -193,7 +193,7 @@ class Nirvana(Cog):
         for i in range(len(results)):
             dojin = results[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.language[0].name
+            dojin_lang = [dojin.language[i].name for i in range(len(dojin.language))]
             dojin_cover = dojin.cover
             dojin_title = dojin.json['title']['pretty']
             dojin_pages = dojin.num_pages
@@ -237,7 +237,7 @@ class Nirvana(Cog):
         for i in range(len(results)):
             dojin = results[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.language[0].name
+            dojin_lang = [dojin.language[i].name for i in range(len(dojin.language))]
             dojin_cover = dojin.cover
             dojin_title = dojin.json['title']['pretty']
             dojin_pages = dojin.num_pages
@@ -281,7 +281,7 @@ class Nirvana(Cog):
         for i in range(len(results)):
             dojin = results[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.language[0].name
+            dojin_lang = [dojin.language[i].name for i in range(len(dojin.language))]
             dojin_cover = dojin.cover
             dojin_title = dojin.json['title']['pretty']
             dojin_pages = dojin.num_pages
@@ -325,7 +325,7 @@ class Nirvana(Cog):
         for i in range(len(results)):
             dojin = results[i]
             dojin_id = dojin.id
-            dojin_lang = dojin.language[0].name
+            dojin_lang = [dojin.language[i].name for i in range(len(dojin.language))]
             dojin_cover = dojin.cover
             dojin_title = dojin.json['title']['pretty']
             dojin_pages = dojin.num_pages

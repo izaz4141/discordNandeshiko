@@ -1,4 +1,4 @@
-from discord import Embed, File, Intents, ActivityType, Activity
+from discord import Embed, File, Intents, ActivityType, Activity, Message
 from discord import Bot as BotClient
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import CommandNotFound, Context, BadArgument, MissingRequiredArgument, CommandOnCooldown, when_mentioned_or
@@ -258,10 +258,15 @@ class Bot(BotBase):
             if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.totalE
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis)-1)])], weights= [1, 1, 2], k=1)[0])
-            
             if message.reference:
-                await wordle.process_message_as_guess(self, message)
-                await kataple.process_message_as_guess(self, message)
+                if isinstance(message.reference.resolved, Message):
+                    parent = message.reference.resolved
+                    if parent.embeds:
+                        embed = parent.embeds[0]
+                        if embed.title == "wordle":
+                            await wordle.process_message_as_guess(self, message)
+                        elif embed.title == "Kataple":
+                            await kataple.process_message_as_guess(self, message)
                 
             await self.process_commands(message)
             

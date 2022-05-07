@@ -1,7 +1,7 @@
 from hentai import Hentai, Utils, Sort
 import asyncio
 
-from discord.ext.menus import MenuPages, ListPageSource
+from ..utils.menus import MenuPages, ListPageSource
 from discord.ext.commands import Cog, CheckFailure, command, is_nsfw
 from discord import Embed
 

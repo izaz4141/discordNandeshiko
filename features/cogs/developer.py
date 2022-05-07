@@ -8,7 +8,6 @@ from subprocess import run, PIPE
 from datetime import datetime
 import asyncio
 
-from ..cogs.info import Info
 
 
 class Developer(Cog):

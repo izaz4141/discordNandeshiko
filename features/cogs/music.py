@@ -1,7 +1,7 @@
 from email.errors import FirstHeaderLineIsContinuationDefect
 from discord import Embed, Colour, PCMVolumeTransformer, FFmpegOpusAudio, FFmpegPCMAudio
 from discord.ext.commands import command, Cog
-from discord.ext.menus import MenuPages, ListPageSource
+from ..utils.menus import MenuPages, ListPageSource
 from discord.utils import get
 
 import asyncio

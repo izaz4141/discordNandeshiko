@@ -2,7 +2,7 @@ from discord.ext.commands import Cog, command, BadArgument, cooldown, BucketType
 from random import choice, randint
 from discord import Member, Embed
 from discord.errors import HTTPException, Forbidden
-from discord.ext.menus import MenuPages, ListPageSource
+from ..utils.menus import MenuPages, ListPageSource
 from typing import Optional
 from aiohttp import request
 # from jikanpy import Jikan
@@ -11,7 +11,7 @@ from pybooru import Danbooru, Moebooru
 from pygelbooru import Gelbooru
 # from difflib import get_close_matches
 from saucenao_api import SauceNao
-from ..games import wordle, kataple
+from ..utils import wordle, kataple
 
 import asyncio
 from ..db import db

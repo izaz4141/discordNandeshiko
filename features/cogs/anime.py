@@ -1,5 +1,5 @@
 from discord.ext.commands import Cog, command
-from discord.ext.menus import MenuPages, ListPageSource
+from ..utils.menus import MenuPages, ListPageSource
 from discord.utils import get
 from discord import Embed
 from asyncio import TimeoutError

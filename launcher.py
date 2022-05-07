@@ -1,6 +1,6 @@
 from os import system
 # system('python -m pip uninstall discord.py&&y')
-system('python -m pip install saucenao-api==2.3.1 && Y')
+system('python -m pip install saucenao-api==2.3.1')
 
 
 from features.bot_main import bot

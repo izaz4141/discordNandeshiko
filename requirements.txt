@@ -17,4 +17,3 @@ PyNaCl==1.4.0
 Pillow==9.1.0
 openai==0.16.0
 py-cord @ git+https://github.com/Pycord-Development/pycord@37c9567769a07fae11d77f7505de50d1a2d12785
-discord-ext-menus @ git+https://github.com/Rapptz/discord-ext-menus@fbb8803779373357e274e1540b368365fd9d8074

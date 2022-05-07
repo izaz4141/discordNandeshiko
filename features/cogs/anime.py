@@ -95,6 +95,8 @@ Id : {str(self.entries[menu.current_page]['mal_id'])} \n",
         ]
         
         for name, value in fields:
+            if value == '':
+                value = 'Tidak Diketahui'
             embed.add_field(name=name,value=value,inline=False)
 
         embed.set_image(url=self.entries[menu.current_page]["image_url"])
@@ -130,11 +132,9 @@ class IsiCharaSearch(ListPageSource):
 Id : {str(self.entries[menu.current_page]['mal_id'])} ",
                       colour=self.ctx.author.colour)
         dr_anim = ', '.join(str(anime['name']) for anime in self.entries[menu.current_page]['anime'])
-        if dr_anim == '':
-            dr_anim = 'None'
+        
         dr_mango = ', '.join(str(manga['name']) for manga in self.entries[menu.current_page]['manga'])
-        if dr_mango == '':
-            dr_mango = 'None'
+        
         
         fields = [
             ("Dari Anime", dr_anim ),
@@ -142,6 +142,8 @@ Id : {str(self.entries[menu.current_page]['mal_id'])} ",
         ]
         
         for name, value in fields:
+            if value == '':
+                value = 'Tidak Diketahui'
             embed.add_field(name=name,value=value,inline=False)
 
         embed.set_image(url=self.entries[menu.current_page]["image_url"])
@@ -180,15 +182,11 @@ Source : {str(self.entries[menu.current_page]['source'])}\n\
 Episodes : {str(self.entries[menu.current_page]['episodes'])}\n\
 Id : {str(self.entries[menu.current_page]['mal_id'])}\n",
                       colour=self.ctx.author.colour)
-        try:
-            produsa = '\n'.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))
-        except IndexError:
-            produsa = 'None'
+        
+        produsa = '\n'.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))
+        
         lisensa = '\n'.join(str(i) for i in self.entries[menu.current_page]['licensors'])
-        if lisensa == '':
-            lisensa = 'None'
-        if produsa == '':
-            produsa = 'None'
+        
         
         fields = [
             ("Producers", produsa ),
@@ -197,6 +195,8 @@ Id : {str(self.entries[menu.current_page]['mal_id'])}\n",
             ("Sinopsis", f"{str(self.entries[menu.current_page]['synopsis']):.1021s}...")
         ]
         for name, value in fields:
+            if value == '':
+                value = 'Tidak Diketahui'
             embed.add_field(name=name, value=value, inline=False)
         embed.set_image(url=self.entries[menu.current_page]["image_url"])
         embed.set_footer(text=f"{offset:,} of {len_data:,} hasil.")
@@ -235,15 +235,11 @@ Source : {str(self.entries[menu.current_page]['source'])}\n\
 Episodes : {str(self.entries[menu.current_page]['episodes'])}\n\
 Id : {str(self.entries[menu.current_page]['mal_id'])}\n",
                       colour=self.ctx.author.colour)
-        try:
-            produsa = '\n'.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))
-        except IndexError:
-            produsa = 'None'
+        
+        produsa = '\n'.join(str(self.entries[menu.current_page]['producers'][i]['name']) for i in range(len(self.entries[menu.current_page]['producers'])))
+        
         lisensa = '\n'.join(str(i) for i in self.entries[menu.current_page]['licensors'])
-        if lisensa == '':
-            lisensa = 'None'
-        if produsa == '':
-            produsa = 'None'
+        
         
         fields = [
             ("Producers", produsa ),
@@ -252,6 +248,8 @@ Id : {str(self.entries[menu.current_page]['mal_id'])}\n",
             ("Sinopsis", f"{str(self.entries[menu.current_page]['synopsis']):.1021s}...")
         ]
         for name, value in fields:
+            if value == '':
+                value = 'Tidak Diketahui'
             embed.add_field(name=name, value=value, inline=False)
         # fields=[]
         # for genre in self.entries[menu.current_page]["genres"]:

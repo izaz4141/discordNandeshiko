@@ -76,15 +76,11 @@ class PostListD(ListPageSource):
                         description= "No Id",
                         colour= self.ctx.author.colour)
         if not post_detail["pixiv_id"] is None:
-            sauce =  "https://pixiv.net/artworks/" + str(post_detail["pixiv_id"])
+            sauce =  "https://www.pixiv.net/artworks/" + str(post_detail["pixiv_id"])
         else:
             sauce = post_detail["source"]
-            if sauce == "":
-                sauce = "Unknown"
         
         artis = post_detail["tag_string_artist"]
-        if artis == "":
-            artis = "Unknown"
         fields = [
             ("Artist", artis),
             ("Source", sauce),
@@ -92,6 +88,8 @@ class PostListD(ListPageSource):
         ]
         
         for name, value in fields:
+            if value == '':
+                value = "Tidak Diketahui"
             embed.add_field(name=name, value=value, inline=False)
         img_format = ["jpg", "png", "gif", "jpeg"]
         vid_format = ["webm", "mp4", "mkv"]
@@ -281,7 +279,7 @@ class PostListG(ListPageSource):
             sauce = "Unknown"
         elif "pximg" in sauce:
             sauced = sauce.split("/")[-1].split("_")[0]
-            sauce = "https://pixiv.net/artworks/" + str(sauced)
+            sauce = "https://www.pixiv.net/artworks/" + str(sauced)
         
         fields = [
             ("Source", sauce),
@@ -289,6 +287,8 @@ class PostListG(ListPageSource):
         ]
         
         for name, value in fields:
+            if value == '':
+                value = "Tidak Diketahui"
             embed.add_field(name=name, value=value, inline=False)
             
         try:
@@ -323,21 +323,19 @@ class IsiSauceNao(ListPageSource):
                     colour=self.ctx.author.colour)
         
         sauce = "\n".join(post_detail.urls)
-        if sauce == "":
-            sauce = "Unknown"
-        elif "pximg" in sauce:
+        if "pximg" in sauce:
             sauced = sauce.split("/")[-1].split("_")[0]
-            sauce = "https://pixiv.net/artworks/" + str(sauced)
+            sauce = "https://www.pixiv.net/artworks/" + str(sauced)
             
         autor = post_detail.author
-        if autor is None:
-            autor = "Unknown"
         
         fields = [("Author", autor),
             ("Source", sauce)
         ]
         
         for name, value in fields:
+            if value == '':
+                value = "Tidak Diketahui"
             embed.add_field(name=name, value=value, inline=False)
             
         try:
@@ -885,6 +883,8 @@ class Fun(Cog):
             img_format = ["jpg", "png", "gif", "jpeg"]
             if ctx.message.reference:
                 link = await ctx.fetch_message(ctx.message.reference.message_id)
+            elif not ctx.message.attachments == []:
+                link = ctx.message
             else:
                 def _check(m):
                     if m.author == ctx.author:
@@ -904,21 +904,12 @@ class Fun(Cog):
                     await msg.delete()
                     await ctx.send("Ih kacang")
             if not link =="Takda":
-                try:
-                    result = sauce.from_url(link.attachments[0].url)
-                    hasil_saos = result.results
-                    menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
-                                    clear_reactions_after=True,
-                                    timeout=60.0)# bisa ditambah clear_reaction_after=True
-                    await menu.start(ctx)
-                except IndexError:
-                    konten = link.content
-                    result = sauce.from_url(konten)
-                    hasil_saos = result.results
-                    menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
-                                    clear_reactions_after=True,
-                                    timeout=60.0)# bisa ditambah clear_reaction_after=True
-                    await menu.start(ctx)
+                result = sauce.from_url(link.attachments[0].url)
+                hasil_saos = result.results
+                menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
+                                clear_reactions_after=True,
+                                timeout=60.0)# bisa ditambah clear_reaction_after=True
+                await menu.start(ctx)
         else:
             result = sauce.from_url(link)
             hasil_saos = result.results

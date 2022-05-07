@@ -23,7 +23,7 @@ from apscheduler.triggers.cron import CronTrigger
 from ..cogs.help import Help
 from ..cloud.dropbox import *
 from dropbox.exceptions import ApiError
-from ..games.wordle import process_message_as_guess
+from ..utils import wordle, kataple
 
 try:
     download_from_dropbox("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
@@ -260,7 +260,8 @@ class Bot(BotBase):
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis)-1)])], weights= [1, 1, 2], k=1)[0])
             
             if message.reference:
-                await process_message_as_guess(self, message)
+                await wordle.process_message_as_guess(self, message)
+                await kataple.process_message_as_guess(self, message)
                 
             await self.process_commands(message)
             

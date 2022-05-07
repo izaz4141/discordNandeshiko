@@ -102,7 +102,7 @@ class Nirvana(Cog):
             dojin_pages = dojin.json['num_pages']
             dojin_fav = dojin.json['num_favorites']
             dojin_artists = []
-            for artis in dojin.artists:
+            for artis in dojin.artist:
                 dojin_artists.append(artis.name)
             dojin_tags = []
             for tag in dojin.tag:
@@ -141,7 +141,7 @@ class Nirvana(Cog):
             dojin_pages = dojin.json['num_pages']
             dojin_fav = dojin.json['num_favorites']
             dojin_artists = []
-            for artis in dojin.artists:
+            for artis in dojin.artist:
                 dojin_artists.append(artis.name)
             dojin_tags = []
             for tag in dojin.tag:
@@ -180,7 +180,7 @@ class Nirvana(Cog):
             dojin_pages = dojin.json['num_pages']
             dojin_fav = dojin.json['num_favorites']
             dojin_artists = []
-            for artis in dojin.artists:
+            for artis in dojin.artist:
                 dojin_artists.append(artis.name)
             dojin_tags = []
             for tag in dojin.tag:
@@ -219,7 +219,7 @@ class Nirvana(Cog):
             dojin_pages = dojin.json['num_pages']
             dojin_fav = dojin.json['num_favorites']
             dojin_artists = []
-            for artis in dojin.artists:
+            for artis in dojin.artist:
                 dojin_artists.append(artis.name)
             dojin_tags = []
             for tag in dojin.tag:
@@ -258,7 +258,7 @@ class Nirvana(Cog):
             dojin_pages = dojin.json['num_pages']
             dojin_fav = dojin.json['num_favorites']
             dojin_artists = []
-            for artis in dojin.artists:
+            for artis in dojin.artist:
                 dojin_artists.append(artis.name)
             dojin_tags = []
             for tag in dojin.tag:
@@ -297,7 +297,7 @@ class Nirvana(Cog):
             dojin_pages = dojin.json['num_pages']
             dojin_fav = dojin.json['num_favorites']
             dojin_artists = []
-            for artis in dojin.artists:
+            for artis in dojin.artist:
                 dojin_artists.append(artis.name)
             dojin_tags = []
             for tag in dojin.tag:
@@ -334,7 +334,7 @@ class Nirvana(Cog):
         dojin_pages = dojin.json['num_pages']
         dojin_fav = dojin.json['num_favorites']
         dojin_artists = []
-        for artis in dojin.artists:
+        for artis in dojin.artist:
             dojin_artists.append(artis.name)
         dojin_tags = []
         for tag in dojin.tag:
@@ -392,7 +392,7 @@ class Nirvana(Cog):
         dojin_pages = dojin.json['num_pages']
         dojin_fav = dojin.json['num_favorites']
         dojin_artists = []
-        for artis in dojin.artists:
+        for artis in dojin.artist:
             dojin_artists.append(artis.name)
         dojin_tags = []
         for tag in dojin.tag:

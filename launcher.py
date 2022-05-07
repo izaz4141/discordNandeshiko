@@ -1,7 +1,7 @@
 from features.bot_main import bot
 from os import system
 
-system('python -m pip install hentai==3.2.10 --install-option="--no-deps"')
+system('python -m pip install saucenao-api==2.3.1')
 
 VERSION = "0.0.3"
 

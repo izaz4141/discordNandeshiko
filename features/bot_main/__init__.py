@@ -125,11 +125,15 @@ class Bot(BotBase):
         exist = []
 
         for id_ in members_past:
-            if not self.get_user(id_):
+            usar = self.get_user(id_)
+            if not usar:
                 to_remove.append(id_)
 
-            elif self.get_user(id_):
-                exist.append(id_)
+            elif usar:
+                if not usar.bot:
+                    exist.append(id_)
+                else:
+                    to_remove.append(id_)
         for id_ in exist:
             try :
                 to_remove = remove_items(to_remove, id_ )

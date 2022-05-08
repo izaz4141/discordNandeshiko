@@ -10,7 +10,7 @@ class NQN(Cog):
     async def act(self, message, emoji):
             webhook = await message.channel.create_webhook(name=message.author.nick)
             await webhook.send(
-                str(emoji), username=message.author.name, avatar_url=message.author.avatar.url)
+                str(emoji), username=message.author.nick, avatar_url=message.author.avatar.url)
 
             webhooks = await message.channel.webhooks()
             for webhook in webhooks:

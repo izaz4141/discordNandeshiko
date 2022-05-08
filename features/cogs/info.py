@@ -15,7 +15,7 @@ class Info(Cog):
         """Memberi Info User yang dimention/diri sendiri"""
         if not target == "Takda":
             if target.isdigit():
-                target = self.bot.get_user(target)
+                target = self.bot.get_user(int(target))
                 if isinstance(target, type(None)):
                     return await ctx.send("Maaf kak Nadeshiko tidak dapat menemukan user dengan ID tersebut >_<'")
             elif isinstance(target, Member):

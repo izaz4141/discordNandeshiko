@@ -106,7 +106,8 @@ class Misc(Cog):
     @Cog.listener()
     async def on_guild_join(self, guild):
         self.bot.update_db()
-
+    async def on_guild_remove(self,guild):
+        self.bot.update_db()
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:

@@ -100,7 +100,25 @@ class Bot(BotBase):
         
         # memb = {}
         # for guild in self.guilds:
-            
+        guilds_past = db.column("SELECT GuildID FROM guilds")
+        to_remove = []
+        exist = []
+        
+        for id_ in guilds_past:
+            if not self.get_guild(id_):
+                to_remove.append(id_)
+
+            elif self.get_guild(id_):
+                exist.append(id_)
+        for id_ in exist:
+            try :
+                to_remove = remove_items(to_remove, id_ )
+
+            except ValueError:
+                pass
+
+
+        db.multiexec("DELETE FROM guilds WHERE GuildID = ?", ((id_,) for id_ in to_remove))
         
         members_past = db.column("SELECT UserID FROM exp")
         to_remove = []
@@ -113,6 +131,7 @@ class Bot(BotBase):
 
                 if guild.get_member(id_):
                     exist.append(id_)
+                    break
         for id_ in exist:
             try :
                 to_remove = remove_items(to_remove, id_ )

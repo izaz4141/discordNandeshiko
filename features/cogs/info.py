@@ -76,7 +76,7 @@ class Info(Cog):
             for guild in self.bot.guilds:
                 servers[guild.name] = guild.id
             if nama.isdigit():
-                guild = self.bot.get_guild(nama)
+                guild = self.bot.get_guild(int(nama))
                 if isinstance(guild, type(None)):
                     return await ctx.send("Maaf kak tidak ada server dengan ID tersebut")
             elif not nama in servers.keys():

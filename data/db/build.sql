@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS guilds (
 	LogChannel integer DEFAULT 0,
 	WelChannel integer DEFAULT 0,
 	Leg text DEFAULT 'OFF',
-	Welcome text DEFAULT 'OFF'
+	Welcome text DEFAULT 'OFF',
+	NQN text DEFAULT 'ON'
 );
 
 CREATE TABLE IF NOT EXISTS exp (

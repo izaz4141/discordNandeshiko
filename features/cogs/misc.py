@@ -90,6 +90,18 @@ class Misc(Cog):
     async def welcome_off(self,ctx):
         db.execute("UPDATE guilds set Welcome = ? WHERE GuildID = ?", 'OFF', ctx.guild.id)
         await ctx.send("Mematikan fungsi Welcome bot...")
+        
+    @command(name="nqn_on")
+    @has_permissions(manage_messages=True)
+    async def NQN_ON(self,ctx):
+        db.execute("UPDATE guilds set NQN = ? WHERE GuildID = ?", 'ON', ctx.guild.id)
+        await ctx.send("Menghidupkan fungsi NQN bot...")
+        
+    @command(name="nqn_off")
+    @has_permissions(manage_messages=True)
+    async def NQN_OFF(self,ctx):
+        db.execute("UPDATE guilds set NQN = ? WHERE GuildID = ?", 'OFF', ctx.guild.id)
+        await ctx.send("Mematikan fungsi NQN bot...")
             
     @Cog.listener()
     async def on_guild_join(self, guild):

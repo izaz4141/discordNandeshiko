@@ -12,6 +12,7 @@ import random
 import shutil
 import os
 
+from ..db import db
 
 urlp = PoolManager()
 
@@ -197,12 +198,11 @@ class Developer(Cog):
         result = await loop.run_in_executor(None, lambda: run(commands, stdout= PIPE))
         output = result.stdout.decode('utf-8')
         await ctx.send(output[:2000])
-        
 
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:
             self.bot.cogs_ready.ready_up("developer")
-
+        
 def setup(bot):
     bot.add_cog(Developer(bot))

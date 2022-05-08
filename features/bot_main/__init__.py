@@ -88,8 +88,8 @@ class Bot(BotBase):
         backup("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
 
     def update_db(self):
-        db.multiexec("INSERT OR IGNORE INTO guilds (GuildID) VALUES (?)", ((guild.id,) for guild in self.guilds))
-
+        db.multiexec("INSERT OR IGNORE INTO guilds (GuildID,GuildName) VALUES (?,?)", ((guild.id, guild.name,) for guild in self.guilds))
+        
         db.multiexec("INSERT OR IGNORE INTO exp (UserID,UserName) VALUES (?,?)", ((member.id, f"{member.name}#{member.discriminator}",) for guild in self.guilds for member in guild.members if not member.bot ))
         
         # memb = {}
@@ -253,8 +253,10 @@ class Bot(BotBase):
     async def on_message(self, message):
         if not message.author.bot:
             if message.author.id in self.owner_ids:
-                if message.content == "update db" :
-                    self.update_db_intoCloud()
+                if message.content == "upload db" :
+                    return self.update_db_intoCloud()
+                elif message.content == "update db":
+                    return self.update_db()
             if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.totalE
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis)-1)])], weights= [1, 1, 2], k=1)[0])

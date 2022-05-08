@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS guilds (
 	GuildID integer PRIMARY KEY,
+	GuildName text,
 	Prefix text DEFAULT '+',
 	LogChannel integer DEFAULT 0,
 	WelChannel integer DEFAULT 0,

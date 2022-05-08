@@ -74,9 +74,15 @@ class Info(Cog):
             servers = {}
             for guild in self.bot.guilds:
                 servers[guild.name] = guild.id
-            if not nama in servers.keys():
+            if nama.isdigit():
+                try:
+                    guild = self.bot.get_guild(nama)
+                except Exception:
+                    return await ctx.send("Maaf kak tidak ada server dengan ID tersebut")
+            elif not nama in servers.keys():
                 return await ctx.send(f"Maaf kak server dengan nama {nama} tidak ditemukan...")
-            guild = self.bot.get_guild(servers[nama])
+            else:
+                guild = self.bot.get_guild(servers[nama])
         else:
             guild = ctx.guild
         
@@ -110,6 +116,8 @@ class Info(Cog):
                 ("\u200b", "\u200b", True)]
 
         for name, value, inline in fields:
+            if value == '':
+                value = 'Tidak Diketahui'
             embed.add_field(name=name, value=value, inline=inline)
 
         await ctx.send(embed=embed)

@@ -11,9 +11,19 @@ class Info(Cog):
         self.bot = bot
 
     @command(name="userinfo", aliases=["ui"])
-    async def user_info(self, ctx, *, target: Optional[Member]):
+    async def user_info(self, ctx, *, target= "Takda"):
         """Memberi Info User yang dimention/diri sendiri"""
-        target = target or ctx.author
+        if not target == "Takda":
+            if target.isdigit():
+                target = self.bot.get_user(target)
+                if isinstance(target, type(None)):
+                    return await ctx.send("Maaf kak Nadeshiko tidak dapat menemukan user dengan ID tersebut >_<'")
+            elif isinstance(target, Member):
+                pass
+            else:
+                return
+        elif target == "Takda":
+            target = target or ctx.author
 
         embed = Embed(title="User Information",
                       colour=target.colour,

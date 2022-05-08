@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog, command, is_owner
 from discord.utils import get
-from discord import Embed
+from discord import Embed, User, Member
 
 from os import execv
 from sys import executable, argv
@@ -12,7 +12,6 @@ import random
 import shutil
 import os
 
-from ..db import db
 
 urlp = PoolManager()
 
@@ -174,6 +173,38 @@ class Developer(Cog):
             
             os.remove(f"./data/temp-image/{file_name}.jpg")
             await ctx.send("Foto Profil telah berhasil diubah~")
+            
+    @command(name= "user_info")
+    async def us_info(self,ctx,*,target):
+        if not ctx.author.id in self.bot.owner_ids:
+            return
+        if target.isdigit():
+            target = self.bot.get_user(int(target))
+            if isinstance(target, type(None)):
+                return await ctx.send("Maaf kak Nadeshiko tidak dapat menemukan user dengan ID tersebut >_<'")
+        else:
+            return await ctx.send("Argumen Harus merupakan suatu ID Int")
+
+        embed = Embed(title="Info User",
+                      colour=target.colour,
+                      timestamp = datetime.utcnow())
+        if isinstance(target, User):
+            fields = [("Nama", f"{target.name}#{target.discriminator}", True),
+                    ("ID", target.id, False),
+                    ("Tanggal Akun Dibuat", target.created_at.strftime("%d/%m/%Y %H:%M:%S"), False),
+                    ("Mutual Guilds", '\n'.join([guild.name for guild in target.mutual_guilds]), False),
+                    ("Hp Status", f"{str(target.mutual_guilds[0].get_member(target.id).mobile_status)}", True),
+                    ("Web Status", f"{str(target.mutual_guilds[0].get_member(target.id).web_status)}", True),
+                    ("Desktop Status", f"{str(target.mutual_guilds[0].get_member(target.id).desktop_status)}", True),
+                    ("Client Status", f"{''.join(''.join(str(target.mutual_guilds[0].get_member(target.id)._client_status).split('{')).split('}'))}", False)
+                    ]
+        for name, value, inline in fields:
+            if value == '':
+                value = "Tidak Diketahui"
+            embed.add_field(name=name, value=value, inline=inline)
+        if not isinstance(target.avatar, type(None)):
+            embed.set_thumbnail(url=target.avatar.url)
+        await ctx.send(embed=embed)
         
     @command(name="fullrestart")
     async def full_restart(self, ctx):

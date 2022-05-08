@@ -1,6 +1,6 @@
 from types import NoneType
 from discord.ext.commands import Cog, command
-from discord import Member, Embed
+from discord import Member, Embed, User
 from typing import Optional
 from datetime import datetime
 
@@ -11,57 +11,37 @@ class Info(Cog):
         self.bot = bot
 
     @command(name="userinfo", aliases=["ui"])
-    async def user_info(self, ctx, *, target= "Takda"):
+    async def user_info(self, ctx, *, target: Optional[Member]):
         """Memberi Info User yang dimention/diri sendiri"""
-        if not target == "Takda":
-            if target.isdigit():
-                target = self.bot.get_user(int(target))
-                if isinstance(target, type(None)):
-                    return await ctx.send("Maaf kak Nadeshiko tidak dapat menemukan user dengan ID tersebut >_<'")
-            elif isinstance(target, Member):
-                pass
-            else:
-                return
-        elif target == "Takda":
-            target = ctx.author
+        
+        target = target or ctx.author
 
-        embed = Embed(title="User Information",
+        embed = Embed(title="Info User",
                       colour=target.colour,
                       timestamp = datetime.utcnow())
-
         if target.activity is None:
-            fields = [("Nama", target.display_name, True),
-                      ("ID", target.id, False),
-                      ("Role", target.top_role.mention, False),
-                      ("Status", str(target.status).title(), True),
-                      ("Aktivitas", f"{bool(target.activity)}", True),
-                      ("Tanggal Akun Dibuat", target.created_at.strftime("%d/%m/%Y %H:%M:%S"), False),
-                      ("Tanggal Join Server", target.joined_at.strftime("%d/%m/%Y %H:%M:%S"), False),
-                      ("Boosted", bool(target.premium_since), True),
-                      ("Hp Status", f"{str(target.mobile_status)}", True),
-                      ("Web Status", f"{str(target.web_status)}", True),
-                      ("Desktop Status", f"{str(target.desktop_status)}", True),
-                      ("Client Status", f"{''.join(''.join(str(target._client_status).split('{')).split('}'))}", False)
-                     ]
-            for name, value, inline in fields:
-                embed.add_field(name=name, value=value, inline=inline)
+            aktivitas = f"{bool(target.activity)}"
         else:
-            fields = [("Nama", target.display_name, True),
-                      ("ID", target.id, False),
-                      ("Role", target.top_role.mention, False),
-                      ("Status", str(target.status).title(), True),
-                      ("Aktivitas", f"{str(target.activity.type).split('.')[-1].title()}type: {target.activity.name} ", True),
-                      ("Tanggal Akun Dibuat", target.created_at.strftime("%d/%m/%Y %H:%M:%S"), False),
-                      ("Tanggal Join Server", target.joined_at.strftime("%d/%m/%Y %H:%M:%S"), False),
-                      ("Boosted", bool(target.premium_since), True),
-                      ("Hp Status", f"{str(target.mobile_status)}", True),
-                      ("Web Status", f"{str(target.web_status)}", True),
-                      ("Desktop Status", f"{str(target.desktop_status)}", True),
-                      ("Client Status", f"{''.join(''.join(str(target._client_status).split('{')).split('}'))}", False)
-                    ]
-            for name, value, inline in fields:
-                embed.add_field(name=name, value=value, inline=inline)
-        embed.set_thumbnail(url=target.avatar.url)
+            aktivitas = f"{str(target.activity.type).split('.')[-1].title()}type: {target.activity.name} "
+        fields = [("Nama", target.display_name, True),
+                ("ID", target.id, False),
+                ("Role", target.top_role.mention, False),
+                ("Status", str(target.status).title(), True),
+                ("Aktivitas", aktivitas, True),
+                ("Tanggal Akun Dibuat", target.created_at.strftime("%d/%m/%Y %H:%M:%S"), False),
+                ("Tanggal Join Server", target.joined_at.strftime("%d/%m/%Y %H:%M:%S"), False),
+                ("Boosted", bool(target.premium_since), True),
+                ("Hp Status", f"{str(target.mobile_status)}", True),
+                ("Web Status", f"{str(target.web_status)}", True),
+                ("Desktop Status", f"{str(target.desktop_status)}", True),
+                ("Client Status", f"{''.join(''.join(str(target._client_status).split('{')).split('}'))}", False)
+                ]
+        for name, value, inline in fields:
+            if value == '':
+                value = "Tidak Diketahui"
+            embed.add_field(name=name, value=value, inline=inline)
+        if not isinstance(target.avatar, type(None)):
+            embed.set_thumbnail(url=target.avatar.url)
         await ctx.send(embed=embed)
         
     @command(name="avatar")

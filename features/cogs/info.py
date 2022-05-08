@@ -1,3 +1,4 @@
+from types import NoneType
 from discord.ext.commands import Cog, command
 from discord import Member, Embed
 from typing import Optional
@@ -75,9 +76,8 @@ class Info(Cog):
             for guild in self.bot.guilds:
                 servers[guild.name] = guild.id
             if nama.isdigit():
-                try:
-                    guild = self.bot.get_guild(nama)
-                except Exception:
+                guild = self.bot.get_guild(nama)
+                if isinstance(guild, type(None)):
                     return await ctx.send("Maaf kak tidak ada server dengan ID tersebut")
             elif not nama in servers.keys():
                 return await ctx.send(f"Maaf kak server dengan nama {nama} tidak ditemukan...")

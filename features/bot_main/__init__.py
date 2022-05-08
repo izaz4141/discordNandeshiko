@@ -89,11 +89,11 @@ class Bot(BotBase):
 
     def update_db(self):
         db.multiexec("INSERT OR IGNORE INTO guilds (GuildID,GuildName) VALUES (?,?)", ((guild.id, guild.name,) for guild in self.guilds))
-        for guild in self.bot.guilds:
+        for guild in self.guilds:
             db.execute("UPDATE guilds set GuildName = ? WHERE GuildID = ?", guild.name, guild.id)
         
         db.multiexec("INSERT OR IGNORE INTO exp (UserID,UserName) VALUES (?,?)", ((member.id, f"{member.name}#{member.discriminator}",) for guild in self.guilds for member in guild.members if not member.bot ))
-        for guild in self.bot.guilds:
+        for guild in self.guilds:
             for member in guild.members:
                 if not member.bot:
                     db.execute("UPDATE exp set UserName = ? Where UserID = ?", f"{member.name}#{member.discriminator}", member.id)

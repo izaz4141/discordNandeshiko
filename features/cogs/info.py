@@ -23,7 +23,7 @@ class Info(Cog):
             else:
                 return
         elif target == "Takda":
-            target = target or ctx.author
+            target = ctx.author
 
         embed = Embed(title="User Information",
                       colour=target.colour,

@@ -294,7 +294,7 @@ class Music(Cog):
                 durasi = format_durasi(entry['duration'])
                 entries.append([entry['title'], entry['formats'][0]['url'], durasi, entry['thumbnail']])
             try:
-                if self.playing[ctx.guild.id] is True:
+                if ctx.voice_client.is_playing():
                     for entry in entries:
                         self.song_queue[ctx.guild.id].append(entry)
                 else:
@@ -392,7 +392,7 @@ class Music(Cog):
         if ctx.author.voice is None:
             return await ctx.send("Connect dulu ke voice channel ya kak")
         try:
-            if self.playing[ctx.guild.id] is True and ctx.author.voice.channel.id != ctx.voice_client.channel.id:
+            if ctx.voice_client.is_playing() and ctx.author.voice.channel.id != ctx.voice_client.channel.id:
                 await ctx.send("Ihh nanti aja ya kak, Nadeshiko lagi nyanyi")
                 return 69
         except Exception:
@@ -450,7 +450,7 @@ class Music(Cog):
                 return await ctx.send("Maaf kak fitur menambahkan dari playlist dinonaktifkan di server kakak")
 
         try:
-            if self.playing[ctx.guild.id] is True:
+            if ctx.voice_client.is_playing():
                 try:
                     queue_len = len(self.song_queue[ctx.guild.id])
                     self.song_queue[ctx.guild.id].append([result['title'], result['source'], result['duration'], result['thumbnail']])
@@ -543,7 +543,7 @@ class Music(Cog):
         if ctx.voice_client is None:
             return await ctx.send("Joinin aku dulu kak")
 
-        if not ctx.voice_client.is_paused():
+        if  ctx.voice_client.is_playing():
             return await ctx.send("Berisik ih, lagi nyanyi juga")
         
         ctx.voice_client.resume()

@@ -314,12 +314,11 @@ class Music(Cog):
     async def stopwatch_song(self, voice_client, guild_id, durasi):
         while time() - self.position[guild_id] < int(durasi):
             await asyncio.sleep(5)
+            if self.playing[guild_id] is False or voice_client.is_paused():
+                break
             embed = await self.passive_np(voice_client, guild_id, time() - self.position[guild_id], self.np_display[guild_id])
             np_msg = await self.bot.get_channel(self.np_id[guild_id][1]).fetch_message(self.np_id[guild_id][0])
             await np_msg.edit(embed=embed)
-            if self.playing[guild_id] is False or voice_client.is_paused() or not voice_client.is_playing():
-                break
-            
                             
     async def download_image(self, url, file_path, file_name):
         full_path = file_path + file_name + '.jpg'
@@ -362,7 +361,10 @@ class Music(Cog):
             pass
         ctx.voice_client.play(PCMVolumeTransformer(FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS), volume=volume), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
         self.position[ctx.guild.id] = time()
-        
+        try:
+            self.volume[ctx.guild.id] = ctx.voice_client.source.volume
+        except AttributeError:
+            self.volume[ctx.guild.id] = volume
         self.np[ctx.guild.id] = song
         self.playing[ctx.guild.id] = True
         self.fu[ctx.guild.id] = True
@@ -604,9 +606,13 @@ class Music(Cog):
     
     async def passive_np(self, voice_client, guild_id, posisi=0, rgb:list = []):
         vol_lv = []
-        for i in range(round(voice_client.source.volume*10)):
+        try:
+            vol = round(voice_client.source.volume * 10)
+        except AttributeError:
+            vol = round(self.volume[guild_id] * 10)
+        for i in range(vol):
             vol_lv.append(BAR[0])
-        for i in range(10-round(voice_client.source.volume*10)):
+        for i in range(10-vol):
             vol_lv.append(BAR[1])
         
         if rgb == []:

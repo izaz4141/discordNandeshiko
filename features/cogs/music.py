@@ -44,13 +44,13 @@ def format_durasi(durasi:int):
     durasi = int(durasi)
     if durasi >= 3600:
         jam = durasi//3600
-        durasi = durasi%3600
-    if durasi >= 60:
-        menit = durasi//60
-        detik = durasi%60
+        donat = durasi%3600
+    if donat >= 60:
+        menit = donat//60
+        detik = donat%60
     else:
         menit = 0
-        detik = durasi
+        detik = donat
     if durasi >= 3600:
         return f"{jam}:{menit}:{detik}"
     else:

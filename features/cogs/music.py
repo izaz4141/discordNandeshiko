@@ -625,9 +625,9 @@ class Music(Cog):
             
         # ━ ⬤ ─
         # progress_bar = ["━━━━━━⬤─────────────"] #20 karakter
-        bagian = self.np[guild_id][2] / 27
+        bagian = self.np[guild_id][2] / 24
         terisi = round(posisi / bagian)
-        sisa = 27 - (terisi + 1)
+        sisa = 24 - (terisi + 1)
         bar_form = []
         if not terisi == 0:
             for n in range(terisi-1):

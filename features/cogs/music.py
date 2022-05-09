@@ -7,6 +7,7 @@ from discord.utils import get
 import asyncio
 from youtube_dl import YoutubeDL
 from youtube_search import YoutubeSearch
+from time import time
 import datetime as dt
 import random
 from urllib3 import PoolManager
@@ -116,7 +117,10 @@ class Music(Cog):
         self.np_id = {}
         self.fu = {}
         self.volume = {}
-        
+        self.position = {}
+        self.np_display = {}
+        self.progress_bar = {}
+        self.pause = {}
     async def check_queue(self, ctx):
         try:
             if len(self.song_queue[ctx.guild.id]) > 0:
@@ -149,7 +153,7 @@ class Music(Cog):
                             self.timer[ctx.guild.id] += 1
                             if self.timer[ctx.guild.id] >= 60:
                                 if self.playing[ctx.guild.id] is True:
-                                    await self.leave(ctx)
+                                    await self.passive_leave(ctx.guild.id, ctx.voice_client)
                     
                 except KeyError:
                         while True:
@@ -158,7 +162,7 @@ class Music(Cog):
                             await asyncio.sleep(1)
                             self.timer[ctx.guild.id] += 1
                             if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
-                                await self.leave(ctx)
+                                await self.passive_leave(ctx.guild.id, ctx.voice_client)
         except KeyError:
             try:
                 if self.repeat[ctx.guild.id] is True:
@@ -172,7 +176,7 @@ class Music(Cog):
                         await asyncio.sleep(1)
                         self.timer[ctx.guild.id] += 1
                         if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
-                            await self.leave(ctx)
+                            await self.passive_leave(ctx.guild.id, ctx.voice_client)
             except KeyError:
                 while True:
                     if self.fu[ctx.guild.id] is True:
@@ -180,7 +184,7 @@ class Music(Cog):
                     await asyncio.sleep(1)
                     self.timer[ctx.guild.id] += 1
                     if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id]:
-                        await self.leave(ctx)
+                        await self.passive_leave(ctx.guild.id, ctx.voice_client)
                 
     async def poll_song(self, user, channel):
         poll = Embed(title=f"Vote to Skip Song by - {user.name}#{user.discriminator}", description="**80% of the voice channel must vote to skip for it to pass.**", colour= Colour.blue())
@@ -269,8 +273,7 @@ class Music(Cog):
                     lagu = await loop.run_in_executor(None, lambda: ydl.extract_info(f"{'https://www.youtube.com' + track['url_suffix']}", download=False))
                 except Exception: 
                     return None
-            durasi = format_durasi(lagu['duration'])
-            return {'source': lagu['formats'][0]['url'], 'title': lagu['title'], 'duration' : durasi, 'thumbnail' : lagu['thumbnail']}
+            return {'source': lagu['formats'][0]['url'], 'title': lagu['title'], 'duration' : lagu['duration'], 'thumbnail' : lagu['thumbnail']}
 
     async def link_handler(self, ctx, song):
         if "youtube.com/playlist?" in song:
@@ -285,14 +288,12 @@ class Music(Cog):
             except Exception: 
                 return None
         if not info['webpage_url_basename'] == "playlist":
-            durasi = format_durasi(info['duration'])
-            return {'source': info['formats'][0]['url'], 'title': info['title'], 'duration' : durasi, 'thumbnail' : info['thumbnail']}
+            return {'source': info['formats'][0]['url'], 'title': info['title'], 'duration' : info['duration'], 'thumbnail' : info['thumbnail']}
         else:
             
             entries = []
             for entry in info['entries']:
-                durasi = format_durasi(entry['duration'])
-                entries.append([entry['title'], entry['formats'][0]['url'], durasi, entry['thumbnail']])
+                entries.append([entry['title'], entry['formats'][0]['url'], entry['duration'], entry['thumbnail']])
             try:
                 if ctx.voice_client.is_playing():
                     for entry in entries:
@@ -312,6 +313,17 @@ class Music(Cog):
                 await msg.delete()
                 await ctx.send(f"{len(entries)} lagu dari {info['title']} berhasil ditambahkan")
                 return "playlist"
+            
+    async def stopwatch_song(self, voice_client, guild_id, durasi):
+        while time() - self.position[guild_id] < int(durasi):
+            await asyncio.sleep(5)
+            if int( (time() - self.position[guild_id]) / self.progress_bar[guild_id][0]) != self.progress_bar[guild_id][1]:
+                embed = await self.passive_np(voice_client, guild_id, time() - self.position[guild_id], self.np_display[guild_id])
+                np_msg = await self.bot.get_channel(self.np_id[guild_id][1]).fetch_message(self.np_id[guild_id][0])
+                await np_msg.edit(embed=embed)
+            if self.playing[guild_id] is False or voice_client.is_paused() or not voice_client.is_playing():
+                break
+            
                             
     async def download_image(self, url, file_path, file_name):
         full_path = file_path + file_name + '.jpg'
@@ -353,35 +365,55 @@ class Music(Cog):
         except Exception:
             pass
         ctx.voice_client.play(PCMVolumeTransformer(FFmpegPCMAudio(song[1], **self.FFMPEG_OPTIONS), volume=volume), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
+        self.position[ctx.guild.id] = time()
+        
         self.np[ctx.guild.id] = song
         self.playing[ctx.guild.id] = True
         self.fu[ctx.guild.id] = True
         try:
             np_id = self.np_id[ctx.guild.id][0]
             if isinstance(np_id, int):
-                vol_lv = []
-                for i in range(round(ctx.voice_client.source.volume*10)):
-                    vol_lv.append(BAR[0])
-                for i in range(10-round(ctx.voice_client.source.volume*10)):
-                    vol_lv.append(BAR[1])
-                file_name = "Music-Cover" + str(random.randint(1, 101))
-                loop = self.bot.loop or asyncio.get_event_loop()
-                await self.download_image(self.np[ctx.guild.id][3], "./data/temp-image/", file_name)
+                embed = await self.passive_np(ctx.voice_client, ctx.guild.id)
+                # vol_lv = []
+                # for i in range(round(ctx.voice_client.source.volume*10)):
+                #     vol_lv.append(BAR[0])
+                # for i in range(10-round(ctx.voice_client.source.volume*10)):
+                #     vol_lv.append(BAR[1])
+                # file_name = "Music-Cover" + str(random.randint(1, 101))
+                # loop = self.bot.loop or asyncio.get_event_loop()
+                # await self.download_image(self.np[ctx.guild.id][3], "./data/temp-image/", file_name)
                 
-                # Read Image
-                img = Image.open(f"./data/temp-image/{file_name}.jpg")
-                # Convert Image into RGB
-                img = img.convert('RGB')
-                # call function
-                red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
-                os.remove(f"./data/temp-image/{file_name}.jpg")
-                
-                embed = Embed(
-                    title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
-                    description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━⬤───────────── {self.np[ctx.guild.id][2]}",
-                    colour= Colour.from_rgb(red, green, blue)
-                )
-                embed.set_image(url=self.np[ctx.guild.id][3])
+                # # Read Image
+                # img = Image.open(f"./data/temp-image/{file_name}.jpg")
+                # # Convert Image into RGB
+                # img = img.convert('RGB')
+                # # call function
+                # red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
+                # os.remove(f"./data/temp-image/{file_name}.jpg")
+                # rgb = [red, green, blue]
+                # self.np_display[ctx.guild.id] = rgb
+                # os.remove(f"./data/temp-image/{file_name}.jpg")
+            
+                # # ━ ⬤ ─
+                # progress_bar = ["━━━━━━⬤─────────────"] #20 karakter
+                # bagian = int(self.np[ctx.guild.id][2] / 20)
+                # terisi = int(0 / bagian)
+                # bunder = terisi + 1
+                # sisa = 20 - (terisi + bunder)
+                # bar_form = []
+                # if not terisi == 0:
+                #     for n in range(terisi-1):
+                #         bar_form.append("━")
+                # bar_form.append("⬤")
+                # if not sisa == 0:
+                #     for n in range(sisa-1):
+                #         bar_form.append("─")
+                # embed = Embed(
+                #     title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
+                #     description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━⬤───────────── {format_durasi(self.np[ctx.guild.id][2])}",
+                #     colour= Colour.from_rgb(red, green, blue)
+                # )
+                # embed.set_image(url=self.np[ctx.guild.id][3])
                 np_msg = await self.bot.get_channel(self.np_id[ctx.guild.id][1]).fetch_message(np_id)
                 await np_msg.edit(embed=embed)
         except Exception:
@@ -407,19 +439,26 @@ class Music(Cog):
     async def leave(self, ctx):
         """Gunakan command ini untuk mereset cog musik apabila terjadi bug
         """
-        if ctx.voice_client is not None:
-            self.song_queue[ctx.guild.id] = []
-            self.shuffle[ctx.guild.id] = False
-            self.repeat[ctx.guild.id] = False
-            self.np[ctx.guild.id] = []
-            self.np_id[ctx.guild.id] = []
-            self.playing[ctx.guild.id] = False
-            self.timer[ctx.guild.id] = 0
-            self.volume[ctx.guild.id] = 0.5
-            return await ctx.voice_client.disconnect()
+        await self.passive_leave(ctx.guild.id, ctx.voice_client, ctx.message.channel)
 
-        await ctx.send("Nadeshiko tidak sedang berada dalam voice channel")
-
+    async def passive_leave(self,guild_id, voice_client, channel = "Takda"):
+        if voice_client is not None:
+            self.song_queue[guild_id] = []
+            self.shuffle[guild_id] = False
+            self.repeat[guild_id] = False
+            self.np[guild_id] = []
+            self.np_id[guild_id] = []
+            self.playing[guild_id] = False
+            self.fu[guild_id] = False
+            self.timer[guild_id] = 0
+            self.volume[guild_id] = 0.5
+            self.position[guild_id] = False
+            self.np_display[guild_id] = []
+            self.progress_bar[guild_id] = []
+            return await voice_client.disconnect()
+        if not channel == "Takda":
+            await channel.send("Nadeshiko tidak sedang berada dalam voice channel")
+    
     @command(name="play")
     async def play(self, ctx, *, song=None):
         if song is None:
@@ -536,6 +575,7 @@ class Music(Cog):
             return await ctx.send("Nadeshiko ga lagi nyanyi kok kak")
 
         ctx.voice_client.pause()
+        self.pause[ctx.guild.id] = time()
         await ctx.send("Lagu telah dijeda")
 
     @command(name="resume")
@@ -545,42 +585,71 @@ class Music(Cog):
 
         if  ctx.voice_client.is_playing():
             return await ctx.send("Berisik ih, lagi nyanyi juga")
-        
+        try:
+            if isinstance(self.np_id[ctx.guild.id][0], int):
+                self.np[ctx.guild.id][2] += time() - self.pause[ctx.guild.id]
+                await self.stopwatch_song(ctx.voice_client, ctx.guild.id, self.np[ctx.guild.id][2])
+        except Exception:
+            pass
         ctx.voice_client.resume()
         await ctx.send("Okee, ku lanjut nyanyi yaa")
     
     @command(name="np")
     async def np(self,ctx):
         if not self.np[ctx.guild.id] == []:
-            vol_lv = []
-            for i in range(round(ctx.voice_client.source.volume*10)):
-                vol_lv.append(BAR[0])
-            for i in range(10-round(ctx.voice_client.source.volume*10)):
-                vol_lv.append(BAR[1])
+            embed = await self.passive_np(ctx.voice_client, ctx.guild.id)
+            msg = await ctx.send(embed=embed)
+            self.np_id[ctx.guild.id] = [msg.id, msg.channel.id]
+            for emoji in list(BUTTON.keys()):
+                await msg.add_reaction(emoji)
+            await self.stopwatch_song(ctx.voice_client, ctx.guild.id,self.np[ctx.guild.id][2])
+        else:
+            await ctx.send("Nadeshiko sedang tidak menyanyi")
+    
+    async def passive_np(self, voice_client, guild_id, posisi=0, rgb:list = []):
+        vol_lv = []
+        for i in range(round(voice_client.source.volume*10)):
+            vol_lv.append(BAR[0])
+        for i in range(10-round(voice_client.source.volume*10)):
+            vol_lv.append(BAR[1])
+        
+        if rgb == []:
             file_name = "Music-Cover" + str(random.randint(1, 101))
             loop = self.bot.loop or asyncio.get_event_loop()
-            await self.download_image(self.np[ctx.guild.id][3], "./data/temp-image/", file_name)
-            
+            await self.download_image(self.np[guild_id][3], "./data/temp-image/", file_name)
+        
             # Read Image
             img = Image.open(f"./data/temp-image/{file_name}.jpg")
             # Convert Image into RGB
             img = img.convert('RGB')
             # call function
             red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
+            rgb = [red, green, blue]
+            self.np_display[guild_id] = rgb
             os.remove(f"./data/temp-image/{file_name}.jpg")
-            embed = Embed(
-                title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
-                description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━⬤───────────── {self.np[ctx.guild.id][2]}",
-                colour= Colour.from_rgb(red, green, blue)
-            )
-            embed.set_image(url=self.np[ctx.guild.id][3])
-            msg = await ctx.send(embed=embed)
-            self.np_id[ctx.guild.id] = [msg.id, msg.channel.id]
-            for emoji in list(BUTTON.keys()):
-                await msg.add_reaction(emoji)
             
-        else:
-            await ctx.send("Nadeshiko sedang tidak menyanyi")
+        # ━ ⬤ ─
+        # progress_bar = ["━━━━━━⬤─────────────"] #20 karakter
+        bagian = self.np[guild_id][2] / 20
+        terisi = int(posisi / bagian)
+        sisa = 20 - (terisi + 1)
+        self.progress_bar[guild_id] = [bagian, terisi, sisa]
+        bar_form = []
+        if not terisi == 0:
+            for n in range(terisi-1):
+                bar_form.append("━")
+        bar_form.append("⬤")
+        if not sisa == 0:
+            for n in range(sisa-1):
+                bar_form.append("─")
+        embed = Embed(
+            title= f"Now playing: **{self.np[guild_id][0]}**",
+            description= f"Volume : {''.join(vol_lv)} 『{voice_client.source.volume * 100}』\n    {format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
+            colour= Colour.from_rgb(rgb[0], rgb[1], rgb[2])
+        )
+        embed.set_image(url=self.np[guild_id][3])
+        return embed
+        
     
     @command(name="shuffle")
     async def shuffle(self, ctx):
@@ -680,16 +749,8 @@ class Music(Cog):
 
                     # if bot has been alone in the VC for more than 60 seconds ? disconnect
                     if self.timer[before.channel.guild.id] >= 60:
-                        self.song_queue[member.guild.id] = []
-                        self.shuffle[member.guild.id] = False
-                        self.repeat[member.guild.id] = False
-                        self.np[member.guild.id] = []
-                        self.np_id[member.guild.id] = []
-                        self.playing[member.guild.id] = False
-                        self.timer[member.guild.id] = 0
-                        self.volume[member.guild.id] = 0.5
-                        await voice.disconnect()
-                        return
+                        await self.passive_leave(member.guild.id, voice)
+                        break
     # Button control on now playing embed
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
@@ -740,8 +801,15 @@ class Music(Cog):
         if reaction.emoji == "⏯️":
             if reaction.message.guild.voice_client.is_paused():
                 reaction.message.guild.voice_client.resume()
+                try:
+                    if isinstance(self.np_id[reaction.message.guild.id][0], int):
+                        self.np[reaction.message.guild.id][2] += time() - self.pause[reaction.message.guild.id]
+                        await self.stopwatch_song(reaction.message.guild.voice_client, reaction.message.guild.id, self.np[reaction.message.guild.id][2])
+                except Exception:
+                    pass
                 msg = await reaction.message.channel.send("Lagu diteruskan")
-            elif not reaction.message.guild.voice_client.is_paused():
+            elif reaction.message.guild.voice_client.is_playing():
+                self.pause[reaction.message.guild.id] = time()
                 reaction.message.guild.voice_client.pause()
                 msg = await reaction.message.channel.send("Lagu telah dijeda")
             await asyncio.sleep(5)

@@ -293,25 +293,22 @@ class Music(Cog):
             entries = []
             for entry in info['entries']:
                 entries.append([entry['title'], entry['formats'][0]['url'], entry['duration'], entry['thumbnail']])
-            try:
-                if ctx.voice_client.is_playing():
-                    for entry in entries:
-                        self.song_queue[ctx.guild.id].append(entry)
-                else:
-                    await self.play_song(ctx, entries[0])
-                    entries.pop(0)
-                    for entry in entries:
-                        self.song_queue[ctx.guild.id].append(entry)
-                await msg.delete()
-                await ctx.send(f"{len(entries)} lagu dari {info['title']} berhasil ditambahkan")
-                return "playlist"
-            except KeyError:
+
+            if ctx.voice_client.is_playing():
+                try:
+                    self.song_queue[ctx.guild.id] += entries
+                except KeyError:
+                    self.song_queue[ctx.guild.id] = entries
+            else:
                 await self.play_song(ctx, entries[0])
                 entries.pop(0)
-                self.song_queue[ctx.guild.id] = entries
-                await msg.delete()
-                await ctx.send(f"{len(entries)} lagu dari {info['title']} berhasil ditambahkan")
-                return "playlist"
+                try:
+                    self.song_queue[ctx.guild.id] += entries
+                except KeyError:
+                    self.song_queue[ctx.guild.id] = entries
+            await msg.delete()
+            await ctx.send(f"{len(entries)} lagu dari {info['title']} berhasil ditambahkan")
+            return "playlist"
             
     async def stopwatch_song(self, voice_client, guild_id, durasi):
         while time() - self.position[guild_id] < int(durasi):

@@ -119,7 +119,6 @@ class Music(Cog):
         self.volume = {}
         self.position = {}
         self.np_display = {}
-        self.progress_bar = {}
         self.pause = {}
     async def check_queue(self, ctx):
         try:
@@ -317,10 +316,9 @@ class Music(Cog):
     async def stopwatch_song(self, voice_client, guild_id, durasi):
         while time() - self.position[guild_id] < int(durasi):
             await asyncio.sleep(5)
-            if int( (time() - self.position[guild_id]) / self.progress_bar[guild_id][0]) != self.progress_bar[guild_id][1]:
-                embed = await self.passive_np(voice_client, guild_id, time() - self.position[guild_id], self.np_display[guild_id])
-                np_msg = await self.bot.get_channel(self.np_id[guild_id][1]).fetch_message(self.np_id[guild_id][0])
-                await np_msg.edit(embed=embed)
+            embed = await self.passive_np(voice_client, guild_id, time() - self.position[guild_id], self.np_display[guild_id])
+            np_msg = await self.bot.get_channel(self.np_id[guild_id][1]).fetch_message(self.np_id[guild_id][0])
+            await np_msg.edit(embed=embed)
             if self.playing[guild_id] is False or voice_client.is_paused() or not voice_client.is_playing():
                 break
             
@@ -454,7 +452,7 @@ class Music(Cog):
             self.volume[guild_id] = 0.5
             self.position[guild_id] = False
             self.np_display[guild_id] = []
-            self.progress_bar[guild_id] = []
+            self.pause[guild_id] = 0
             return await voice_client.disconnect()
         if not channel == "Takda":
             await channel.send("Nadeshiko tidak sedang berada dalam voice channel")
@@ -633,7 +631,6 @@ class Music(Cog):
         bagian = self.np[guild_id][2] / 20
         terisi = int(posisi / bagian)
         sisa = 20 - (terisi + 1)
-        self.progress_bar[guild_id] = [bagian, terisi, sisa]
         bar_form = []
         if not terisi == 0:
             for n in range(terisi-1):

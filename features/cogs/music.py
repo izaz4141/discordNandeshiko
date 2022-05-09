@@ -42,6 +42,7 @@ urlp = PoolManager()
 
 def format_durasi(durasi:int):
     durasi = int(durasi)
+    donat = durasi
     if durasi >= 3600:
         jam = durasi//3600
         donat = durasi%3600

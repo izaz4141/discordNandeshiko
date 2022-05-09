@@ -512,7 +512,7 @@ class Music(Cog):
         for i, title in enumerate(self.song_queue[ctx.guild.id]):
             
                 
-            queue.append(f"**{i+1:3d}**)  {title[0]} ({title[2]})")
+            queue.append(f"**{i+1:3d}**)  {title[0]} ({format_durasi(title[2])})")
         menu = MenuPages(source=IsiSearchTag(ctx, queue),
                          clear_reactions_after=True,
                          timeout=60.0)# bisa ditambah clear_reaction_after=True
@@ -625,9 +625,9 @@ class Music(Cog):
             
         # ━ ⬤ ─
         # progress_bar = ["━━━━━━⬤─────────────"] #20 karakter
-        bagian = self.np[guild_id][2] / 20
-        terisi = int(posisi / bagian)
-        sisa = 20 - (terisi + 1)
+        bagian = self.np[guild_id][2] / 27
+        terisi = round(posisi / bagian)
+        sisa = 27 - (terisi + 1)
         bar_form = []
         if not terisi == 0:
             for n in range(terisi-1):
@@ -638,7 +638,7 @@ class Music(Cog):
                 bar_form.append("─")
         embed = Embed(
             title= f"Now playing: **{self.np[guild_id][0]}**",
-            description= f"Volume : {''.join(vol_lv)} 『{voice_client.source.volume * 100}』\n    {format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
+            description= f"Volume : {''.join(vol_lv)} 『{round(voice_client.source.volume * 100)}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
             colour= Colour.from_rgb(rgb[0], rgb[1], rgb[2])
         )
         embed.set_image(url=self.np[guild_id][3])

@@ -621,7 +621,7 @@ class Music(Cog):
                 bar_form.append("─")
         embed = Embed(
             title= f"Now playing: **{self.np[guild_id][0]}**",
-            description= f"Volume : {''.join(vol_lv)} 『{round(vol * 10)}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
+            description= f"Volume : {''.join(vol_lv)} 『{vol * 10}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
             colour= Colour.from_rgb(rgb[0], rgb[1], rgb[2])
         )
         embed.set_image(url=self.np[guild_id][3])
@@ -808,7 +808,7 @@ class Music(Cog):
             except KeyError:
                 return await reaction.message.channel.send("Tidak ada lagu dalam antrian")
             self.np_queue[reaction.message.guild.id] = [1, 0]
-            embed = await self.passive_queue(reaction.message.guild.id)
+            embed = self.passive_queue(reaction.message.guild.id)
             
             msg = await reaction.message.channel.send(embed=embed, delete_after=15)
             for emoji in BUTTON_QUEUE:

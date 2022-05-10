@@ -1,4 +1,3 @@
-from email.errors import FirstHeaderLineIsContinuationDefect
 from discord import Embed, Colour, PCMVolumeTransformer, FFmpegOpusAudio, FFmpegPCMAudio
 from discord.ext.commands import command, Cog
 from ..utils.menus import MenuPages, ListPageSource
@@ -26,17 +25,23 @@ OPTIONS = {
 }
 
 BUTTON = {
+    "⏬" : "vol_down",
     "⏮️" : 'previous',
+    "🎶" : "queue",
     "🔀" : 'shuffle',
     "⏯️" : 'playpause',
     "🔁" : 'repeat',
-    "⏭️" : 'next'
+    "🔂" : "repeat_one",
+    "⏭️" : 'next',
+    "⏫" : "vol_up"
 }
 
 BAR = {
     0 : "▮",
     1 : "▯"
 }
+
+BUTTON_QUEUE = [ "⏮️", "◀️", "▶️", "⏭️" ]
 
 urlp = PoolManager()
 
@@ -112,6 +117,7 @@ class Music(Cog):
         self.song_queue = {}
         self.shuffle = {}
         self.repeat = {}
+        self.repeat_one = {}
         self.np = {}
         self.playing = {}
         self.timer = {}
@@ -121,14 +127,19 @@ class Music(Cog):
         self.position = {}
         self.np_display = {}
         self.pause = {}
+        self.np_queue = {}
     async def check_queue(self, ctx):
         try:
             if len(self.song_queue[ctx.guild.id]) > 0:
                 try:
                     if self.repeat[ctx.guild.id] is True:
                         self.song_queue[ctx.guild.id].append(self.np[ctx.guild.id])
+                    elif self.repeat_one[ctx.guild.id] is True:
+                        self.song_queue[ctx.guild.id].insert(0, self.np[ctx.guild.id])
+                        
                 except KeyError:
                     self.repeat[ctx.guild.id] = False
+                    self.repeat_one[ctx.guild.id] = False
                 await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
                 self.song_queue[ctx.guild.id].pop(0)
                 try:
@@ -140,7 +151,7 @@ class Music(Cog):
                 self.fu[ctx.guild.id] = False
                 self.timer[ctx.guild.id] = 0
                 try:
-                    if self.repeat[ctx.guild.id] is True:
+                    if self.repeat[ctx.guild.id] is True or self.repeat_one[ctx.guild.id] is True:
                         self.playing[ctx.guild.id] = True
                         self.song_queue[ctx.guild.id] = [self.np[ctx.guild.id]]
                         await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
@@ -149,8 +160,8 @@ class Music(Cog):
                         while True:
                             if self.fu[ctx.guild.id] is True:
                                 break
-                            await asyncio.sleep(1)
-                            self.timer[ctx.guild.id] += 1
+                            await asyncio.sleep(10)
+                            self.timer[ctx.guild.id] += 10
                             if self.timer[ctx.guild.id] >= 60:
                                 if self.playing[ctx.guild.id] is True:
                                     await self.passive_leave(ctx.guild.id, ctx.voice_client)
@@ -159,13 +170,13 @@ class Music(Cog):
                         while True:
                             if self.fu[ctx.guild.id] is True:
                                 break
-                            await asyncio.sleep(1)
-                            self.timer[ctx.guild.id] += 1
+                            await asyncio.sleep(10)
+                            self.timer[ctx.guild.id] += 10
                             if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
                                 await self.passive_leave(ctx.guild.id, ctx.voice_client)
         except KeyError:
             try:
-                if self.repeat[ctx.guild.id] is True:
+                if self.repeat[ctx.guild.id] is True or self.repat_one[ctx.guild.id] is True:
                     self.song_queue[ctx.guild.id] = [self.np[ctx.guild.id]]
                     await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
                     self.song_queue[ctx.guild.id].pop(0)
@@ -173,16 +184,16 @@ class Music(Cog):
                     while True:
                         if self.fu[ctx.guild.id] is True:
                             break
-                        await asyncio.sleep(1)
-                        self.timer[ctx.guild.id] += 1
+                        await asyncio.sleep(10)
+                        self.timer[ctx.guild.id] += 10
                         if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
                             await self.passive_leave(ctx.guild.id, ctx.voice_client)
             except KeyError:
                 while True:
                     if self.fu[ctx.guild.id] is True:
                         break
-                    await asyncio.sleep(1)
-                    self.timer[ctx.guild.id] += 1
+                    await asyncio.sleep(10)
+                    self.timer[ctx.guild.id] += 10
                     if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id]:
                         await self.passive_leave(ctx.guild.id, ctx.voice_client)
                 
@@ -405,6 +416,7 @@ class Music(Cog):
             self.song_queue[guild_id] = []
             self.shuffle[guild_id] = False
             self.repeat[guild_id] = False
+            self.repat_one[guild_id] = False
             self.np[guild_id] = []
             self.np_id[guild_id] = []
             self.playing[guild_id] = False
@@ -414,6 +426,7 @@ class Music(Cog):
             self.position[guild_id] = False
             self.np_display[guild_id] = []
             self.pause[guild_id] = 0
+            self.np_queue[guild_id] = []
             return await voice_client.disconnect()
         if not channel == "Takda":
             await channel.send("Nadeshiko tidak sedang berada dalam voice channel")
@@ -467,6 +480,8 @@ class Music(Cog):
 
     @command(name="queue", aliases=["q"])
     async def queue(self, ctx): # display the current guilds queue
+        """Menunjukkan Antrian Lagu
+        """
         try:
             if len(self.song_queue[ctx.guild.id]) == 0:
                 return await ctx.send("Tidak ada lagu dalam antrian")
@@ -535,7 +550,7 @@ class Music(Cog):
 
         ctx.voice_client.pause()
         self.pause[ctx.guild.id] = time()
-        await ctx.send("Lagu telah dijeda")
+        await ctx.send("Lagu telah dijeda", delete_after= 4)
 
     @command(name="resume")
     async def resume(self, ctx):
@@ -551,7 +566,7 @@ class Music(Cog):
         except Exception:
             pass
         ctx.voice_client.resume()
-        await ctx.send("Okee, ku lanjut nyanyi yaa")
+        await ctx.send("Okee, ku lanjut nyanyi yaa", delete_after= 4)
     
     @command(name="np")
     async def np(self,ctx):
@@ -618,27 +633,52 @@ class Music(Cog):
         try:
             if self.shuffle[ctx.guild.id] is False:
                 self.shuffle[ctx.guild.id] = True
-                await ctx.send("Mode shuffle diaktifkan")
+                await ctx.send("Mode shuffle diaktifkan", delete_after= 4)
             else:
                 self.shuffle[ctx.guild.id] = False
-                await ctx.send("Mode shuffle dimatikan")
+                await ctx.send("Mode shuffle dimatikan", delete_after= 4)
         except KeyError:
             self.shuffle[ctx.guild.id] = True
-            await ctx.send("Mode shuffle diaktifkan")
+            await ctx.send("Mode shuffle diaktifkan", delete_after= 4)
             
     @command(name="repeat")
     async def repeat(self, ctx):
-        try:
-            if self.repeat[ctx.guild.id] is False:
-                self.repeat[ctx.guild.id] = True
-                await ctx.send("Mode repeat diaktifkan")
-            else:
-                self.repeat[ctx.guild.id] = False
-                await ctx.send("Mode repeat dimatikan")
-        except KeyError:
-            self.repeat[ctx.guild.id] = True
-            await ctx.send("Mode repeat diaktifkan")
+        await self.passive_repeat(ctx.guild.id, ctx.message.channel)
             
+    async def passive_repeat(self, guild_id, channel):
+        try:
+            if self.repeat[guild_id] is False:
+                self.repeat[guild_id] = True
+                self.repeat_one[guild_id] = False
+                await channel.send("Mode repeat diaktifkan", delete_after= 4)
+            else:
+                self.repeat[guild_id] = False
+                await channel.send("Mode repeat dimatikan", delete_after= 4)
+        except KeyError:
+            self.repeat[guild_id] = True
+            self.repeat_one[guild_id] = False
+            await channel.send("Mode repeat diaktifkan", delete_after= 4)
+    
+    @command(name="repeatone")
+    async def repeat_one(self,ctx):
+        """Memutar ulang lagu yang sedang berputar terus menerus
+        """
+        await self.passive_repeat_one(ctx.guild.id, ctx.message.channel)
+        
+    async def passive_repeat_one(self, guild_id, channel):
+        try:
+            if self.repeat_one[guild_id] is False:
+                self.repeat[guild_id] = False
+                self.repeat_one[guild_id] = True
+                await channel.send("Mode repeat one diaktifkan", delete_after= 4)
+            else:
+                self.repeat_one[guild_id] = False
+                await channel.send("Mode repeat one dimatikan", delete_after= 4)
+        except KeyError:
+            self.repeat_one[guild_id] = True
+            self.repeat[guild_id] = False
+            await channel.send("Mode repeat one diaktifkan", delete_after= 4)
+    
     @command(name="remove")
     async def remove(self, ctx, number):
         if not number.isnumeric():
@@ -662,7 +702,7 @@ class Music(Cog):
             number = 100
         ctx.voice_client.source.volume = number/100
         self.volume[ctx.guild.id] = number/100
-        await ctx.send("Oke, kusesuaiin ya volumenya~")
+        await ctx.send("Oke, kusesuaiin ya volumenya~", delete_after= 4)
         
          
     @Cog.listener()
@@ -722,7 +762,10 @@ class Music(Cog):
             if user.voice.channel.id == reaction.message.guild.voice_client.channel.id:
                 if reaction.message.id == self.np_id[reaction.message.guild.id][0]:
                     if not self.np == []:
-                        await self.button_control(reaction, user)
+                        return await self.button_control(reaction, user)
+                        
+            if reaction.message.id == self.np_queue[reaction.message.guild.id][1]:
+                return await self.queue_control(reaction)
         except (AttributeError, KeyError):
             return
                     
@@ -735,11 +778,22 @@ class Music(Cog):
                 if reaction.message.id == self.np_id[reaction.message.guild.id][0]:
                     if not self.np == []:
                         await self.button_control(reaction, user)
+                        
+            if reaction.message.id == self.np_queue[reaction.message.guild.id][1]:
+                return await self.queue_control(reaction)
         except (AttributeError, KeyError):
             return
                     
     async def button_control(self, reaction, user):
-        if reaction.emoji == "⏮️":
+        if reaction.emoji == "⏬":
+            reaction.message.guild.voice_client.source.volume -= 0.05
+            self.volume[reaction.message.guild.id] -= 0.05
+            await reaction.message.channel.send("Oke, kukecilkan dulu ya volumenya~", delete_after= 4)
+        elif reaction.emoji == "⏫":
+            reaction.message.guild.voice_client.source.volume += 0.05
+            self.volume[reaction.message.guild.id] += 0.05
+            await reaction.message.channel.send("Oke, kubesarin dulu ya volumenya~", delete_after= 4)
+        elif reaction.emoji == "⏮️":
             skip, poll_msg = await self.poll_song(user, reaction.message.channel)
             if skip:
                 self.song_queue[reaction.message.guild.id].insert(0, self.song_queue[reaction.message.guild.id][len(self.song_queue[reaction.message.guild.id])-1])
@@ -747,7 +801,20 @@ class Music(Cog):
                 reaction.message.guild.voice_client.stop()
             await asyncio.sleep(4)
             await poll_msg.delete()
-        if reaction.emoji == "🔀":
+        elif reaction.emoji == "🎶":
+            try:
+                if len(self.song_queue[reaction.message.guild.id]) == 0:
+                    return await reaction.message.channel.send("Tidak ada lagu dalam antrian")
+            except KeyError:
+                return await reaction.message.channel.send("Tidak ada lagu dalam antrian")
+            self.np_queue[reaction.message.guild.id] = [1, 0]
+            embed = await self.passive_queue(reaction.message.guild.id)
+            
+            msg = await reaction.message.channel.send(embed=embed, delete_after=15)
+            for emoji in BUTTON_QUEUE:
+                await msg.add_reaction(emoji)
+            self.np_queue[reaction.message.guild.id][1] = msg.id
+        elif reaction.emoji == "🔀":
             try:
                 if self.shuffle[reaction.message.guild.id] is False:
                     self.shuffle[reaction.message.guild.id] = True
@@ -760,7 +827,7 @@ class Music(Cog):
                 msg = await reaction.message.channel.send("Mode shuffle diaktifkan")
             await asyncio.sleep(4)
             await msg.delete()
-        if reaction.emoji == "⏯️":
+        elif reaction.emoji == "⏯️":
             if reaction.message.guild.voice_client.is_paused():
                 reaction.message.guild.voice_client.resume()
                 try:
@@ -776,25 +843,67 @@ class Music(Cog):
                 msg = await reaction.message.channel.send("Lagu telah dijeda")
             await asyncio.sleep(5)
             await msg.delete()
-        if reaction.emoji == "🔁":
-            try:
-                if self.repeat[reaction.message.guild.id] is False:
-                    self.repeat[reaction.message.guild.id] = True
-                    msg = await reaction.message.channel.send("Mode repeat diaktifkan")
-                else:
-                    self.repeat[reaction.message.guild.id] = False
-                    msg = await reaction.message.channel.send("Mode repeat dimatikan")
-            except KeyError:
-                self.repeat[reaction.message.guild.id] = True
-                msg = await reaction.message.channel.send("Mode repeat diaktifkan")
-            await asyncio.sleep(4)
-            await msg.delete()
-        if reaction.emoji == "⏭️":
+        elif reaction.emoji == "🔁":
+            await self.passive_repeat(reaction.message.guild.id, reaction.message.channel)
+            # try:
+            #     if self.repeat[reaction.message.guild.id] is False:
+            #         self.repeat[reaction.message.guild.id] = True
+            #         msg = await reaction.message.channel.send("Mode repeat diaktifkan")
+            #     else:
+            #         self.repeat[reaction.message.guild.id] = False
+            #         msg = await reaction.message.channel.send("Mode repeat dimatikan")
+            # except KeyError:
+            #     self.repeat[reaction.message.guild.id] = True
+            #     msg = await reaction.message.channel.send("Mode repeat diaktifkan")
+            # await asyncio.sleep(4)
+            # await msg.delete()
+        elif reaction.emoji == "🔂":
+            await self.passive_repeat_one(reaction.message.guild.id, reaction.message.channel)
+        elif reaction.emoji == "⏭️":
             skip, poll_msg = await self.poll_song(user, reaction.message.channel)
             if skip:
                 reaction.message.guild.voice_client.stop()
             await asyncio.sleep(4)
             await poll_msg.delete()
+            
+    async def queue_control(self, reaction):
+        benar = False
+        if reaction.emoji == "⏮️":
+            self.np_queue[reaction.message.guild.id][0] = 1
+            embed = self.passive_queue(reaction.message.guild.id)
+            benar = True
+        elif reaction.emoji == "◀️":
+            self.np_queue[reaction.message.guild.id][0] -= 1
+            embed = self.passive_queue(reaction.message.guild.id)
+            benar = True
+        elif reaction.emoji == "▶️":
+            self.np_queue[reaction.message.guild.id][0] += 1
+            embed = self.passive_queue(reaction.message.guild.id)
+            benar = True
+        elif reaction.emoji == "⏭️":
+            self.np_queue[reaction.message.guild.id][0] = (len(self.song_queue) + 9) // 10
+            embed = self.passive_queue(reaction.message.guild.id)
+            benar = True
+        if benar is True:
+            msg = await reaction.message.channel.fetch_message(self.np_queue[reaction.message.guild.id][1])
+            await msg.edit(embed= embed, delete_after= 15)
+            
+    def passive_queue(self, guild_id):
+        queue = []
+        for i, title in enumerate(self.song_queue[guild_id]):
+            queue.append(f"**{i+1:3d}**)  {title[0]} ({format_durasi(title[2])})")
+        if len(queue) <= self.np_queue[guild_id][0] * 10:
+            self.np_queue[guild_id][0] = (len(queue) + 9) // 10
+            queue = queue[(self.np_queue[guild_id][0] * 10) - 10:]
+        else:
+            queue = queue[(self.np_queue[guild_id][0] * 10) - 10 : self.np_queue[guild_id][0] * 10]
+        lagu = "\n".join([cr for cr in queue])
+        embed = Embed(title=f"Antrian Musik:",
+                    description = f"{lagu}",
+                    colour=self.ctx.author.colour)
+        
+        embed.set_footer(text=f"{(self.np_queue[guild_id] * 10) - 9:,} - {self.np_queue[guild_id] * 10:,} dari {len(self.song_queue[guild_id]):,} lagu.")
+        return embed
 
     @Cog.listener()
     async def on_ready(self):

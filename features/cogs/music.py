@@ -25,15 +25,15 @@ OPTIONS = {
 }
 
 BUTTON = {
-    "⏬" : "vol_down",
+    # "⏬" : "vol_down",
+    # "⏫" : "vol_up",
     "⏮️" : 'previous',
-    "🎶" : "queue",
+    # "🎶" : "queue",
     "🔀" : 'shuffle',
     "⏯️" : 'playpause',
     "🔁" : 'repeat',
     "🔂" : "repeat_one",
-    "⏭️" : 'next',
-    "⏫" : "vol_up"
+    "⏭️" : 'next'
 }
 
 BAR = {
@@ -621,7 +621,7 @@ class Music(Cog):
                 bar_form.append("─")
         embed = Embed(
             title= f"Now playing: **{self.np[guild_id][0]}**",
-            description= f"Volume : {''.join(vol_lv)} 『{round(self.volume[guild_id] * 10)}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
+            description= f"Volume : {''.join(vol_lv)} 『{round(self.volume[guild_id] * 100)}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
             colour= Colour.from_rgb(rgb[0], rgb[1], rgb[2])
         )
         embed.set_image(url=self.np[guild_id][3])

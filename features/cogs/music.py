@@ -766,7 +766,7 @@ class Music(Cog):
                         
             if reaction.message.id == self.np_queue[reaction.message.guild.id][1]:
                 return await self.queue_control(reaction)
-        except (AttributeError, KeyError):
+        except (AttributeError, KeyError, IndexError):
             return
                     
     @Cog.listener()
@@ -781,7 +781,7 @@ class Music(Cog):
                         
             if reaction.message.id == self.np_queue[reaction.message.guild.id][1]:
                 return await self.queue_control(reaction)
-        except (AttributeError, KeyError):
+        except (AttributeError, KeyError, IndexError):
             return
                     
     async def button_control(self, reaction, user):
@@ -808,7 +808,7 @@ class Music(Cog):
             except KeyError:
                 return await reaction.message.channel.send("Tidak ada lagu dalam antrian")
             self.np_queue[reaction.message.guild.id] = [1, 0]
-            embed = self.passive_queue(reaction.message.guild.id)
+            embed = self.passive_queue(reaction.message.guild.id, reaction.message.author)
             
             msg = await reaction.message.channel.send(embed=embed, delete_after=15)
             for emoji in BUTTON_QUEUE:
@@ -870,25 +870,25 @@ class Music(Cog):
         benar = False
         if reaction.emoji == "⏮️":
             self.np_queue[reaction.message.guild.id][0] = 1
-            embed = self.passive_queue(reaction.message.guild.id)
+            embed = self.passive_queue(reaction.message.guild.id, reaction.message.author)
             benar = True
         elif reaction.emoji == "◀️":
             self.np_queue[reaction.message.guild.id][0] -= 1
-            embed = self.passive_queue(reaction.message.guild.id)
+            embed = self.passive_queue(reaction.message.guild.id, reaction.message.author)
             benar = True
         elif reaction.emoji == "▶️":
             self.np_queue[reaction.message.guild.id][0] += 1
-            embed = self.passive_queue(reaction.message.guild.id)
+            embed = self.passive_queue(reaction.message.guild.id, reaction.message.author)
             benar = True
         elif reaction.emoji == "⏭️":
             self.np_queue[reaction.message.guild.id][0] = (len(self.song_queue) + 9) // 10
-            embed = self.passive_queue(reaction.message.guild.id)
+            embed = self.passive_queue(reaction.message.guild.id, reaction.message.author)
             benar = True
         if benar is True:
             msg = await reaction.message.channel.fetch_message(self.np_queue[reaction.message.guild.id][1])
             await msg.edit(embed= embed, delete_after= 15)
             
-    def passive_queue(self, guild_id):
+    def passive_queue(self, guild_id, user):
         queue = []
         for i, title in enumerate(self.song_queue[guild_id]):
             queue.append(f"**{i+1:3d}**)  {title[0]} ({format_durasi(title[2])})")
@@ -898,9 +898,9 @@ class Music(Cog):
         else:
             queue = queue[(self.np_queue[guild_id][0] * 10) - 10 : self.np_queue[guild_id][0] * 10]
         lagu = "\n".join([cr for cr in queue])
-        embed = Embed(title=f"Antrian Musik:",
+        embed = Embed(title="Antrian Musik:",
                     description = f"{lagu}",
-                    colour=self.ctx.author.colour)
+                    colour=user.colour)
         
         embed.set_footer(text=f"{(self.np_queue[guild_id] * 10) - 9:,} - {self.np_queue[guild_id] * 10:,} dari {len(self.song_queue[guild_id]):,} lagu.")
         return embed

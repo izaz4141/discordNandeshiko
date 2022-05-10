@@ -416,7 +416,7 @@ class Music(Cog):
             self.song_queue[guild_id] = []
             self.shuffle[guild_id] = False
             self.repeat[guild_id] = False
-            self.repat_one[guild_id] = False
+            self.repeat_one[guild_id] = False
             self.np[guild_id] = []
             self.np_id[guild_id] = []
             self.playing[guild_id] = False

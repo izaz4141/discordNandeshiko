@@ -621,7 +621,7 @@ class Music(Cog):
                 bar_form.append("─")
         embed = Embed(
             title= f"Now playing: **{self.np[guild_id][0]}**",
-            description= f"Volume : {''.join(vol_lv)} 『{vol * 10}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
+            description= f"Volume : {''.join(vol_lv)} 『{round(self.volume[guild_id] * 10)}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
             colour= Colour.from_rgb(rgb[0], rgb[1], rgb[2])
         )
         embed.set_image(url=self.np[guild_id][3])
@@ -902,7 +902,7 @@ class Music(Cog):
                     description = f"{lagu}",
                     colour=user.colour)
         
-        embed.set_footer(text=f"{(self.np_queue[guild_id] * 10) - 9:,} - {self.np_queue[guild_id] * 10:,} dari {len(self.song_queue[guild_id]):,} lagu.")
+        embed.set_footer(text=f"{(self.np_queue[guild_id][0] * 10) - 9:,} - {self.np_queue[guild_id][0] * 10:,} dari {len(self.song_queue[guild_id]):,} lagu.")
         return embed
 
     @Cog.listener()

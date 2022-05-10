@@ -312,9 +312,10 @@ class Music(Cog):
             return "playlist"
             
     async def stopwatch_song(self, voice_client, guild_id, durasi):
+        np_id = self.np_id[guild_id][0]
         while time() - self.position[guild_id] < int(durasi):
             await asyncio.sleep(5)
-            if self.playing[guild_id] is False or voice_client.is_paused():
+            if self.playing[guild_id] is False or voice_client.is_paused() or np_id != self.np_id[guild_id][0]:
                 break
             embed = await self.passive_np(voice_client, guild_id, time() - self.position[guild_id], self.np_display[guild_id])
             np_msg = await self.bot.get_channel(self.np_id[guild_id][1]).fetch_message(self.np_id[guild_id][0])
@@ -372,46 +373,6 @@ class Music(Cog):
             np_id = self.np_id[ctx.guild.id][0]
             if isinstance(np_id, int):
                 embed = await self.passive_np(ctx.voice_client, ctx.guild.id)
-                # vol_lv = []
-                # for i in range(round(ctx.voice_client.source.volume*10)):
-                #     vol_lv.append(BAR[0])
-                # for i in range(10-round(ctx.voice_client.source.volume*10)):
-                #     vol_lv.append(BAR[1])
-                # file_name = "Music-Cover" + str(random.randint(1, 101))
-                # loop = self.bot.loop or asyncio.get_event_loop()
-                # await self.download_image(self.np[ctx.guild.id][3], "./data/temp-image/", file_name)
-                
-                # # Read Image
-                # img = Image.open(f"./data/temp-image/{file_name}.jpg")
-                # # Convert Image into RGB
-                # img = img.convert('RGB')
-                # # call function
-                # red, green, blue = await loop.run_in_executor(None, lambda: self.most_common_used_color(img))
-                # os.remove(f"./data/temp-image/{file_name}.jpg")
-                # rgb = [red, green, blue]
-                # self.np_display[ctx.guild.id] = rgb
-                # os.remove(f"./data/temp-image/{file_name}.jpg")
-            
-                # # ━ ⬤ ─
-                # progress_bar = ["━━━━━━⬤─────────────"] #20 karakter
-                # bagian = int(self.np[ctx.guild.id][2] / 20)
-                # terisi = int(0 / bagian)
-                # bunder = terisi + 1
-                # sisa = 20 - (terisi + bunder)
-                # bar_form = []
-                # if not terisi == 0:
-                #     for n in range(terisi-1):
-                #         bar_form.append("━")
-                # bar_form.append("⬤")
-                # if not sisa == 0:
-                #     for n in range(sisa-1):
-                #         bar_form.append("─")
-                # embed = Embed(
-                #     title= f"Now playing: **{self.np[ctx.guild.id][0]}**",
-                #     description= f"Volume : {''.join(vol_lv)} 『{ctx.voice_client.source.volume * 100}』\n    ..:.. ━━━━━━⬤───────────── {format_durasi(self.np[ctx.guild.id][2])}",
-                #     colour= Colour.from_rgb(red, green, blue)
-                # )
-                # embed.set_image(url=self.np[ctx.guild.id][3])
                 np_msg = await self.bot.get_channel(self.np_id[ctx.guild.id][1]).fetch_message(np_id)
                 await np_msg.edit(embed=embed)
         except Exception:
@@ -645,7 +606,7 @@ class Music(Cog):
                 bar_form.append("─")
         embed = Embed(
             title= f"Now playing: **{self.np[guild_id][0]}**",
-            description= f"Volume : {''.join(vol_lv)} 『{round(voice_client.source.volume * 100)}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
+            description= f"Volume : {''.join(vol_lv)} 『{round(vol * 10)}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
             colour= Colour.from_rgb(rgb[0], rgb[1], rgb[2])
         )
         embed.set_image(url=self.np[guild_id][3])

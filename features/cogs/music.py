@@ -4,7 +4,8 @@ from ..utils.menus import MenuPages, ListPageSource
 from discord.utils import get
 
 import asyncio
-from youtube_dl import YoutubeDL
+# from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 from youtube_search import YoutubeSearch
 from time import time
 import datetime as dt
@@ -97,7 +98,7 @@ class Music(Cog):
         self.bot = bot 
         self.YDL_OPTIONS = {
             'audioquality': 5,
-            'format': 'bestaudio[acodec=opus]',
+            'format': 'opus/bestaudio/best',
             'outtmpl': '{}',
             'restrictfilenames': True,
             'flatplaylist': True,
@@ -110,8 +111,20 @@ class Music(Cog):
             'no_warnings': True,
             'default_search': 'auto',
             # bind to ipv4 since ipv6 addresses cause issues sometimes
-            'source_address': '0.0.0.0'
+            'source_address': '0.0.0.0',
+            'postprocessors': [{  # Extract audio using ffmpeg
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'opus',
+            }]
         }
+        # self.YDL_OPTIONS = {
+        #     'format': 'opus/bestaudio/best',
+        #     # ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
+        #     'postprocessors': [{  # Extract audio using ffmpeg
+        #         'key': 'FFmpegExtractAudio',
+        #         'preferredcodec': 'opus',
+        #     }]
+        # }
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         # self.FFMPEG_OPTIONS = {'options' : '-vn'}
         self.song_queue = {}
@@ -282,9 +295,10 @@ class Music(Cog):
             with YoutubeDL(ydl_format) as ydl:
                 try: 
                     lagu = await loop.run_in_executor(None, lambda: ydl.extract_info(f"{'https://www.youtube.com' + track['url_suffix']}", download=False))
+                    lagu = await loop.run_in_executor(None, lambda: ydl.sanitize_info(lagu))
                 except Exception: 
                     return None
-            return {'source': lagu['formats'][0]['url'], 'title': lagu['title'], 'duration' : lagu['duration'], 'thumbnail' : lagu['thumbnail']}
+            return {'source': lagu['url'], 'title': lagu['title'], 'duration' : lagu['duration'], 'thumbnail' : lagu['thumbnail']}
 
     async def link_handler(self, ctx, song):
         if "youtube.com/playlist?" in song:
@@ -296,15 +310,16 @@ class Music(Cog):
         with YoutubeDL(ydl_format) as ydl:
             try: 
                 info = await loop.run_in_executor(None, lambda: ydl.extract_info(song, download=False))
+                info = await loop.run_in_executor(None, lambda: ydl.sanitize_info(info))
             except Exception: 
                 return None
         if not info['webpage_url_basename'] == "playlist":
-            return {'source': info['formats'][0]['url'], 'title': info['title'], 'duration' : info['duration'], 'thumbnail' : info['thumbnail']}
+            return {'source': info['url'], 'title': info['title'], 'duration' : info['duration'], 'thumbnail' : info['thumbnail']}
         else:
             
             entries = []
             for entry in info['entries']:
-                entries.append([entry['title'], entry['formats'][0]['url'], entry['duration'], entry['thumbnail']])
+                entries.append([entry['title'], entry['url'], entry['duration'], entry['thumbnail']])
 
             if ctx.voice_client.is_playing():
                 try:

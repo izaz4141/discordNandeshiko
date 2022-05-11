@@ -7,13 +7,86 @@ from sys import executable, argv
 from subprocess import run, PIPE
 from datetime import datetime
 from urllib3 import PoolManager
+from json import loads
 import asyncio
 import random
 import shutil
 import os
 
+from ..db import db
+from ..utils.menus import MenuPages, ListPageSource
 
 urlp = PoolManager()
+
+class IsiStatistik(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=1)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*1) + 1
+        len_data = len(self.entries)
+
+        embed = Embed(title=self.entries[menu.current_page][1],
+                      description= f"Members: {len(list(filter(lambda m: not m.bot, self.entries[menu.current_page][2].members)))}\nBots: {len(list(filter(lambda m: m.bot, self.entries[menu.current_page][2].members)))}" ,
+                      colour=self.ctx.author.colour)
+        
+        fields = []
+        if self.entries[menu.current_page][0] == {} or self.entries[menu.current_page][0] == 0:
+            embed.add_field(name="Command", value="Server ini belum pernah memakai command")
+        else:
+            commands = sorted(self.entries[menu.current_page][0].keys())
+            for command in commands:
+                fields.append((command, self.entries[menu.current_page][0][command]))
+            
+            for name, value in fields:
+                if value == '':
+                    value = 'Tidak Diketahui'
+                embed.add_field(name=name,value=value,inline=True)
+        if not isinstance(self.entries[menu.current_page][2].icon, type(None)):
+            embed.set_image(url=self.entries[menu.current_page][2].icon.url)
+        embed.set_footer(text=f"{offset:,} dari {len_data:,} server.")
+
+        # for name, value in fields:
+        #     embed.add_field(name=name, value=value, inline=False)
+        return embed
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        
+
+        
+        # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
+
+        return await self.write_page(menu, fields)
+    
+class IsiServerList(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=7)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*self.per_page) + 1
+        len_data = len(self.entries)
+
+        embed = Embed(title="Server List",
+                      colour=self.ctx.author.colour)
+        for name, value in fields:
+            embed.add_field(name=name, value=value, inline=False)
+        
+        embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} server.")
+        return embed
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        for entry in entries:
+            fields.append((entry.name, f"Members: {len(list(filter(lambda m: not m.bot, entry.members)))}\nBots: {len(list(filter(lambda m: m.bot, entry.members)))}"))
+
+        # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
+
+        return await self.write_page(menu, fields)
 
 class Developer(Cog):
     def __init__(self,bot):
@@ -33,61 +106,32 @@ class Developer(Cog):
         """
         if not ctx.author.id in self.bot.owner_ids:
             return
-        embed = Embed(title= "Server List",
-                      colour= ctx.author.colour)
         
-        servers = []
+        servers = [guild for guild in self.bot.guilds]
+        menu = MenuPages(source=IsiServerList(ctx, servers),
+                        # delete_message_after=True,
+                        timeout=60.0)# bisa ditambah clear_reaction_after=True
+        await menu.start(ctx)
+        
+    @command(name="servercommandstatistics", aliases=['scs'])
+    async def server_command_statistics(self,ctx):
+        """Menampilkan statistik command yang diinvoke tiap server
+        """
+        if not ctx.author.id in self.bot.owner_ids:
+            return
+        statistics = []
         for guild in self.bot.guilds:
-            embed.add_field(name=guild.name,
-                            value= f"Members: {len(list(filter(lambda m: not m.bot, guild.members)))}\nBots: {len(list(filter(lambda m: m.bot, guild.members)))}")
-        embed.set_thumbnail(url=ctx.guild.me.avatar.url)
-        await ctx.send(embed=embed)
-        
-    # @command(name="server_info")
-    # async def ser_inf(self, ctx, *, nama):
-    #     """Memberikan info server dengan input nama
-
-    #     Args:
-    #         nama (str): Nama Server
-    #     """
-    #     servers = {}
-    #     for guild in self.bot.guilds:
-    #         servers[guild.name] = guild.id
-    #     if not nama in servers.keys():
-    #         return await ctx.send(f"Maaf kak server dengan nama {nama} tidak ditemukan...")
-    #     guild = self.bot.get_guild(servers[nama])
-    #     embed = Embed(title="Server information",
-    #                   colour=guild.owner.colour,
-    #                   timestamp=datetime.utcnow())
-    #     try:
-    #         embed.set_thumbnail(url=guild.icon.url)
-    #     except Exception:
-    #         pass
-
-    #     statuses = [len(list(filter(lambda m: str(m.status) == "online", guild.members))),
-    #                 len(list(filter(lambda m: str(m.status) == "idle", guild.members))),
-    #                 len(list(filter(lambda m: str(m.status) == "dnd", guild.members))),
-    #                 len(list(filter(lambda m: str(m.status) == "offline", guild.members)))]
-
-    #     fields = [("ID", guild.id, True),
-    #             ("Owner", guild.owner, False),
-    #             ("Region", guild.region, True),
-    #             ("Created at", guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), False),
-    #             ("Members", len(guild.members), True),
-    #             ("Humans", len(list(filter(lambda m: not m.bot, guild.members))), True),
-    #             ("Bots", len(list(filter(lambda m: m.bot, guild.members))), True),
-    #             ("Banned members", len(await guild.bans().flatten()), True),
-    #             ("Invites", len(await guild.invites()), True),
-    #             ("Text channels", len(guild.text_channels), True),
-    #             ("Voice channels", len(guild.voice_channels), True),
-    #             ("Categories", len(guild.categories), True),
-    #             ("Roles", len(guild.roles), True),
-    #             ("Statuses", f"🟢 {statuses[0]} 🟠 {statuses[1]} 🔴 {statuses[2]} ⚪ {statuses[3]}", True),
-    #             ("\u200b", "\u200b", True)]
-
-    #     for name, value, inline in fields:
-    #         embed.add_field(name=name, value=value, inline=inline)
-    #     await ctx.send(embed=embed)
+            stat = db.record("SELECT Statistics FROM guilds WHERE GuildID = ?", guild.id)[0]
+            try:
+                stat = loads(stat)
+            except Exception:
+                stat = 0
+            statistics.append([stat, guild.name, guild])
+        statistics = sorted(statistics, key= lambda y: y[1])
+        menu = MenuPages(source=IsiStatistik(ctx, statistics),
+                        # delete_message_after=True,
+                        timeout=60.0)# bisa ditambah clear_reaction_after=True
+        await menu.start(ctx)
     
     @command(name="guildsplash", aliases=['gs'])
     async def guild_splash(self,ctx, *, nama):

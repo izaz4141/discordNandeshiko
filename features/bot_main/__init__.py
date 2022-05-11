@@ -10,6 +10,7 @@ from saucenao_api.errors import UnknownClientError, ShortLimitReachedError, Long
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 from time import time
+from json import loads, dumps
 from glob import glob
 from os import getenv
 from random import choices, randint
@@ -74,6 +75,7 @@ class Bot(BotBase):
         self.cogs_ready = Ready()
         self.guild = None
         self.scheculer = AsyncIOScheduler()
+        self.maintenance = False
 
         db.autosave(self.scheculer)
         super().__init__(command_prefix=get_prefix, owner_ids=OWNER_IDS, intents=intents)
@@ -158,8 +160,19 @@ class Bot(BotBase):
 
     async def process_commands(self, message):
         ctx = await self.get_context(message, cls= Context)
-
         if self.ready:
+            if ctx.command:
+                statistics = db.record("SELECT Statistics FROM guilds WHERE GuildID = ?", ctx.guild.id)[0]
+                try:
+                    statistics = loads(statistics)
+                except Exception:
+                    statistics = statistics
+                try:
+                    statistics[ctx.command.name] += 1
+                except KeyError:
+                    statistics[ctx.command.name] = 1
+                baru = dumps(statistics)
+                db.execute("UPDATE guilds SET Statistics = ? WHERE GuildID = ?", baru, ctx.guild.id)
             await self.invoke(ctx)
         else:
             if not ctx.prefix is None:
@@ -279,11 +292,25 @@ class Bot(BotBase):
     @client.event
     async def on_message(self, message):
         if not message.author.bot:
+            if getenv("DESKTOP_KEY") == "benar":
+                if not message.author.id in self.owner_ids:
+                    return
+            elif self.maintenance is True:
+                if message.content == "maintenance off" and message.author.id in self.owner_ids:
+                    self.maintenance = False
+                    return
+                return
             if message.author.id in self.owner_ids:
                 if message.content == "upload db" :
                     return self.update_db_intoCloud()
                 elif message.content == "update db":
                     return self.update_db()
+                elif message.content == "maintenance on":
+                    self.maintenance = True
+                    return
+                elif message.content == "maintenance off":
+                    self.maintenance = False
+                    return
             if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.totalE
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis)-1)])], weights= [1, 1, 2], k=1)[0])

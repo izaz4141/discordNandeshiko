@@ -9,7 +9,7 @@ Pybooru==4.2.2
 pygelbooru==0.3.2
 jsonschema>=2.6.0, <3.0.0
 simplejson==3.17.2
-youtube-dl==2021.12.17
+yt-dlp==2022.4.8
 youtube-search==2.1.0
 hentai==3.2.10
 dropbox==11.9.0

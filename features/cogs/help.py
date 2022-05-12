@@ -52,7 +52,8 @@ class HelpMenu(ListPageSource):
         commando_list = []
         for cog_name in cog_command.keys():
             commando_list.append([cog_name, cog_command[cog_name]])
-        commando_list = sorted(commando_list, key= lambda y: y[0])
+        commando_list = sorted(commando_list, key= lambda y: y[0]) #idk why this doesnt work in heroku
+        bagian = []
         for name, value in zip([cmdcog_name[0] for cmdcog_name in commando_list], [command[1] for command in commando_list]):
             value = "\n".join(value)
             if name == '':
@@ -62,10 +63,10 @@ class HelpMenu(ListPageSource):
                 value = "Tidak ada perintah dalam Cog ini"
             if name.lower() in Forbidden_Cog:
                 if self.ctx.author.id in self.owner_ids:
-                    fields.append((name, value))
+                    bagian.append((name, value))
             else:
-                fields.append((name, value))
-        for name, value in fields:
+                bagian.append((name, value))
+        for name, value in bagian:
             embed.add_field(name=name, value=value, inline=False)
 
         return embed

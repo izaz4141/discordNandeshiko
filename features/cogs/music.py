@@ -104,7 +104,7 @@ class Music(Cog):
             'flatplaylist': True,
             'nocheckcertificate': True,
             'ignoreerrors': True,
-            'logtostderr': False,
+            # 'logtostderr': False,
             "extractaudio": True,
             # "audioformat": "opus",
             'quiet': True,
@@ -177,7 +177,7 @@ class Music(Cog):
                             self.timer[ctx.guild.id] += 10
                             if self.timer[ctx.guild.id] >= 60:
                                 if self.playing[ctx.guild.id] is True:
-                                    await self.passive_leave(ctx.guild.id, ctx.voice_client)
+                                    return await self.passive_leave(ctx.guild.id, ctx.voice_client)
                     
                 except KeyError:
                         while True:
@@ -186,7 +186,7 @@ class Music(Cog):
                             await asyncio.sleep(10)
                             self.timer[ctx.guild.id] += 10
                             if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
-                                await self.passive_leave(ctx.guild.id, ctx.voice_client)
+                                return await self.passive_leave(ctx.guild.id, ctx.voice_client)
         except KeyError:
             try:
                 if self.repeat[ctx.guild.id] is True or self.repat_one[ctx.guild.id] is True:
@@ -200,7 +200,7 @@ class Music(Cog):
                         await asyncio.sleep(10)
                         self.timer[ctx.guild.id] += 10
                         if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
-                            await self.passive_leave(ctx.guild.id, ctx.voice_client)
+                            return await self.passive_leave(ctx.guild.id, ctx.voice_client)
             except KeyError:
                 while True:
                     if self.fu[ctx.guild.id] is True:
@@ -208,7 +208,7 @@ class Music(Cog):
                     await asyncio.sleep(10)
                     self.timer[ctx.guild.id] += 10
                     if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id]:
-                        await self.passive_leave(ctx.guild.id, ctx.voice_client)
+                        return await self.passive_leave(ctx.guild.id, ctx.voice_client)
                 
     async def poll_song(self, user, channel):
         poll = Embed(title=f"Vote to Skip Song by - {user.name}#{user.discriminator}", description="**80% of the voice channel must vote to skip for it to pass.**", colour= Colour.blue())
@@ -321,7 +321,7 @@ class Music(Cog):
             for entry in info['entries']:
                 entries.append([entry['title'], entry['url'], entry['duration'], entry['thumbnail']])
 
-            if ctx.voice_client.is_playing():
+            if ctx.voice_client.is_playing() or ctx.voice_client.is_paused():
                 try:
                     self.song_queue[ctx.guild.id] += entries
                 except KeyError:
@@ -427,7 +427,7 @@ class Music(Cog):
         await self.passive_leave(ctx.guild.id, ctx.voice_client, ctx.message.channel)
 
     async def passive_leave(self,guild_id, voice_client, channel = "Takda"):
-        if voice_client is not None:
+        if not voice_client is None:
             self.song_queue[guild_id] = []
             self.shuffle[guild_id] = False
             self.repeat[guild_id] = False
@@ -476,7 +476,7 @@ class Music(Cog):
                 return await ctx.send("Maaf kak fitur menambahkan dari playlist dinonaktifkan di server kakak")
 
         try:
-            if ctx.voice_client.is_playing():
+            if ctx.voice_client.is_playing() or ctx.voice_client.is_paused():
                 try:
                     queue_len = len(self.song_queue[ctx.guild.id])
                     self.song_queue[ctx.guild.id].append([result['title'], result['source'], result['duration'], result['thumbnail']])

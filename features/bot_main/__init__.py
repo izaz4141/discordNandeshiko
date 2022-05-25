@@ -13,6 +13,7 @@ from time import time
 from json import loads, dumps
 from glob import glob
 from os import getenv
+from traceback import format_exc
 from random import choices, randint
 from asyncio import sleep
 from apscheduler.triggers.cron import CronTrigger
@@ -194,14 +195,14 @@ class Bot(BotBase):
         else:
             channel = self.get_channel(757478450490638376) 
             await channel.send("Ada sesuatu yang salah")
+        
+        await self.get_user(OWNER_IDS[0]).send(format_exc())
         raise
 
     async def on_command_error(self, ctx, exc):
         if any([isinstance(exc, error) for error in IGNORE_EXCEPTION]):
             pass
         elif isinstance(exc, MissingRequiredArgument):
-            
-            
             await ctx.send("Perintahnya tidak lengkap kak")
             await Help(self).cmd_help(ctx, ctx.command)
         

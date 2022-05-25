@@ -10,7 +10,7 @@ from aiohttp import request
 from pybooru import Danbooru, Moebooru
 from pygelbooru import Gelbooru
 # from difflib import get_close_matches
-from saucenao_api import SauceNao
+from ..utils.saucenao_api.saucenao_api import SauceNao
 from ..utils import wordle, kataple
 
 import asyncio

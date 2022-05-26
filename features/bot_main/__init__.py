@@ -6,7 +6,7 @@ from discord.ext.commands.errors import MissingPermissions, MissingRole, NSFWCha
 from discord.errors import HTTPException, Forbidden, NotFound
 from urllib3.exceptions import MaxRetryError
 from requests.exceptions import SSLError
-from saucenao_api.errors import UnknownClientError, ShortLimitReachedError, LongLimitReachedError
+from ..utils.saucenao_api.errors import UnknownClientError, ShortLimitReachedError, LongLimitReachedError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 from time import time

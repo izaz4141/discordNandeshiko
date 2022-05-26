@@ -320,7 +320,7 @@ class Bot(BotBase):
                     parent = message.reference.resolved
                     if parent.embeds:
                         embed = parent.embeds[0]
-                        if embed.title == "wordle":
+                        if embed.title == "Wordle":
                             await wordle.process_message_as_guess(self, message)
                         elif embed.title == "Kataple":
                             await kataple.process_message_as_guess(self, message)

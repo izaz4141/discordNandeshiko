@@ -9,7 +9,7 @@ from requests.exceptions import SSLError
 from ..utils.saucenao_api.errors import UnknownClientError, ShortLimitReachedError, LongLimitReachedError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
-from time import time
+# from time import time
 from json import loads, dumps
 from glob import glob
 from os import getenv

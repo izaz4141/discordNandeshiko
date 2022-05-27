@@ -339,14 +339,16 @@ class Music(Cog):
             
     async def stopwatch_song(self, voice_client, guild_id, durasi):
         np_id = self.np_id[guild_id][0]
-        while time() - self.position[guild_id] < int(durasi):
-            await asyncio.sleep(5)
-            if self.playing[guild_id] is False or voice_client.is_paused() or np_id != self.np_id[guild_id][0]:
+        posisi = self.position[guild_id]
+        np = self.np[guild_id]
+        while time() - posisi < int(durasi):
+            await asyncio.sleep(2)
+            if self.playing[guild_id] is False or voice_client.is_paused() or np_id != self.np_id[guild_id][0] or np != self.np[guild_id]:
                 break
             embed = await self.passive_np(voice_client, guild_id, time() - self.position[guild_id], self.np_display[guild_id])
             np_msg = await self.bot.get_channel(self.np_id[guild_id][1]).fetch_message(self.np_id[guild_id][0])
             await np_msg.edit(embed=embed)
-                            
+
     async def download_image(self, url, file_path, file_name):
         full_path = file_path + file_name + '.jpg'
         loop = self.bot.loop or asyncio.get_event_loop()
@@ -401,6 +403,7 @@ class Music(Cog):
                 embed = await self.passive_np(ctx.voice_client, ctx.guild.id)
                 np_msg = await self.bot.get_channel(self.np_id[ctx.guild.id][1]).fetch_message(np_id)
                 await np_msg.edit(embed=embed)
+                await self.stopwatch_song(ctx.voice_client, ctx.guild.id, song[2])
         except Exception:
             return
 

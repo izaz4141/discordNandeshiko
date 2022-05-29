@@ -45,7 +45,7 @@ class IsiStatistik(ListPageSource):
                     value = 'Tidak Diketahui'
                 embed.add_field(name=name,value=value,inline=True)
         if not isinstance(self.entries[menu.current_page][2].icon, type(None)):
-            embed.set_image(url=self.entries[menu.current_page][2].icon.url)
+            embed.set_thumbnail(url=self.entries[menu.current_page][2].icon.url)
         embed.set_footer(text=f"{offset:,} dari {len_data:,} server.")
 
         # for name, value in fields:
@@ -82,7 +82,10 @@ class IsiServerList(ListPageSource):
         fields = []
         
         for entry in entries:
-            fields.append((entry.name, f"Members: {len(list(filter(lambda m: not m.bot, entry.members)))}\nBots: {len(list(filter(lambda m: m.bot, entry.members)))}"))
+            wel = db.field("SELECT Welcome FROM guilds WHERE GuildID = ?", entry.id)
+            leg = db.field("SELECT Leg FROM guilds WHERE GuildID = ?", entry.id)
+            nqn = db.field("SELECT NQN FROM guilds WHERE GuildID = ?", entry.id)
+            fields.append((entry.name, f"Members: {len(list(filter(lambda m: not m.bot, entry.members)))}\nBots: {len(list(filter(lambda m: m.bot, entry.members)))}\nWelcome: {wel}\nLog: {leg}\nNQN: {nqn}"))
 
         # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
 

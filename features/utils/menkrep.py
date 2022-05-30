@@ -8,7 +8,7 @@ jv_serv = JavaServer(url)
 br_serv = BedrockServer(url)
 
 def get_status(link: Optional[str]):
-    if isinstance(link, type(None)):
+    if not isinstance(link, type(None)):
         jv_serv = JavaServer.lookup(link)
         br_serv = BedrockServer.lookup(link)
     status = jv_serv.status()

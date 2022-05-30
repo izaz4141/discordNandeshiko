@@ -78,7 +78,7 @@ class Bot(BotBase):
         self.cogs_ready = Ready()
         self.guild = None
         self.scheculer = AsyncIOScheduler()
-        self.maintenance = False
+        self.maintenance = True
 
         db.autosave(self.scheculer)
         super().__init__(command_prefix=get_prefix, owner_ids=OWNER_IDS, intents=intents)

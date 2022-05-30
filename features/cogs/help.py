@@ -20,9 +20,8 @@ def syntax(command):
 
 
 class HelpMenu(ListPageSource):
-    def __init__(self, ctx, data, cmd, owner_ids):
+    def __init__(self, ctx, data, owner_ids):
         self.ctx = ctx
-        self.cmd = cmd
         self.owner_ids = owner_ids
 
         super().__init__(data, per_page=3)
@@ -34,36 +33,15 @@ class HelpMenu(ListPageSource):
         embed = Embed(title="Help",
                       description="Selamat datang ke Menu Help Campers!",
                       colour=self.ctx.author.colour)
-        cog_command = {}
-        for cog in fields:
-            cog_command[cog] = []
-        for comand in list(self.cmd):
-            beneer = False
-            for cog in fields:
-                if comand.cog_name == cog:
-                    cmdcog_name = cog
-                    beneer = True
-                    break
-            if beneer is True:
-                cog_command[cmdcog_name].append(syntax(comand))
+        
         embed.set_thumbnail(url=self.ctx.guild.me.avatar.url)
         embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} Cog.")
-        fields = []
-        commando_list = [[cog_name, cog_command[cog_name]] for cog_name in cog_command.keys()]
-        commando_list = sorted(commando_list, key= lambda y: y[0])
-        for name, value in zip([cmdcog_name[0] for cmdcog_name in commando_list], [command[1] for command in commando_list]):
-            value = "\n".join(value)
-            if name == '':
-                name = "Unknown Cog"
-            
-            elif value == '':
-                value = "Tidak ada perintah dalam Cog ini"
-            if name.lower() in Forbidden_Cog:
-                if self.ctx.author.id in self.owner_ids:
-                    fields.append((name, value))
-            else:
-                fields.append((name, value))
+
         for name, value in fields:
+            if name in Forbidden_Cog and not self.ctx.author.id in self.owner_ids:
+                continue
+            if value == '':
+                value = "Cog ini tidak memiliki perintah!"
             embed.add_field(name=name, value=value, inline=False)
 
         return embed
@@ -71,9 +49,9 @@ class HelpMenu(ListPageSource):
     async def format_page(self, menu, entries):
         fields = []
         
-
         for entry in entries:
-            fields.append(entry)
+            cmd_line = '\n'.join([syntax(cmd) for cmd in entry[0]])
+            fields.append((entry[1], cmd_line))
 
         return await self.write_page(menu, fields)
 
@@ -157,7 +135,15 @@ class Help(Cog):
         ```help fun```
         """
         if cmd is None:
-            menu = MenuPages(source=HelpMenu(ctx, list(self.bot.cogs.keys()), list(self.bot.commands), self.bot.owner_ids),
+            cogs = {}
+            for cmd in self.bot.commands:
+                try:
+                    cogs[cmd.cog_name].append(cmd)
+                except Exception:
+                    cogs[cmd.cog_name] = [cmd]
+            cogg = [[cogs[cog], cog] for cog in cogs.keys()]
+            cogs_sorted = sorted(cogg, key= lambda y: y[1])
+            menu = MenuPages(source=HelpMenu(ctx, cogs_sorted, self.bot.owner_ids),
                             #  delete_message_after=True,
                             clear_reactions_after= True,
                              timeout=60.0)# bisa ditambah clear_reaction_after=True

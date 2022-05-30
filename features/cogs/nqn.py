@@ -20,7 +20,7 @@ class NQN(Cog):
     @Cog.listener()
     async def on_message(self, message):
         if not message.content == '' and not message.author.bot:
-            if isinstance(message.guild, None):
+            if isinstance(message.guild, type(None)):
                 return
             if db.field("SELECT NQN FROM guilds WHERE GuildID = ?", message.guild.id) == 'ON':
                 l_kata = message.content.split(" ")

@@ -54,9 +54,11 @@ def remove_items(test_list, item):
     return res
 
 def get_prefix(bot, message):
-    prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
-    return when_mentioned_or(prefix)(bot, message)
-
+    if not isinstance(message.guild, type(None)):
+        prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
+        return when_mentioned_or(prefix)(bot, message)
+    else:
+        return when_mentioned_or("+")(bot, message)
 class Ready(object):
     def __init__(self):
         for cog in COGS:
@@ -162,7 +164,7 @@ class Bot(BotBase):
     async def process_commands(self, message):
         ctx = await self.get_context(message, cls= Context)
         if self.ready:
-            if ctx.command:
+            if ctx.command and not isinstance(ctx.guild, type(None)):
                 statistics = db.record("SELECT Statistics FROM guilds WHERE GuildID = ?", ctx.guild.id)[0]
                 try:
                     statistics = loads(statistics)
@@ -202,6 +204,8 @@ class Bot(BotBase):
     async def on_command_error(self, ctx, exc):
         if any([isinstance(exc, error) for error in IGNORE_EXCEPTION]):
             pass
+        elif isinstance(ctx.guild, type(None)):
+            await ctx.send("Kata kak Glicole gaboleh ikutin orang di tempat sepi!")
         elif isinstance(exc, MissingRequiredArgument):
             await ctx.send("Perintahnya tidak lengkap kak")
             await Help(self).cmd_help(ctx, ctx.command)
@@ -240,7 +244,8 @@ class Bot(BotBase):
                 await ctx.send("Maaf! Aku sedang sibuk, coba beberapa saat lagi.")
             elif isinstance(exc.original, LongLimitReachedError):
                 await ctx.send("Maaf! Limit sauce yang boleh dicari hari ini sudah tercapai")
-                
+            
+
             else:
                 raise exc.original
 
@@ -254,9 +259,10 @@ class Bot(BotBase):
             self.guild = self.get_guild(605057520955818010) #KALAU HANYA SATU SERVER
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)
+            self.SERVER_EXCEPTION = ['wo1', 'wo2']
             self.totalE = []
             for guild in self.guilds:
-                if not guild.name == "wo1" and not guild.name == "wo2":
+                if not guild.name in self.SERVER_EXCEPTION:
                     for i in range(len(guild.emojis)-1):
                         self.totalE.append(guild.emojis[i])
             minute = [19, 39, 59]

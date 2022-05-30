@@ -49,9 +49,7 @@ class HelpMenu(ListPageSource):
         embed.set_thumbnail(url=self.ctx.guild.me.avatar.url)
         embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} Cog.")
         fields = []
-        commando_list = []
-        for cog_name in cog_command.keys():
-            commando_list.append([cog_name, cog_command[cog_name]])
+        commando_list = [[cog_name, cog_command[cog_name]] for cog_name in cog_command.keys()]
         commando_list = sorted(commando_list, key= lambda y: y[0])
         for name, value in zip([cmdcog_name[0] for cmdcog_name in commando_list], [command[1] for command in commando_list]):
             value = "\n".join(value)

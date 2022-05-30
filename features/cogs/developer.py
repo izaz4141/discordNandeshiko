@@ -65,7 +65,7 @@ class IsiServerList(ListPageSource):
     def __init__(self, ctx, data):
         self.ctx = ctx
 
-        super().__init__(data, per_page=7)
+        super().__init__(data, per_page=4)
 
     async def write_page(self, menu, fields=[]):
         offset = (menu.current_page*self.per_page) + 1
@@ -110,7 +110,9 @@ class Developer(Cog):
         if not ctx.author.id in self.bot.owner_ids:
             return
         
-        servers = [guild for guild in self.bot.guilds]
+        servers = [[guild, guild.name] for guild in self.bot.guilds if not guild.name in self.bot.SERVER_EXCEPTION]
+        servers = sorted(servers, key= lambda y: y[1])
+        servers = [server[0] for server in servers]
         menu = MenuPages(source=IsiServerList(ctx, servers),
                         # delete_message_after=True,
                         timeout=60.0)# bisa ditambah clear_reaction_after=True
@@ -129,7 +131,8 @@ class Developer(Cog):
                 stat = loads(stat)
             except Exception:
                 stat = 0
-            statistics.append([stat, guild.name, guild])
+            if not guild.name in self.bot.SERVER_EXCEPTION:
+                statistics.append([stat, guild.name, guild])
         statistics = sorted(statistics, key= lambda y: y[1])
         menu = MenuPages(source=IsiStatistik(ctx, statistics),
                         # delete_message_after=True,

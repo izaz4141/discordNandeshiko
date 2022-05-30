@@ -14,9 +14,11 @@ from json import loads, dumps
 from glob import glob
 from os import getenv
 from traceback import format_exc
+from tenacity import retry, stop_after_attempt, wait_fixed
 from random import choices, randint
-from asyncio import sleep
+from asyncio import sleep, get_event_loop
 from apscheduler.triggers.cron import CronTrigger
+from mcstatus import JavaServer
 
 
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
@@ -25,7 +27,7 @@ from apscheduler.triggers.cron import CronTrigger
 from ..cogs.help import Help
 from ..cloud.dropbox import *
 from dropbox.exceptions import ApiError
-from ..utils import wordle, kataple
+from ..utils import wordle, kataple, menkrep
 
 try:
     download_from_dropbox("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
@@ -42,6 +44,7 @@ intents = Intents.all()
 # intents.presences = True
 # intents.message_content = True
 # PREFIX = "+"
+mc_serv = JavaServer.lookup(getenv("MINECRAFT_LINK"))
 OWNER_IDS = [343962708166574090]
 COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
@@ -253,6 +256,14 @@ class Bot(BotBase):
         else:
             raise exc
 
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
+    async def mc_check(self):
+        status = mc_serv.status()
+        if menkrep.players.online >= 1:
+            loop = self.loop or get_event_loop()
+            embed = await loop.run_in_executor(None, lambda: menkrep.get_status())
+            await self.get_user(OWNER_IDS[0]).send(embed=embed)
+
     async def on_ready(self):
         if not self.ready:
             # self.guilds = await self.fetch_guilds(limit= 5)
@@ -266,11 +277,15 @@ class Bot(BotBase):
                 if not guild.name in self.SERVER_EXCEPTION:
                     for i in range(len(guild.emojis)-1):
                         self.totalE.append(guild.emojis[i])
+            #automatically turn maintenance on if run from desktop
             if DESKTOP_KEY == "benar":
                 self.maintenance = True
+            #create task to update database into dropbox every 20 minutes
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
+            for minu in range(9, 60, 10):
+                self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():

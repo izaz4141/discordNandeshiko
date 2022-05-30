@@ -4,14 +4,16 @@ from os import getenv
 from typing import Optional
 
 url = getenv("MINECRAFT_LINK")
+jv_serv = JavaServer(url)
+br_serv = BedrockServer(url)
 
 def get_status(link: Optional[str]):
-    link = link or url
-    server = JavaServer.lookup(link)
-    ser = BedrockServer.lookup(link)
-    status = server.status()
-    query = server.query()
-    bs =ser.status()
+    if isinstance(link, type(None)):
+        jv_serv = JavaServer.lookup(link)
+        br_serv = BedrockServer.lookup(link)
+    status = jv_serv.status()
+    query = jv_serv.query()
+    bs =br_serv.status()
     embed = Embed(
         title= f"{bs.map}",
         description= f"{status.description}"

@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog, command
 from typing import Optional
-
+from tenacity import retry, stop_after_attempt, wait_fixed
 from asyncio import get_event_loop
 
 from ..utils.menkrep import get_status
@@ -8,6 +8,13 @@ from ..utils.menkrep import get_status
 class Private(Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
+    async def passive_mc_status(self, ctx, link):
+        loop = self.bot.loop or get_event_loop()
+        link = link or None
+        embed = await loop.run_in_executor(None, lambda: get_status(link))
+        await ctx.send(embed=embed)
 
     @command(name="mcstatus")
     async def minecraft_server_status(self, ctx, *, link: Optional[str]):
@@ -18,10 +25,8 @@ class Private(Cog):
         """
         if not ctx.author.id in self.bot.owner_ids:
             return
-        loop = self.bot.loop or get_event_loop()
-        link = link or None
-        embed = await loop.run_in_executor(None, lambda: get_status(link))
-        await ctx.send(embed=embed)
+        await self.passive_mc_status(ctx, link)
+        
 
     @Cog.listener()
     async def on_ready(self):

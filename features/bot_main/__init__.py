@@ -216,13 +216,13 @@ class Bot(BotBase):
 
         elif isinstance(exc, CommandOnCooldown):
             if exc.retry_after < 60:
-                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.cooldown.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after:,.2f} detik.")
+                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after:,.2f} detik.")
 
             elif exc.retry_after < 3600:
-                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.cooldown.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after/60:,.2f} menit.")
+                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after/60:,.2f} menit.")
 
             else:
-                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.cooldown.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after/3600:,.4f} jam.")
+                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after/3600:,.4f} jam.")
                 
         elif isinstance(exc, MissingRole):
             await ctx.send(f"Maaf kakak tidak dapat mengakses perintah ini karena belum bergabung dalam **{exc.missing_role}**")

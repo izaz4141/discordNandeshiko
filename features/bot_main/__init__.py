@@ -45,6 +45,7 @@ intents = Intents.all()
 OWNER_IDS = [343962708166574090]
 COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
+DESKTOP_KEY = getenv("DESKTOP_KEY")
 
 def remove_items(test_list, item):
     # using list comprehension to perform the tast for n in item:
@@ -78,7 +79,7 @@ class Bot(BotBase):
         self.cogs_ready = Ready()
         self.guild = None
         self.scheculer = AsyncIOScheduler()
-        self.maintenance = True
+        self.maintenance = False
 
         db.autosave(self.scheculer)
         super().__init__(command_prefix=get_prefix, owner_ids=OWNER_IDS, intents=intents)
@@ -265,6 +266,8 @@ class Bot(BotBase):
                 if not guild.name in self.SERVER_EXCEPTION:
                     for i in range(len(guild.emojis)-1):
                         self.totalE.append(guild.emojis[i])
+            if DESKTOP_KEY == "benar":
+                self.maintenance = True
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
@@ -299,7 +302,7 @@ class Bot(BotBase):
     @client.event
     async def on_message(self, message):
         if not message.author.bot:
-            if getenv("DESKTOP_KEY") == "benar":
+            if DESKTOP_KEY == "benar":
                 if not message.author.id in self.owner_ids:
                     return
             elif self.maintenance is True:

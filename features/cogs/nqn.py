@@ -1,3 +1,4 @@
+from types import NoneType
 from discord.ext.commands import Cog
 from discord.errors import NotFound
 
@@ -19,6 +20,8 @@ class NQN(Cog):
     @Cog.listener()
     async def on_message(self, message):
         if not message.content == '' and not message.author.bot:
+            if isinstance(message.guild, NoneType):
+                return
             if db.field("SELECT NQN FROM guilds WHERE GuildID = ?", message.guild.id) == 'ON':
                 l_kata = message.content.split(" ")
                 a = {}

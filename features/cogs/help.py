@@ -4,7 +4,7 @@ from discord.utils import get
 from discord import Embed, File
 from typing import Optional
 
-Forbidden_Cog = ["developer"]
+Forbidden_Cog = ["developer", "private"]
 
 def syntax(command):
     cmd_and_alias = " | ".join([str(command), *command.aliases])

@@ -7,6 +7,7 @@ from discord.errors import HTTPException, Forbidden, NotFound
 from urllib3.exceptions import MaxRetryError
 from requests.exceptions import SSLError
 from ..utils.saucenao_api.errors import UnknownClientError, ShortLimitReachedError, LongLimitReachedError
+from tenacity import RetryError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 # from time import time
@@ -249,7 +250,8 @@ class Bot(BotBase):
                 await ctx.send("Maaf! Aku sedang sibuk, coba beberapa saat lagi.")
             elif isinstance(exc.original, LongLimitReachedError):
                 await ctx.send("Maaf! Limit sauce yang boleh dicari hari ini sudah tercapai")
-            
+            elif isinstance(exc.original, RetryError):
+                await ctx.send("Maaf kak Nadeshiko tidak dapat menghubungi server yang terkait...")
 
             else:
                 raise exc.original

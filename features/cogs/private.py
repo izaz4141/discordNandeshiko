@@ -18,7 +18,7 @@ class Private(Cog):
 
     @command(name="mcstatus")
     async def minecraft_server_status(self, ctx, *, link: Optional[str]):
-        """Mengambil status dari server minecraft
+        """Mengambil status dari server java minecraft
 
         Args:
             link (Optional[str]): Link server minecraft, jika tidak diisi akan mengambil server elang.

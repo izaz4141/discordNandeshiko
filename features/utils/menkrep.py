@@ -5,24 +5,21 @@ from typing import Optional
 
 url = getenv("MINECRAFT_LINK")
 
-def get_status(link: Optional[str]):
+def get_status(link: Optional[str]=None):
     link = link or url
     server = JavaServer.lookup(link)
-    ser = BedrockServer.lookup(link)
     status = server.status()
     query = server.query()
-    bs =ser.status()
     embed = Embed(
-        title= f"{bs.map}",
+        title= f"{link}",
         description= f"{status.description}"
     )
     fields = [
         ("Versi", f"Server {status.version.name} {query.software.brand} {query.software.version}"),
-        ("Gamemode", bs.gamemode),
         ("Jumlah Player", f"{status.players.online}/{status.players.max}")
     ]
     if status.players.online > 0:
-        fields.append(("List Player Online", '\n'.join(query.players.names)))
+        fields.append(("List Player Online", ', '.join(query.players.names)))
     for name, value in fields:
         if value == [] or value == "":
             value = "Tidak Diketahui"

@@ -20,7 +20,6 @@ from asyncio import sleep, get_event_loop
 from apscheduler.triggers.cron import CronTrigger
 from mcstatus import JavaServer
 
-
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
 # system("git remote set_url origin https://github.com/izaz4141/discordNandeshiko.git")
 
@@ -199,10 +198,12 @@ class Bot(BotBase):
         if err == "on_command_error":
             await args[0].send("?")
         else:
-            channel = self.get_channel(757478450490638376) 
+            channel = self.get_channel(757478450490638376)
             await channel.send("Ada sesuatu yang salah")
         
-        await self.get_user(OWNER_IDS[0]).send(format_exc())
+        string_err = f"{''.join(reversed(format_exc())):.1999}"
+        string_err = ''.join(reversed(string_err))
+        await self.get_user(OWNER_IDS[0]).send(string_err)
         raise
 
     async def on_command_error(self, ctx, exc):
@@ -259,9 +260,9 @@ class Bot(BotBase):
     @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
     async def mc_check(self):
         status = mc_serv.status()
-        if menkrep.players.online >= 1:
+        if status.players.online >= 1:
             loop = self.loop or get_event_loop()
-            embed = await loop.run_in_executor(None, lambda: menkrep.get_status())
+            embed = await loop.run_in_executor(None, lambda: menkrep.get_status(None))
             await self.get_user(OWNER_IDS[0]).send(embed=embed)
 
     async def on_ready(self):

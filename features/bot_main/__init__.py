@@ -19,7 +19,6 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 from random import choices, randint
 from asyncio import sleep, get_event_loop
 from apscheduler.triggers.cron import CronTrigger
-from mcstatus import JavaServer
 
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
 # system("git remote set_url origin https://github.com/izaz4141/discordNandeshiko.git")
@@ -44,7 +43,6 @@ intents = Intents.all()
 # intents.presences = True
 # intents.message_content = True
 # PREFIX = "+"
-mc_serv = JavaServer.lookup(getenv("MINECRAFT_LINK"))
 OWNER_IDS = [343962708166574090]
 COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
@@ -261,11 +259,11 @@ class Bot(BotBase):
 
     @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
     async def mc_check(self):
-        status = mc_serv.status()
-        if status.players.online >= 1:
-            loop = self.loop or get_event_loop()
-            embed = await loop.run_in_executor(None, lambda: menkrep.get_status(None))
-            await self.get_user(OWNER_IDS[0]).send(embed=embed)
+        loop = self.loop or get_event_loop()
+        embed, online = await loop.run_in_executor(None, lambda: menkrep.get_status(None))
+        if self.mc_on != online:
+            await self.get_channel(982940674213150760).send(embed=embed)
+            self.mc_on = online
 
     async def on_ready(self):
         if not self.ready:
@@ -274,6 +272,7 @@ class Bot(BotBase):
             self.guild = self.get_guild(605057520955818010) #KALAU HANYA SATU SERVER
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)
+            self.mc_on = 0
             self.SERVER_EXCEPTION = ['wo1', 'wo2']
             self.totalE = []
             for guild in self.guilds:
@@ -287,7 +286,7 @@ class Bot(BotBase):
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
-            for minu in range(9, 60, 10):
+            for minu in range(0, 60, 1):
                 self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
             self.scheculer.start()
             self.update_db()

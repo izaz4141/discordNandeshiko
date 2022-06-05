@@ -13,10 +13,10 @@ class Private(Cog):
     async def passive_mc_status(self, ctx, link):
         loop = self.bot.loop or get_event_loop()
         link = link or None
-        embed = await loop.run_in_executor(None, lambda: get_status(link))
+        embed, online = await loop.run_in_executor(None, lambda: get_status(link))
         await ctx.send(embed=embed)
 
-    @command(name="mcstatus")
+    @command(name="mcstatus", aliases= ["mcs"])
     async def minecraft_server_status(self, ctx, *, link: Optional[str]):
         """Mengambil status dari server java minecraft
 

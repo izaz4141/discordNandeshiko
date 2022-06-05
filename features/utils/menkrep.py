@@ -1,4 +1,4 @@
-from mcstatus import JavaServer, BedrockServer
+from mcstatus import JavaServer
 from discord import Embed
 from os import getenv
 from typing import Optional
@@ -19,12 +19,12 @@ def get_status(link: Optional[str]=None):
         ("Jumlah Player", f"{status.players.online}/{status.players.max}")
     ]
     if status.players.online > 0:
-        fields.append(("List Player Online", ', '.join(query.players.names)))
+        fields.append(("List Player Online", ', '.join(query.players.names[:6])))
     for name, value in fields:
         if value == [] or value == "":
             value = "Tidak Diketahui"
         embed.add_field(name=name, value=value, inline=False)
-    return embed
+    return embed, status.players.online
 
 if __name__ == "__main__":
     get_status()

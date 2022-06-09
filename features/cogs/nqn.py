@@ -11,6 +11,10 @@ DESKTOP_KEY = getenv("DESKTOP_KEY")
 class NQN(Cog):
     def __init__(self, bot):
         self.bot = bot
+        if DESKTOP_KEY == "benar":
+                self.maintenance = True
+        else:
+            self.maintenance = False
         
     async def act(self, message, emoji):
         nick = message.author.nick or message.author.name

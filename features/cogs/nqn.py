@@ -27,9 +27,9 @@ class NQN(Cog):
         if not message.author.bot:
             if self.bot.maintenance is True:
                 if DESKTOP_KEY == "benar":
-                    if not message.author.id in self.owner_ids:
+                    if not message.author.id in self.bot.owner_ids:
                         return
-                elif message.author.id in self.owner_ids:
+                elif message.author.id in self.bot.owner_ids:
                     return
             if not message.content == '':
                 if isinstance(message.guild, type(None)):

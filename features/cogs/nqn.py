@@ -11,10 +11,6 @@ DESKTOP_KEY = getenv("DESKTOP_KEY")
 class NQN(Cog):
     def __init__(self, bot):
         self.bot = bot
-        if DESKTOP_KEY == "benar":
-                self.maintenance = True
-        else:
-            self.maintenance = False
         
     async def act(self, message, emoji):
         nick = message.author.nick or message.author.name
@@ -29,24 +25,11 @@ class NQN(Cog):
     @Cog.listener()
     async def on_message(self, message):
         if not message.author.bot:
-            if DESKTOP_KEY == "benar":
-                if not message.author.id in self.bot.owner_ids:
-                    return
-            elif self.maintenance is True:
-                if message.content == "maintenance off" and message.author.id in self.bot.owner_ids:
-                    self.maintenance = False
-                    return
-                return
-            if message.author.id in self.bot.owner_ids:
-                if message.content == "upload db" :
-                    return self.update_db_intoCloud()
-                elif message.content == "update db":
-                    return self.update_db()
-                elif message.content == "maintenance on":
-                    self.maintenance = True
-                    return
-                elif message.content == "maintenance off":
-                    self.maintenance = False
+            if self.bot.maintenance is True:
+                if DESKTOP_KEY == "benar":
+                    if not message.author.id in self.owner_ids:
+                        return
+                elif message.author.id in self.owner_ids:
                     return
             if not message.content == '':
                 if isinstance(message.guild, type(None)):

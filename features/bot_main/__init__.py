@@ -319,14 +319,14 @@ class Bot(BotBase):
     @client.event
     async def on_message(self, message):
         if not message.author.bot:
-            if DESKTOP_KEY == "benar":
-                if not message.author.id in self.owner_ids:
+            if self.maintenance is True:
+                if DESKTOP_KEY == "benar":
+                    if not message.author.id in self.owner_ids:
+                        return
+                elif message.author.id in self.owner_ids:
+                    if message.content == "maintenance off":
+                        self.maintenance = False
                     return
-            elif self.maintenance is True:
-                if message.content == "maintenance off" and message.author.id in self.owner_ids:
-                    self.maintenance = False
-                    return
-                return
             if message.author.id in self.owner_ids:
                 if message.content == "upload db" :
                     return self.update_db_intoCloud()

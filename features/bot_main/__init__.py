@@ -6,17 +6,19 @@ from discord.ext.commands.errors import MissingPermissions, MissingRole, NSFWCha
 from discord.errors import HTTPException, Forbidden, NotFound
 from urllib3.exceptions import MaxRetryError
 from requests.exceptions import SSLError
-from saucenao_api.errors import UnknownClientError, ShortLimitReachedError, LongLimitReachedError
+from ..utils.saucenao_api.errors import UnknownClientError, ShortLimitReachedError, LongLimitReachedError
+from tenacity import RetryError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
-from time import time
+# from time import time
 from json import loads, dumps
 from glob import glob
 from os import getenv
+from traceback import format_exc
+from tenacity import retry, stop_after_attempt, wait_fixed
 from random import choices, randint
-from asyncio import sleep
+from asyncio import sleep, get_event_loop
 from apscheduler.triggers.cron import CronTrigger
-
 
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
 # system("git remote set_url origin https://github.com/izaz4141/discordNandeshiko.git")
@@ -24,7 +26,7 @@ from apscheduler.triggers.cron import CronTrigger
 from ..cogs.help import Help
 from ..cloud.dropbox import *
 from dropbox.exceptions import ApiError
-from ..utils import wordle, kataple
+from ..utils import wordle, kataple, menkrep
 
 try:
     download_from_dropbox("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
@@ -44,6 +46,7 @@ intents = Intents.all()
 OWNER_IDS = [343962708166574090]
 COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
+DESKTOP_KEY = getenv("DESKTOP_KEY")
 
 def remove_items(test_list, item):
     # using list comprehension to perform the tast for n in item:
@@ -53,9 +56,11 @@ def remove_items(test_list, item):
     return res
 
 def get_prefix(bot, message):
-    prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
-    return when_mentioned_or(prefix)(bot, message)
-
+    if not isinstance(message.guild, type(None)):
+        prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
+        return when_mentioned_or(prefix)(bot, message)
+    else:
+        return when_mentioned_or("+")(bot, message)
 class Ready(object):
     def __init__(self):
         for cog in COGS:
@@ -161,7 +166,7 @@ class Bot(BotBase):
     async def process_commands(self, message):
         ctx = await self.get_context(message, cls= Context)
         if self.ready:
-            if ctx.command:
+            if ctx.command and not isinstance(ctx.guild, type(None)):
                 statistics = db.record("SELECT Statistics FROM guilds WHERE GuildID = ?", ctx.guild.id)[0]
                 try:
                     statistics = loads(statistics)
@@ -192,16 +197,20 @@ class Bot(BotBase):
         if err == "on_command_error":
             await args[0].send("?")
         else:
-            channel = self.get_channel(757478450490638376) 
+            channel = self.get_channel(757478450490638376)
             await channel.send("Ada sesuatu yang salah")
+        
+        string_err = f"{''.join(reversed(format_exc())):.1999}"
+        string_err = ''.join(reversed(string_err))
+        await self.get_user(OWNER_IDS[0]).send(string_err)
         raise
 
     async def on_command_error(self, ctx, exc):
         if any([isinstance(exc, error) for error in IGNORE_EXCEPTION]):
             pass
+        elif isinstance(ctx.guild, type(None)):
+            await ctx.send("Kata kak Glicole gaboleh ikutin orang di tempat sepi!")
         elif isinstance(exc, MissingRequiredArgument):
-            
-            
             await ctx.send("Perintahnya tidak lengkap kak")
             await Help(self).cmd_help(ctx, ctx.command)
         
@@ -210,13 +219,13 @@ class Bot(BotBase):
 
         elif isinstance(exc, CommandOnCooldown):
             if exc.retry_after < 60:
-                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.cooldown.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after:,.2f} detik.")
+                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after:,.2f} detik.")
 
             elif exc.retry_after < 3600:
-                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.cooldown.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after/60:,.2f} menit.")
+                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after/60:,.2f} menit.")
 
             else:
-                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.cooldown.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after/3600:,.4f} jam.")
+                await ctx.send(f"Sabar kak, sedang terjadi {str(exc.type).split('.')[-1]} cooldown.\nCoba lagi dalam {exc.retry_after/3600:,.4f} jam.")
                 
         elif isinstance(exc, MissingRole):
             await ctx.send(f"Maaf kakak tidak dapat mengakses perintah ini karena belum bergabung dalam **{exc.missing_role}**")
@@ -239,12 +248,22 @@ class Bot(BotBase):
                 await ctx.send("Maaf! Aku sedang sibuk, coba beberapa saat lagi.")
             elif isinstance(exc.original, LongLimitReachedError):
                 await ctx.send("Maaf! Limit sauce yang boleh dicari hari ini sudah tercapai")
-                
+            elif isinstance(exc.original, RetryError):
+                await ctx.send("Maaf kak Nadeshiko tidak dapat menghubungi server yang terkait...")
+
             else:
                 raise exc.original
 
         else:
             raise exc
+
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
+    async def mc_check(self):
+        loop = self.loop or get_event_loop()
+        embed, online = await loop.run_in_executor(None, lambda: menkrep.get_status(None))
+        if self.mc_on != online:
+            await self.get_channel(982940674213150760).send(embed=embed)
+            self.mc_on = online
 
     async def on_ready(self):
         if not self.ready:
@@ -253,14 +272,22 @@ class Bot(BotBase):
             self.guild = self.get_guild(605057520955818010) #KALAU HANYA SATU SERVER
             self.comfy = self.get_guild(823535615609667624)
             self.stdout = self.get_channel(757478450490638376)
+            self.mc_on = 0
+            self.SERVER_EXCEPTION = ['wo1', 'wo2']
             self.totalE = []
             for guild in self.guilds:
-                if not guild.name == "wo1" and not guild.name == "wo2":
+                if not guild.name in self.SERVER_EXCEPTION:
                     for i in range(len(guild.emojis)-1):
                         self.totalE.append(guild.emojis[i])
+            #automatically turn maintenance on if run from desktop
+            if DESKTOP_KEY == "benar":
+                self.maintenance = True
+            #create task to update database into dropbox every 20 minutes
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
+            for minu in range(0, 60, 1):
+                self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():
@@ -292,14 +319,14 @@ class Bot(BotBase):
     @client.event
     async def on_message(self, message):
         if not message.author.bot:
-            if getenv("DESKTOP_KEY") == "benar":
-                if not message.author.id in self.owner_ids:
+            if self.maintenance is True:
+                if DESKTOP_KEY == "benar":
+                    if not message.author.id in self.owner_ids:
+                        return
+                elif message.author.id in self.owner_ids:
+                    if message.content == "maintenance off":
+                        self.maintenance = False
                     return
-            elif self.maintenance is True:
-                if message.content == "maintenance off" and message.author.id in self.owner_ids:
-                    self.maintenance = False
-                    return
-                return
             if message.author.id in self.owner_ids:
                 if message.content == "upload db" :
                     return self.update_db_intoCloud()
@@ -319,7 +346,7 @@ class Bot(BotBase):
                     parent = message.reference.resolved
                     if parent.embeds:
                         embed = parent.embeds[0]
-                        if embed.title == "wordle":
+                        if embed.title == "Wordle":
                             await wordle.process_message_as_guess(self, message)
                         elif embed.title == "Kataple":
                             await kataple.process_message_as_guess(self, message)

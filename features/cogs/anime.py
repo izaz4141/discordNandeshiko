@@ -7,6 +7,7 @@ from jikanpy import Jikan
 from jikanpy.exceptions import APIException
 from typing import Optional
 from datetime import datetime as date
+import asyncio
 
 
 jikan = Jikan()
@@ -324,7 +325,8 @@ class Anime(Cog):
         """
         nama_anime = str(nama_anime)
         try:
-            result = jikan.search('anime', f'{nama_anime}', page=1)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.search('anime', f'{nama_anime}', page=1))
             list_anime = result["results"]
             menu = MenuPages(source=IsiAnimeSearch(ctx, list_anime),
                             delete_message_after=False,
@@ -332,62 +334,10 @@ class Anime(Cog):
             await menu.start(ctx)
         except APIException:
             await ctx.send(f"Tidak ditemukan anime dengan nama {nama_anime}\nMaaf >n<")
-
-    # @command(name="animesearch", aliases=["as"])
-    # async def ani_search(self, ctx, *, nama_anime: str):
-    #     def _check(r, u):
-    #         return (
-    #             r.emoji in OPTIONS.keys()
-    #             and u == ctx.author
-    #             and r.message.id == msg.id
-    #         )
-            
-            
-    #     from json import dump
-    #     from jikanpy import Jikan
-    #     jikan = Jikan()
-    #     result = jikan.search('anime', f'{nama_anime}', page=1)
-    #     list_anime = result["results"]
-    #     with open("./data/Jikan/Hasil_Carian.json", "w") as f:
-    #         dump(list_anime, f, indent=4)
-    #     embed = Embed(title=f"Hasil search: {nama_anime}",
-    #                   description= (
-    #             "\n".join(
-    #                 f"**{i+1}.** {t['title']}"
-    #                 for i, t in enumerate(list_anime[:5])
-    #             )
-    #         ),
-    #                   colour= ctx.author.colour)
-        
-    #     embed.set_thumbnail(url=list_anime[0]["image_url"])
-        
-    #     msg = await ctx.send(embed=embed)
-    #     for emoji in list(OPTIONS.keys())[:min(len(list_anime), len(OPTIONS))]:
-    #         await msg.add_reaction(emoji)
-        
-    #     try:
-    #         reaction, _ = await self.bot.wait_for("reaction_add", timeout=60.0, check=_check)
-    #     except TimeoutError:
-    #         await msg.delete()
-    #     else:
-    #         anime_terpilih = list_anime[OPTIONS[reaction.emoji]]
-    #         nilai = OPTIONS[reaction.emoji]
-    #         with open("./data/Jikan/order.txt", "w") as f:
-    #             f.write(str(nilai))
-    #         embed = Embed(title= anime_terpilih["title"],
-    #                   description=f"Score : {anime_terpilih['score']:,.2f}\nTipe : {anime_terpilih['type']}\nEpisodes : {anime_terpilih['episodes']:,}\nSinopsis :\n      {anime_terpilih['synopsis']}",
-    #                   colour=ctx.author.colour)
-
-    #         embed.set_image(url=anime_terpilih["image_url"])
-    #         msg = await ctx.send(embed=embed)
-    #         for emoji in list(MOVER.keys()):
-    #             await msg.add_reaction(emoji)
-                
-    #         self.as_id = msg.id
     
     @command(name="season", aliases=["s"])
     async def season_search(self, ctx, *, musim_tahun: Optional[str]=None):
-        """Harus berupa musim *spasi* tahun\nKategori musim : spring, summer, fall, winter.\nContoh: +s fall 2020"""
+        """Mencari Kumpulan Anime yang Tayang pada input Musim\nHarus berupa musim *spasi* tahun\nKategori musim : spring, summer, fall, winter.\nContoh: +s fall 2020"""
         musim_tahun = str(musim_tahun).split(" ")
         musim = musim_tahun[0].lower()
         if musim == "gugur":
@@ -400,9 +350,11 @@ class Anime(Cog):
             musim = "summer"
         try:
             tahun = musim_tahun[1]
-            result = jikan.season(year= tahun, season= musim)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.season(year= tahun, season= musim))
         except IndexError:
-            result = jikan.season(season= musim)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.season(season= musim))
         year = result["season_year"]
         season = result["season_name"]
         list_anime = result["anime"]
@@ -431,7 +383,8 @@ class Anime(Cog):
             hari_ = "sunday"
         
         try:
-            result = jikan.schedule(day= hari_)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.schedule(day= hari_))
             list_anime = result[f"{hari_}"]
             menu = MenuPages(source=IsiJadwalAnime(hari, ctx, list_anime),
                             delete_message_after=False,
@@ -446,7 +399,8 @@ class Anime(Cog):
     
         chara = str(chara)
         try:
-            result = jikan.search("character", f"{chara}", page=1)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.search("character", f"{chara}", page=1))
             list_chara = result["results"]
             menu = MenuPages(source=IsiCharaSearch(ctx, list_chara),
                             delete_message_after=False,
@@ -462,7 +416,8 @@ class Anime(Cog):
         """Mencari orang (seiyuu dkk) dengan kata kunci"""
         person_name = str(person_name)
         try:
-            result = jikan.search("person", person_name, page=1)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.search("person", person_name, page=1))
             list_person = result["results"]
             if list_person == []:
                 await ctx.send("Maaf kak orang dengan nama itu tidak ditemukan\nPerintah ini memang agak rusak.")
@@ -482,8 +437,8 @@ class Anime(Cog):
     @command(name="mangasearch", aliases=["ms"])
     async def manga_search(self, ctx, *, manga):
         """Mencari manga dengan kata kunci"""
-        
-        result = jikan.search("manga", f"{manga}", page=1)
+        loop = self.bot.loop or asyncio.get_event_loop()
+        result = await loop.run_in_executor(None, lambda: jikan.search("manga", f"{manga}", page=1))
         list_manga = result["results"]
         menu = MenuPages(source=IsiMangaSearch(ctx, list_manga),
                          delete_message_after=False,
@@ -495,7 +450,8 @@ class Anime(Cog):
         """Mengambil info character dengan Character Id"""
         chara_id = int(chara_id)
         try:
-            result = jikan.character(chara_id)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.character(chara_id))
             embed = Embed(title= result['name'],
                         description= f"{str(result['name_kanji'])} \n\
 Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} ",
@@ -546,7 +502,8 @@ Nicknames : {', '.join(str(nama) for nama in result['nicknames'])} ",
         
         chara_id = int(chara_id)
         try:
-            result = jikan.person(chara_id)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.person(chara_id))
             embed = Embed(title= result['name'],
                         description= f"Given Name : {str(result['given_name'])} \n\
 Family Name : {str(result['family_name'])} \n\
@@ -595,7 +552,8 @@ Aliases : {', '.join(str(nama) for nama in result['alternate_names'])} " ,
         """Mengambil info anime dengan Anime Id"""
         anime_id = int(anime_id)
         try:
-            result = jikan.anime(anime_id)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.anime(anime_id))
             embed = Embed(title= f"{result['title']}/{str(result['title_english'])} ({str(result['title_japanese'])})",
                           description= f"{'/'.join(str(alias) for alias in result['title_synonyms'])}\n\n\
 Score : {str(result['score'])} dari {str(result['scored_by'])} orang \n\
@@ -669,7 +627,8 @@ Durasi Episode : {str(result['duration'])}",
         """Mengambil info manga dengan Manga Id"""
         manga_id = int(manga_id)
         try:
-            result = jikan.manga(manga_id)
+            loop = self.bot.loop or asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: jikan.manga(manga_id))
             embed = Embed(title= f"{result['title']}/{str(result['title_english'])} ({str(result['title_japanese'])})",
                           description= f"{'/'.join(str(alias) for alias in result['title_synonyms'])}\n\n\
 Score : {str(result['score'])} dari {str(result['scored_by'])} orang \n\
@@ -726,60 +685,6 @@ Chapter : {str(result['chapters'])} ",
             
         except APIException:
             await ctx.send(f"Tidak ditemukan manga dengan id {manga_id}")
-        
-                
-            
-            
-    # @Cog.listener()
-    # async def on_reaction_add(self, reaction, user):
-    #     if not user.bot:
-            
-    #         if reaction.emoji == "▶️":
-    #             if reaction.message.id == self.as_id:
-    #                 from json import load
-    #                 with open("./data/Jikan/order.txt", "r") as f:
-    #                     nilai = f.read()
-    #                 nilai = int(nilai) + MOVER["▶️"]
-    #                 with open("./data/Jikan/order.txt", "w") as f:
-    #                     f.write(str(nilai))
-    #                 with open("./data/Jikan/Hasil_Carian.json", "r") as f:
-    #                     hasil_carian = load(f)
-    #                 anime_terpilih = hasil_carian[nilai]
-    #                 embed = Embed(title= anime_terpilih["title"],
-    #                         description=f"Score : {anime_terpilih['score']:,.2f}\nTipe : {anime_terpilih['type']}\nEpisodes : {anime_terpilih['episodes']:,}\nSinopsis :\n      {anime_terpilih['synopsis']}",
-    #                         colour=user.colour)
-
-    #                 embed.set_image(url=anime_terpilih["image_url"])
-    #                 msg = await reaction.message.channel.send(embed=embed)
-    #                 for emoji in list(MOVER.keys()):
-    #                     await msg.add_reaction(emoji)
-    #                 self.as_id = msg.id
-                
-    #         elif reaction.emoji == "◀️":
-    #             if reaction.message.id == self.as_id:
-    #                 from json import load
-    #                 with open("./data/Jikan/order.txt", "r") as f:
-    #                     nilai = f.read()
-    #                 nilai = int(nilai) + MOVER["◀️"]
-    #                 with open("./data/Jikan/order.txt", "w") as f:
-    #                     f.write(str(nilai))
-    #                 with open("./data/Jikan/Hasil_Carian.json", "r") as f:
-    #                     hasil_carian = load(f)
-    #                 anime_terpilih = hasil_carian[nilai]
-    #                 embed = Embed(title= anime_terpilih["title"],
-    #                         description=f"Score : {anime_terpilih['score']:,.2f}\nTipe : {anime_terpilih['type']}\nEpisodes : {anime_terpilih['episodes']:,}\nSinopsis :\n      {anime_terpilih['synopsis']}",
-    #                         colour=user.colour)
-
-    #                 embed.set_image(url=anime_terpilih["image_url"])
-    #                 msg = await reaction.message.channel.send(embed=embed)
-    #                 for emoji in list(MOVER.keys()):
-    #                     await msg.add_reaction(emoji)
-    #                 self.as_id = msg.id
-            
-            
-                
-            
-            
 
     @Cog.listener()
     async def on_ready(self):

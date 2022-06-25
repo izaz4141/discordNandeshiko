@@ -1,7 +1,6 @@
 from discord.ext.commands import Cog, command
 
 from os import getenv
-from numpy import nanmax
 import openai
 
 openai.api_key = getenv("OPENAI_KEY")

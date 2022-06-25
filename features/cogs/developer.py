@@ -45,7 +45,7 @@ class IsiStatistik(ListPageSource):
                     value = 'Tidak Diketahui'
                 embed.add_field(name=name,value=value,inline=True)
         if not isinstance(self.entries[menu.current_page][2].icon, type(None)):
-            embed.set_image(url=self.entries[menu.current_page][2].icon.url)
+            embed.set_thumbnail(url=self.entries[menu.current_page][2].icon.url)
         embed.set_footer(text=f"{offset:,} dari {len_data:,} server.")
 
         # for name, value in fields:
@@ -65,7 +65,7 @@ class IsiServerList(ListPageSource):
     def __init__(self, ctx, data):
         self.ctx = ctx
 
-        super().__init__(data, per_page=7)
+        super().__init__(data, per_page=4)
 
     async def write_page(self, menu, fields=[]):
         offset = (menu.current_page*self.per_page) + 1
@@ -82,7 +82,10 @@ class IsiServerList(ListPageSource):
         fields = []
         
         for entry in entries:
-            fields.append((entry.name, f"Members: {len(list(filter(lambda m: not m.bot, entry.members)))}\nBots: {len(list(filter(lambda m: m.bot, entry.members)))}"))
+            wel = db.field("SELECT Welcome FROM guilds WHERE GuildID = ?", entry.id)
+            leg = db.field("SELECT Leg FROM guilds WHERE GuildID = ?", entry.id)
+            nqn = db.field("SELECT NQN FROM guilds WHERE GuildID = ?", entry.id)
+            fields.append((entry.name, f"Members: {len(list(filter(lambda m: not m.bot, entry.members)))}\nBots: {len(list(filter(lambda m: m.bot, entry.members)))}\nWelcome: {wel}\nLog: {leg}\nNQN: {nqn}"))
 
         # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
 
@@ -107,7 +110,9 @@ class Developer(Cog):
         if not ctx.author.id in self.bot.owner_ids:
             return
         
-        servers = [guild for guild in self.bot.guilds]
+        servers = [[guild, guild.name] for guild in self.bot.guilds if not guild.name in self.bot.SERVER_EXCEPTION]
+        servers = sorted(servers, key= lambda y: y[1])
+        servers = [server[0] for server in servers]
         menu = MenuPages(source=IsiServerList(ctx, servers),
                         # delete_message_after=True,
                         timeout=60.0)# bisa ditambah clear_reaction_after=True
@@ -126,7 +131,8 @@ class Developer(Cog):
                 stat = loads(stat)
             except Exception:
                 stat = 0
-            statistics.append([stat, guild.name, guild])
+            if not guild.name in self.bot.SERVER_EXCEPTION:
+                statistics.append([stat, guild.name, guild])
         statistics = sorted(statistics, key= lambda y: y[1])
         menu = MenuPages(source=IsiStatistik(ctx, statistics),
                         # delete_message_after=True,

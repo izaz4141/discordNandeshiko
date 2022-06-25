@@ -9,8 +9,9 @@ from aiohttp import request
 # from datetime import datetime
 from pybooru import Danbooru, Moebooru
 from pygelbooru import Gelbooru
+from tenacity import retry, stop_after_attempt, wait_fixed
 # from difflib import get_close_matches
-from saucenao_api import SauceNao
+from ..utils.saucenao_api.saucenao_api import SauceNao
 from ..utils import wordle, kataple
 
 import asyncio
@@ -871,6 +872,7 @@ class Fun(Cog):
             await ctx.send(embed=embed)
             
     @command(name="sauce")
+    @retry(wait=wait_fixed(1), stop=stop_after_attempt(5))
     async def sauceNao_link(self,ctx, link:Optional[str]="Takda"):
         """Mencari saos dari gambar yg dikirim
 

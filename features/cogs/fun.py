@@ -955,20 +955,23 @@ class Fun(Cog):
         term = term.lower()
         # charlist = []
         hasil_search = await gclient.tag_list(name_pattern= "%" + term + "%", limit= 30)
-        if hasil_search == []:
-            await ctx.send(f"Tag {term} tidak ditemukan")
-            return hasil_search
-        # else:
-            # for i, char in enumerate(hasil_search):
-            #     charlist.append(f"{i+1:3d}  {char}")
-            # menu = MenuPages(source=IsiSearchTag(ctx, charlist, term),
-            #                 clear_reactions_after=True,
-            #                 timeout=60.0)# bisa ditambah clear_reaction_after=True
-            # await menu.start(ctx)
-        elif len(hasil_search) == 1:
-            return [hasil_search[0].name]
-        else:
-            return hasil_search
+        try:
+            if hasil_search == []:
+                await ctx.send(f"Tag {term} tidak ditemukan")
+                return hasil_search
+            # else:
+                # for i, char in enumerate(hasil_search):
+                #     charlist.append(f"{i+1:3d}  {char}")
+                # menu = MenuPages(source=IsiSearchTag(ctx, charlist, term),
+                #                 clear_reactions_after=True,
+                #                 timeout=60.0)# bisa ditambah clear_reaction_after=True
+                # await menu.start(ctx)
+            elif len(hasil_search) == 1:
+                return [hasil_search[0].name]
+            else:
+                return hasil_search
+        except TypeError:
+            return [hasil_search.name]
             
     
     @command(name="tagsearch", aliases=["ts"])

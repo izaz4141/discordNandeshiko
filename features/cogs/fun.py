@@ -744,7 +744,7 @@ class Fun(Cog):
                                 clear_reactions_after=True,
                                 timeout=60.0)# bisa ditambah clear_reaction_after=True
                 await menu.start(ctx)
-    @command(name= "lolibooru", aliases='lb')
+    @command(name= "lolibooru", aliases=['lb'])
     async def lolibooru_postList(self, ctx, *, tagss):
         """Pencarian gambar/video dengan tag yang diberikan (tidak random) oleh lolibooru
         Dapat dicari kombinasi tag dengan pemisah ^

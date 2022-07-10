@@ -38,7 +38,7 @@ class HelpMenu(ListPageSource):
         embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} Cog.")
 
         for name, value in fields:
-            if name in Forbidden_Cog and not self.ctx.author.id in self.owner_ids:
+            if name.lower() in Forbidden_Cog and not self.ctx.author.id in self.owner_ids:
                 continue
             if value == '':
                 value = "Cog ini tidak memiliki perintah!"

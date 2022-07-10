@@ -38,8 +38,6 @@ class HelpMenu(ListPageSource):
         embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} Cog.")
 
         for name, value in fields:
-            if name.lower() in Forbidden_Cog and not self.ctx.author.id in self.owner_ids:
-                continue
             if value == '':
                 value = "Cog ini tidak memiliki perintah!"
             embed.add_field(name=name, value=value, inline=False)
@@ -141,7 +139,10 @@ class Help(Cog):
                     cogs[cmd.cog_name].append(cmd)
                 except Exception:
                     cogs[cmd.cog_name] = [cmd]
-            cogg = [[cogs[cog], cog] for cog in cogs.keys()]
+            if not ctx.author.id in self.bot.owner_ids:
+                cogg = [[cogs[cog], cog] for cog in cogs.keys() if not cog.lower() in Forbidden_Cog]
+            else:
+                cogg = [[cogs[cog], cog] for cog in cogs.keys()]
             cogs_sorted = sorted(cogg, key= lambda y: y[1])
             menu = MenuPages(source=HelpMenu(ctx, cogs_sorted, self.bot.owner_ids),
                             #  delete_message_after=True,

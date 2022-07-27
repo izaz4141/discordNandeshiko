@@ -67,24 +67,24 @@ class Log(Cog):
                 log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
                 if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
                     await self.bot.get_channel(log_channel).send(embed=embed)
+        if hasattr(before.avatar, "url") and hasattr(after.avatar, "url"):
+            if before.avatar.url != after.avatar.url:
+                embed = Embed(title="Avatar change",
+                                description="New image is below, old to the right.",
+                                colour=Colour.dark_gold(),
+                                timestamp=datetime.utcnow())
 
-        if before.avatar.url != after.avatar.url:
-            embed = Embed(title="Avatar change",
-                            description="New image is below, old to the right.",
-                            colour=Colour.dark_gold(),
-                            timestamp=datetime.utcnow())
-
-            embed.set_thumbnail(url=before.avatar.url)
-            embed.set_image(url=after.avatar.url)
-            embed.set_footer(text=f"Invoked by {before.name + '#' + before.discriminator}")
-            wic = []
-            for guild in self.bot.guilds:
-                if guild.get_member(before.id):
-                    wic.append(guild.id)
-            for gid in wic:
-                log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
-                if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
-                    await self.bot.get_channel(log_channel).send(embed=embed)
+                embed.set_thumbnail(url=before.avatar.url)
+                embed.set_image(url=after.avatar.url)
+                embed.set_footer(text=f"Invoked by {before.name + '#' + before.discriminator}")
+                wic = []
+                for guild in self.bot.guilds:
+                    if guild.get_member(before.id):
+                        wic.append(guild.id)
+                for gid in wic:
+                    log_channel = db.field("SELECT LogChannel FROM guilds WHERE GuildID = ?", gid)
+                    if db.field("SELECT Leg FROM guilds WHERE GuildID = ?", gid) == 'ON':
+                        await self.bot.get_channel(log_channel).send(embed=embed)
 
     @Cog.listener()
     async def on_member_update(self, before, after):

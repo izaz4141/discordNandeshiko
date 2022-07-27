@@ -20,9 +20,8 @@ def syntax(command):
 
 
 class HelpMenu(ListPageSource):
-    def __init__(self, ctx, data, owner_ids):
+    def __init__(self, ctx, data):
         self.ctx = ctx
-        self.owner_ids = owner_ids
 
         super().__init__(data, per_page=3)
 
@@ -38,8 +37,6 @@ class HelpMenu(ListPageSource):
         embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} Cog.")
 
         for name, value in fields:
-            if name in Forbidden_Cog and not self.ctx.author.id in self.owner_ids:
-                continue
             if value == '':
                 value = "Cog ini tidak memiliki perintah!"
             embed.add_field(name=name, value=value, inline=False)
@@ -141,9 +138,12 @@ class Help(Cog):
                     cogs[cmd.cog_name].append(cmd)
                 except Exception:
                     cogs[cmd.cog_name] = [cmd]
-            cogg = [[cogs[cog], cog] for cog in cogs.keys()]
+            if not ctx.author.id in self.bot.owner_ids:
+                cogg = [[cogs[cog], cog] for cog in cogs.keys() if not cog.lower() in Forbidden_Cog]
+            else:
+                cogg = [[cogs[cog], cog] for cog in cogs.keys()]
             cogs_sorted = sorted(cogg, key= lambda y: y[1])
-            menu = MenuPages(source=HelpMenu(ctx, cogs_sorted, self.bot.owner_ids),
+            menu = MenuPages(source=HelpMenu(ctx, cogs_sorted),
                             #  delete_message_after=True,
                             clear_reactions_after= True,
                              timeout=60.0)# bisa ditambah clear_reaction_after=True

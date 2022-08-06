@@ -130,6 +130,7 @@ class Help(Cog):
 
         Contoh : 
         ```help fun```
+        ```help sauce```
         """
         if cmd is None:
             cogs = {}
@@ -141,7 +142,7 @@ class Help(Cog):
             if not ctx.author.id in self.bot.owner_ids:
                 cogg = [[cogs[cog], cog] for cog in cogs.keys() if not cog.lower() in Forbidden_Cog]
             else:
-                cogg = [[cogs[cog], cog] for cog in cogs.keys()]
+                cogg = [[cogs[cog], cog] for cog in cogs.keys()] #[obj cog, cog_name]
             cogs_sorted = sorted(cogg, key= lambda y: y[1])
             menu = MenuPages(source=HelpMenu(ctx, cogs_sorted),
                             #  delete_message_after=True,

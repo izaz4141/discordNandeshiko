@@ -302,7 +302,7 @@ class Music(Cog):
 
     async def link_handler(self, ctx, song):
         if "youtube.com/playlist?" in song:
-            if not ctx.guild.id == 605057520955818010:
+            if not ctx.guild.id == 605057520955818010 and not ctx.author.id in self.bot.owner_ids:
                 return False
             msg = await ctx.send("Ditemukan suatu playlist, mohon tunggu sampai seluruh playlist dimasukkan dalam antrian")
         ydl_format = self.YDL_OPTIONS.copy()

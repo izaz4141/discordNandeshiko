@@ -141,6 +141,7 @@ class Music(Cog):
         self.np_display = {}
         self.pause = {}
         self.np_queue = {}
+        self.playlisting = {}
     async def check_queue(self, ctx):
         try:
             if len(self.song_queue[ctx.guild.id]) > 0:
@@ -170,24 +171,36 @@ class Music(Cog):
                         await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
                         self.song_queue[ctx.guild.id].pop(0)
                     else:
+                        try:
+                            playlisting = self.playlisting[ctx.guild.id]
+                        except Exception:
+                            self.playlisting[ctx.guild.id] = False
                         while True:
                             if self.fu[ctx.guild.id] is True:
                                 break
-                            await asyncio.sleep(10)
-                            self.timer[ctx.guild.id] += 10
-                            if self.timer[ctx.guild.id] >= 60:
-                                if self.playing[ctx.guild.id] is True:
+                            await asyncio.sleep(1)
+                            self.timer[ctx.guild.id] += 1
+                            if self.timer[ctx.guild.id] >= 300:
+                                if self.playing[ctx.guild.id] is True and self.playlisting[ctx.guild.id] == False:
                                     return await self.passive_leave(ctx.guild.id, ctx.voice_client)
                     
                 except KeyError:
-                        while True:
-                            if self.fu[ctx.guild.id] is True:
-                                break
-                            await asyncio.sleep(10)
-                            self.timer[ctx.guild.id] += 10
-                            if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
-                                return await self.passive_leave(ctx.guild.id, ctx.voice_client)
+                    try:
+                        playlisting = self.playlisting[ctx.guild.id]
+                    except Exception:
+                        self.playlisting[ctx.guild.id] = False
+                    while True:
+                        if self.fu[ctx.guild.id] is True:
+                            break
+                        await asyncio.sleep(1)
+                        self.timer[ctx.guild.id] += 1
+                        if self.timer[ctx.guild.id] >= 300 and self.playing[ctx.guild.id] is True and self.playlisting[ctx.guild.id] == False:
+                            return await self.passive_leave(ctx.guild.id, ctx.voice_client)
         except KeyError:
+            try:
+                playlisting = self.playlisting[ctx.guild.id]
+            except Exception:
+                self.playlisting[ctx.guild.id] = False
             try:
                 if self.repeat[ctx.guild.id] is True or self.repat_one[ctx.guild.id] is True:
                     self.song_queue[ctx.guild.id] = [self.np[ctx.guild.id]]
@@ -197,17 +210,17 @@ class Music(Cog):
                     while True:
                         if self.fu[ctx.guild.id] is True:
                             break
-                        await asyncio.sleep(10)
-                        self.timer[ctx.guild.id] += 10
-                        if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id] is True:
+                        await asyncio.sleep(1)
+                        self.timer[ctx.guild.id] += 1
+                        if self.timer[ctx.guild.id] >= 300 and self.playing[ctx.guild.id] is True and self.playlisting[ctx.guild.id] == False:
                             return await self.passive_leave(ctx.guild.id, ctx.voice_client)
             except KeyError:
                 while True:
                     if self.fu[ctx.guild.id] is True:
                         break
-                    await asyncio.sleep(10)
-                    self.timer[ctx.guild.id] += 10
-                    if self.timer[ctx.guild.id] >= 60 and self.playing[ctx.guild.id]:
+                    await asyncio.sleep(1)
+                    self.timer[ctx.guild.id] += 1
+                    if self.timer[ctx.guild.id] >= 300 and self.playing[ctx.guild.id] and self.playlisting[ctx.guild.id] == False:
                         return await self.passive_leave(ctx.guild.id, ctx.voice_client)
                 
     async def poll_song(self, user, channel):
@@ -305,6 +318,7 @@ class Music(Cog):
             if not ctx.guild.id == 605057520955818010 and not ctx.author.id in self.bot.owner_ids:
                 return False
             msg = await ctx.send("Ditemukan suatu playlist, mohon tunggu sampai seluruh playlist dimasukkan dalam antrian")
+            self.playlisting[ctx.guild.id] = True
         ydl_format = self.YDL_OPTIONS.copy()
         loop = self.bot.loop or asyncio.get_event_loop()
         with YoutubeDL(ydl_format) as ydl:
@@ -335,6 +349,7 @@ class Music(Cog):
                     self.song_queue[ctx.guild.id] = entries
             await msg.delete()
             await ctx.send(f"{len(entries)} lagu dari {info['title']} berhasil ditambahkan")
+            self.playlisting[ctx.guild.id] = False
             return "playlist"
             
     async def stopwatch_song(self, voice_client, guild_id, durasi):
@@ -445,6 +460,7 @@ class Music(Cog):
             self.np_display[guild_id] = []
             self.pause[guild_id] = 0
             self.np_queue[guild_id] = []
+            self.playlisting[guild_id] = False
             return await voice_client.disconnect()
         if not channel == "Takda":
             await channel.send("Nadeshiko tidak sedang berada dalam voice channel")
@@ -637,8 +653,25 @@ class Music(Cog):
         if not sisa == 0:
             for n in range(sisa-1):
                 bar_form.append("─")
+        mode = []
+        try:
+            if self.shuffle[guild_id] == True:
+                mode.append("🔀")
+        except:
+            pass
+        try:
+            if self.repeat[guild_id] == True:
+                mode.append("🔁")
+        except:
+            pass
+        try:
+            if self.repeat_one[guild_id] == True:
+                mode.append("🔂")
+        except:
+            pass
+        
         embed = Embed(
-            title= f"Now playing: **{self.np[guild_id][0]}**",
+            title= f"Now playing: **{self.np[guild_id][0]}**{''.join(mode)}",
             description= f"Volume : {''.join(vol_lv)} 『{round(self.volume[guild_id] * 100)}』\n{format_durasi(posisi)} {''.join(bar_form)} {format_durasi(self.np[guild_id][2])}",
             colour= Colour.from_rgb(rgb[0], rgb[1], rgb[2])
         )
@@ -768,7 +801,7 @@ class Music(Cog):
                         break
 
                     # if bot has been alone in the VC for more than 60 seconds ? disconnect
-                    if self.timer[before.channel.guild.id] >= 60:
+                    if self.timer[before.channel.guild.id] >= 300:
                         await self.passive_leave(member.guild.id, voice)
                         break
     # Button control on now playing embed

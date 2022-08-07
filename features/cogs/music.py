@@ -394,11 +394,11 @@ class Music(Cog):
         while time() - posisi < int(durasi):
             await asyncio.sleep(3)
             if self.playing[guild_id] is False or voice_client.is_paused() or np_id != self.np_id[guild_id][0] or np != self.np[guild_id]:
-                self.nping[guild_id] = False
                 break
             embed = await self.passive_np(voice_client, guild_id, time() - self.position[guild_id], self.np_display[guild_id])
             np_msg = await self.bot.get_channel(self.np_id[guild_id][1]).fetch_message(self.np_id[guild_id][0])
             await np_msg.edit(embed=embed)
+        self.nping[guild_id] = False
 
     async def download_image(self, url, file_path, file_name):
         full_path = file_path + file_name + '.jpg'

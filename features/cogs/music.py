@@ -448,16 +448,6 @@ class Music(Cog):
         self.np[ctx.guild.id] = song
         self.playing[ctx.guild.id] = True
         self.fu[ctx.guild.id] = True
-        # try:
-        #     np_id = self.np_id[ctx.guild.id][0]
-        #     nping = self.nping[ctx.guild.id]
-        #     if isinstance(np_id, int) and nping is False:
-        #         embed = await self.passive_np(ctx.voice_client, ctx.guild.id)
-        #         np_msg = await self.bot.get_channel(self.np_id[ctx.guild.id][1]).fetch_message(np_id)
-        #         await np_msg.edit(embed=embed)
-        #         await self.stopwatch_song(ctx.voice_client, ctx.guild.id, song[2])
-        # except Exception:
-        #     return
 
     @command(name="join")
     async def join(self, ctx):
@@ -537,6 +527,7 @@ class Music(Cog):
                         await self.stopwatch_song(ctx.voice_client, ctx.guild.id, self.np[ctx.guild.id][2])
                 except Exception:
                     return
+                return
             elif result is None:
                 return await ctx.send("Maaf kak, Nadeshiko tidak bisa menemukan lagu yang kakak maksud")
             elif result is False:

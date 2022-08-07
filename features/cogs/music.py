@@ -101,7 +101,8 @@ class Music(Cog):
             'format': 'opus/bestaudio/best',
             'outtmpl': '{}',
             'restrictfilenames': True,
-            'flatplaylist': True,
+            # 'flatplaylist': True,
+            # 'lazy_playlist': True,
             'nocheckcertificate': True,
             'ignoreerrors': True,
             # 'logtostderr': False,
@@ -367,7 +368,10 @@ class Music(Cog):
             
             entries = []
             for entry in info['entries']:
-                entries.append([entry['title'], entry['url'], entry['duration'], entry['thumbnail']])
+                try:
+                    entries.append([entry['title'], entry['url'], entry['duration'], entry['thumbnail']])
+                except Exception:
+                    pass
 
             if ctx.voice_client.is_playing() or ctx.voice_client.is_paused():
                 try:

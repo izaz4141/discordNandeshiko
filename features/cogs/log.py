@@ -69,6 +69,8 @@ class Log(Cog):
                     await self.bot.get_channel(log_channel).send(embed=embed)
         if hasattr(before.avatar, "url") and hasattr(after.avatar, "url"):
             if before.avatar.url != after.avatar.url:
+                if before.id == 706758905585336350:
+                    return
                 embed = Embed(title="Avatar change",
                                 description="New image is below, old to the right.",
                                 colour=Colour.dark_gold(),

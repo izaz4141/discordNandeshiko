@@ -34,11 +34,15 @@ class IsiStatistik(ListPageSource):
         
         fields = []
         if self.entries[menu.current_page][0] == {} or self.entries[menu.current_page][0] == 0:
-            embed.add_field(name="Command", value="Server ini belum pernah memakai command")
+            embed.add_field(name="Commands", value="Server ini belum pernah memakai command")
         else:
             commands = sorted(self.entries[menu.current_page][0].keys())
-            for command in commands:
-                fields.append((command, self.entries[menu.current_page][0][command]))
+            grup = [[command, self.entries[menu.current_page][0][command]] for command in commands]
+            grup = sorted(grup, key= lambda y: y[1], reverse= True)
+            grup = "\n".join([f"{command[0]}: {command[1]}" for command in grup])
+            fields.append(("Commands", grup))
+            # for command in commands:
+            #     fields.append((commands, self.entries[menu.current_page][0][command]))
             
             for name, value in fields:
                 if value == '':

@@ -45,9 +45,11 @@ class HelpMenu(ListPageSource):
 
     async def format_page(self, menu, entries):
         fields = []
-        
+        grup = []
         for entry in entries:
-            cmd_line = '\n'.join([syntax(cmd) for cmd in entry[0]])
+            grup = [[cmd, cmd.name] for cmd in entry[0]]
+            grup = sorted(grup, key= lambda y: y[1])
+            cmd_line = '\n'.join([syntax(cmd[0]) for cmd in grup])
             fields.append((entry[1], cmd_line))
 
         return await self.write_page(menu, fields)

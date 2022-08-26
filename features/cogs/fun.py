@@ -998,7 +998,6 @@ class Fun(Cog):
             await ctx.send(embed=embed)
             
     @command(name="sauce")
-    @retry(wait=wait_fixed(1), stop=stop_after_attempt(5))
     async def sauceNao_link(self,ctx, link:Optional[str]="Takda"):
         """Mencari saos dari gambar yg dikirim
 
@@ -1032,20 +1031,23 @@ class Fun(Cog):
                     await msg.delete()
                     await ctx.send("Ih kacang")
             if not link =="Takda":
-                result = sauce.from_url(link.attachments[0].url)
-                hasil_saos = result.results
-                menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
-                                clear_reactions_after=True,
-                                timeout=60.0)# bisa ditambah clear_reaction_after=True
-                await menu.start(ctx)
+                try:
+                    link = link.attachments[0].url
+                except IndexError:
+                    link = link.embeds[0].url
+                await self.passive_sauce(ctx, link)
         else:
-            result = sauce.from_url(link)
-            hasil_saos = result.results
-            menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
+            await self.passive_sauce(ctx, link)
+
+    @retry(wait=wait_fixed(1), stop=stop_after_attempt(5))
+    async def passive_sauce(self, ctx, link):
+        loop = self.bot.loop or asyncio.get_event_loop()
+        result = await loop.run_in_executor(None, lambda: sauce.from_url(link))
+        hasil_saos = result.results
+        menu = MenuPages(source=IsiSauceNao(ctx, hasil_saos),
                             clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
-            await menu.start(ctx)
-     
+        await menu.start(ctx)
         
 
     @Cog.listener()

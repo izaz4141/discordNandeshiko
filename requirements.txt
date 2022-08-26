@@ -4,7 +4,7 @@ jikanpy==4.3.1
 Pybooru==4.2.2
 pygelbooru==0.3.2
 jsonschema>=2.6.0, <3.0.0
-yt-dlp==2022.4.8
+yt-dlp==2022.7.18
 youtube-search==2.1.0
 hentai==3.2.10
 dropbox==11.9.0

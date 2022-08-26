@@ -20,9 +20,8 @@ def syntax(command):
 
 
 class HelpMenu(ListPageSource):
-    def __init__(self, ctx, data, owner_ids):
+    def __init__(self, ctx, data):
         self.ctx = ctx
-        self.owner_ids = owner_ids
 
         super().__init__(data, per_page=3)
 
@@ -46,9 +45,11 @@ class HelpMenu(ListPageSource):
 
     async def format_page(self, menu, entries):
         fields = []
-        
+        grup = []
         for entry in entries:
-            cmd_line = '\n'.join([syntax(cmd) for cmd in entry[0]])
+            grup = [[cmd, cmd.name] for cmd in entry[0]]
+            grup = sorted(grup, key= lambda y: y[1])
+            cmd_line = '\n'.join([syntax(cmd[0]) for cmd in grup])
             fields.append((entry[1], cmd_line))
 
         return await self.write_page(menu, fields)
@@ -131,6 +132,7 @@ class Help(Cog):
 
         Contoh : 
         ```help fun```
+        ```help sauce```
         """
         if cmd is None:
             cogs = {}
@@ -142,9 +144,9 @@ class Help(Cog):
             if not ctx.author.id in self.bot.owner_ids:
                 cogg = [[cogs[cog], cog] for cog in cogs.keys() if not cog.lower() in Forbidden_Cog]
             else:
-                cogg = [[cogs[cog], cog] for cog in cogs.keys()]
+                cogg = [[cogs[cog], cog] for cog in cogs.keys()] #[obj cog, cog_name]
             cogs_sorted = sorted(cogg, key= lambda y: y[1])
-            menu = MenuPages(source=HelpMenu(ctx, cogs_sorted, self.bot.owner_ids),
+            menu = MenuPages(source=HelpMenu(ctx, cogs_sorted),
                             #  delete_message_after=True,
                             clear_reactions_after= True,
                              timeout=60.0)# bisa ditambah clear_reaction_after=True

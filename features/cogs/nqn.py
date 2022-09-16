@@ -1,6 +1,6 @@
 from types import NoneType
 from discord.ext.commands import Cog
-from discord.errors import NotFound
+from discord.errors import NotFound, Forbidden
 
 from os import getenv
 
@@ -81,6 +81,9 @@ class NQN(Cog):
 
                         except NotFound:
                             pass
+                        except Forbidden:
+                            return
+
         
     @Cog.listener()
     async def on_ready(self):

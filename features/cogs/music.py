@@ -330,10 +330,9 @@ class Music(Cog):
             await msg.add_reaction(emoji)
 
         try:
-            reaction, _ = await self.bot.wait_for("reaction_add", timeout=15.0, check=_check)
+            reaction, _ = await self.bot.wait_for("reaction_add", timeout=25.0, check=_check)
         except asyncio.TimeoutError:
             await msg.delete()
-            await ctx.message.delete()
             return None
         else:
             await msg.delete()

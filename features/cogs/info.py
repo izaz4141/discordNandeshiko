@@ -1,4 +1,3 @@
-from types import NoneType
 from discord.ext.commands import Cog, command
 from discord import Member, Embed, User
 from typing import Optional

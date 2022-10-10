@@ -1,5 +1,6 @@
 from discord import Embed, File, Intents, ActivityType, Activity, Message
 from discord import Bot as BotClient
+from discord.opus import load_opus
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import CommandNotFound, Context, BadArgument, MissingRequiredArgument, CommandOnCooldown, when_mentioned_or
 from discord.ext.commands.errors import MissingPermissions, MissingRole, NSFWChannelRequired
@@ -47,6 +48,7 @@ OWNER_IDS = [343962708166574090]
 COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
 DESKTOP_KEY = getenv("DESKTOP_KEY")
+load_opus("./libopus.so.0.8.0")
 
 def remove_items(test_list, item):
     # using list comprehension to perform the tast for n in item:
@@ -286,8 +288,8 @@ class Bot(BotBase):
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
-            for minu in range(0, 60, 1):
-                self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
+            # for minu in range(0, 60, 1):
+                # self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():

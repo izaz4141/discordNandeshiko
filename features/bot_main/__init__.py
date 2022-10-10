@@ -19,6 +19,7 @@ from traceback import format_exc
 from tenacity import retry, stop_after_attempt, wait_fixed
 from random import choices, randint
 from asyncio import sleep, get_event_loop
+from httpx import AsyncClient
 from apscheduler.triggers.cron import CronTrigger
 
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
@@ -37,7 +38,7 @@ except ApiError:
 
 
 from ..db import db
-
+load_opus("./libopus.so.0.8.0")
 client = BotClient()
 intents = Intents.all()
 # intents.members = True
@@ -48,8 +49,14 @@ OWNER_IDS = [343962708166574090]
 COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
 DESKTOP_KEY = getenv("DESKTOP_KEY")
-load_opus("./libopus.so.0.8.0")
 
+async def wake_up():
+    try:
+        async with AsyncClient() as aclient:
+            await aclient.get("https://discordNandeshiko.izazwidyan.repl.co")
+        print('waken_up')
+    except Exception:
+        print('wake_err')
 def remove_items(test_list, item):
     # using list comprehension to perform the tast for n in item:
 
@@ -288,8 +295,9 @@ class Bot(BotBase):
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
-            # for minu in range(0, 60, 1):
+            for minu in range(0, 60, 1):
                 # self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
+                self.scheculer.add_job(wake_up, CronTrigger(minute= minu))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():

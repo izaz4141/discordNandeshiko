@@ -27,6 +27,7 @@ py-cord = {git = "https://github.com/Pycord-Development/pycord", rev = "37c95677
 Flask = "^2.2.2"
 "backports.zoneinfo" = "^0.2.1"
 numpy = "^1.23.3"
+httpx = "^0.23.0"
 
 [tool.poetry.dev-dependencies]
 

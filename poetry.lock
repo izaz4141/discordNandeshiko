@@ -214,18 +214,6 @@ orderedmultidict = ">=1.0.1"
 six = ">=1.8.0"
 
 [[package]]
-name = "hentai"
-version = "3.2.10"
-description = "Implements a wrapper class around nhentai's RESTful API."
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-requests = "2.27.1"
-tqdm = "4.63.0"
-
-[[package]]
 name = "idna"
 version = "3.3"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -388,7 +376,7 @@ python-versions = "*"
 
 [[package]]
 name = "py-cord"
-version = "2.0.0rc1"
+version = "2.0.0b5"
 description = "A Python wrapper for the Discord API"
 category = "main"
 optional = false
@@ -399,15 +387,15 @@ develop = false
 aiohttp = ">=3.6.0,<3.9.0"
 
 [package.extras]
-docs = ["sphinx (==4.5.0)", "sphinxcontrib-trio (==1.1.2)", "sphinxcontrib-websupport", "myst-parser"]
+docs = ["sphinx (==4.4.0)", "sphinxcontrib-trio (==1.1.2)", "sphinxcontrib-websupport", "myst-parser"]
 speed = ["orjson (>=3.5.4)", "aiodns (>=1.1)", "brotlipy", "cchardet"]
 voice = ["PyNaCl (>=1.3.0,<1.6)"]
 
 [package.source]
 type = "git"
-url = "https://github.com/Pycord-Development/pycord.git"
-reference = "master"
-resolved_reference = "c8f6a920ddc7c4d77dd3a3843508b7a6215962bd"
+url = "https://github.com/Pycord-Development/pycord"
+reference = "37c9567769a07fae11d77f7505de50d1a2d12785"
+resolved_reference = "37c9567769a07fae11d77f7505de50d1a2d12785"
 
 [[package]]
 name = "pybooru"
@@ -662,7 +650,7 @@ websockets = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "f5dad5c4c1c5c2966c00d90933f60ca7fa306b7653f126ea6ca3c0b9c5567963"
+content-hash = "94bee927ae7108580358e62f65aeb321ebac6772b195198e5c6053f2d6083fe8"
 
 [metadata.files]
 aiohttp = [
@@ -747,10 +735,7 @@ apscheduler = [
     {file = "APScheduler-3.9.1-py2.py3-none-any.whl", hash = "sha256:ddc25a0ddd899de44d7f451f4375fb971887e65af51e41e5dcf681f59b8b2c9a"},
     {file = "APScheduler-3.9.1.tar.gz", hash = "sha256:65e6574b6395498d371d045f2a8a7e4f7d50c6ad21ef7313d15b1c7cf20df1e3"},
 ]
-async-timeout = [
-    {file = "async-timeout-4.0.2.tar.gz", hash = "sha256:2163e1640ddb52b7a8c80d0a67a08587e5d245cc9c553a74a847056bc2976b15"},
-    {file = "async_timeout-4.0.2-py3-none-any.whl", hash = "sha256:8ca1e4fcf50d07413d66d1a5e416e42cfdf5851c981d679a09851a6853383b3c"},
-]
+async-timeout = []
 asyncio-dgram = [
     {file = "asyncio-dgram-2.1.2.tar.gz", hash = "sha256:bc28a90bc0523009fb0da16ca983c1400ff403a315754d86e037910563697f91"},
     {file = "asyncio_dgram-2.1.2-py3-none-any.whl", hash = "sha256:9ef55fc760f93c8212709329a1e28a1cf1c1f0fc8222f1be0227c2b7606a10a2"},
@@ -915,10 +900,7 @@ charset-normalizer = [
     {file = "charset-normalizer-2.0.12.tar.gz", hash = "sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597"},
     {file = "charset_normalizer-2.0.12-py3-none-any.whl", hash = "sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df"},
 ]
-click = [
-    {file = "click-8.1.3-py3-none-any.whl", hash = "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"},
-    {file = "click-8.1.3.tar.gz", hash = "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"},
-]
+click = []
 colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
@@ -1000,10 +982,6 @@ frozenlist = [
 furl = [
     {file = "furl-2.1.3-py2.py3-none-any.whl", hash = "sha256:9ab425062c4217f9802508e45feb4a83e54324273ac4b202f1850363309666c0"},
     {file = "furl-2.1.3.tar.gz", hash = "sha256:5a6188fe2666c484a12159c18be97a1977a71d632ef5bb867ef15f54af39cc4e"},
-]
-hentai = [
-    {file = "hentai-3.2.10-py3-none-any.whl", hash = "sha256:62ffe034bc6f0e7ed4cc17cd0d2e689c816dafb39e831d952206b8a3c95e9979"},
-    {file = "hentai-3.2.10.tar.gz", hash = "sha256:1b9f4e03fad69a4a61502534db81683e299969af9d986ec643d092771e537846"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
@@ -1329,10 +1307,7 @@ simplejson = [
     {file = "simplejson-3.17.6-cp39-cp39-win_amd64.whl", hash = "sha256:3fe87570168b2ae018391e2b43fbf66e8593a86feccb4b0500d134c998983ccc"},
     {file = "simplejson-3.17.6.tar.gz", hash = "sha256:cf98038d2abf63a1ada5730e91e84c642ba6c225b0198c3684151b1f80c5f8a6"},
 ]
-six = [
-    {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
-    {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
-]
+six = []
 stone = [
     {file = "stone-3.3.1-py2-none-any.whl", hash = "sha256:cd2f7f9056fc39b16c8fd46a26971dc5ccd30b5c2c246566cd2c0dd27ff96609"},
     {file = "stone-3.3.1-py3-none-any.whl", hash = "sha256:e15866fad249c11a963cce3bdbed37758f2e88c8ff4898616bc0caeb1e216047"},

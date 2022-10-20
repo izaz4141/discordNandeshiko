@@ -39,6 +39,6 @@ jobs:
         pytest
       env: 
         DIS_TOKEN: ${{ secrets.DIS_KEY }}
-        DROPBOS_KEY: ${{ secrets.DROPBOX_KEY }}
+        DROPBOX_KEY: ${{ secrets.DROPBOX_KEY }}
         OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
         MINECRAFT_LINK: ${{ secrets.MINECRAFT_LINK }}

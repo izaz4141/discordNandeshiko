@@ -295,9 +295,9 @@ class Bot(BotBase):
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
-            for minu in range(0, 60, 1):
+            # for minu in range(0, 60, 1):
                 # self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
-                self.scheculer.add_job(wake_up, CronTrigger(minute= minu))
+                # self.scheculer.add_job(wake_up, CronTrigger(minute= minu))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():

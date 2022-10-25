@@ -8,7 +8,7 @@ from features.cloud.keep_alive import keep_alive
 
 VERSION = "0.0.3"
 def main():
-    # keep_alive()
+    keep_alive()
     bot.run(VERSION);
 
 if __name__ == '__main__':

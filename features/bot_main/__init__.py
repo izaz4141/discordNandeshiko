@@ -1,5 +1,6 @@
 from discord import Embed, File, Intents, ActivityType, Activity, Message
 from discord import Bot as BotClient
+from discord.opus import load_opus
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import CommandNotFound, Context, BadArgument, MissingRequiredArgument, CommandOnCooldown, when_mentioned_or
 from discord.ext.commands.errors import MissingPermissions, MissingRole, NSFWChannelRequired
@@ -36,7 +37,7 @@ except ApiError:
 
 
 from ..db import db
-
+load_opus("./libopus.so.0.8.0")
 client = BotClient()
 intents = Intents.all()
 # intents.members = True
@@ -286,8 +287,8 @@ class Bot(BotBase):
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
-            for minu in range(0, 60, 1):
-                self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
+            # for minu in range(0, 60, 1):
+            #     self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():

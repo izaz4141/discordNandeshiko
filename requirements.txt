@@ -14,4 +14,4 @@ mcstatus>=9.0.4, <10.0.0
 tenacity==8.0.1
 flask
 httpx
-py-cord @ git+https://github.com/Pycord-Development/pycord@37c9567769a07fae11d77f7505de50d1a2d12785
+py-cord

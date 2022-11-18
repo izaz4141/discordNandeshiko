@@ -1,6 +1,7 @@
 from discord.ext.commands import Cog, command, BadArgument, cooldown, BucketType
 from random import choice, randint
 from discord import Member, Embed
+from discord.commands import slash_command
 from discord.errors import HTTPException, Forbidden
 from ..utils.menus import MenuPages, ListPageSource
 from typing import Optional
@@ -362,9 +363,9 @@ class Fun(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
-    @command(name="luck")
-    @cooldown(3, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
+    # @command(name="luck")
+    # @cooldown(3, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
+    @slash_command(name='luck', description='Mengecek luck')
     async def luck(self, ctx):
         """Meramalkan keberuntunganmu hari ini
 
@@ -374,7 +375,7 @@ class Fun(Cog):
         if luck <= 30:
             await ctx.send(f'{luck}! Haha ampas')
         elif luck <= 50:
-            await ctx.send(f'{luck}! Mayan lucknya, 50% berhasil. Sisa 50%nya lagi diisi dengan semangat aja!')
+            await ctx.send(f'{luck}! Mayan lucknya, {luck}% berhasil. Sisanya diisi dengan semangat aja!')
         elif luck <= 80:
             await ctx.send(f'{luck}! Kalau dihitung dari pergerakan bintang dan snezhnaya keberuntungan kaka hari ini BAIK!! :thumbsup:')
         elif luck <= 99:

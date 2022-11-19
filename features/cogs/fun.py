@@ -365,7 +365,7 @@ class Fun(Cog):
 
     # @command(name="luck")
     # @cooldown(3, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
-    @slash_command(name='luck', description='Mengecek luck')
+    @slash_command(guild_ids=[823535615609667624], name='luck', description='Mengecek Stat Luck-mu')
     async def luck(self, ctx):
         """Meramalkan keberuntunganmu hari ini
 
@@ -383,7 +383,6 @@ class Fun(Cog):
         elif luck == 100:
             await ctx.send(f"{luck}! (0 o 0 ) Gila beuhh")
         db.execute("UPDATE exp SET Luck = ? WHERE UserID = ?", luck, ctx.author.id)
-            
         
 
     @command(name="dice")

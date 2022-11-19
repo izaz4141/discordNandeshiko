@@ -19,7 +19,6 @@ from traceback import format_exc
 from tenacity import retry, stop_after_attempt, wait_fixed
 from random import choices, randint
 from asyncio import sleep, get_event_loop
-from httpx import AsyncClient
 from apscheduler.triggers.cron import CronTrigger
 
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
@@ -38,7 +37,7 @@ except ApiError:
 
 
 from ..db import db
-load_opus("./libopus.so.0.8.0")
+
 client = BotClient()
 intents = Intents.all()
 # intents.members = True
@@ -49,14 +48,9 @@ OWNER_IDS = [343962708166574090]
 COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
 DESKTOP_KEY = getenv("DESKTOP_KEY")
+if not DESKTOP_KEY == 'benar':
+    load_opus("./libopus.so.0.8.0")
 
-async def wake_up():
-    try:
-        async with AsyncClient() as aclient:
-            await aclient.get("https://discordNandeshiko.izazwidyan.repl.co")
-        print('waken_up')
-    except Exception:
-        print('wake_err')
 def remove_items(test_list, item):
     # using list comprehension to perform the tast for n in item:
 
@@ -323,8 +317,6 @@ class Bot(BotBase):
 
         else:
             print("bot reconnected")
-    
-    
 
     @client.event
     async def on_message(self, message):
@@ -363,8 +355,9 @@ class Bot(BotBase):
                 
             await self.process_commands(message)
             
-            
-
-            
 
 bot = Bot()
+
+@bot.slash_command(guild_ids=[823535615609667624])
+async def tes(ctx):
+    await ctx.send("tis")

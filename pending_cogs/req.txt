@@ -1,0 +1,2 @@
+openai==0.16.0
+jikanpy==4.3.1

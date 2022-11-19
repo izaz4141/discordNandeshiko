@@ -1,4 +1,5 @@
 from discord.ext.commands import Cog, command
+from discord.commands import user_command
 from discord import Member, Embed, User
 from typing import Optional
 from datetime import datetime
@@ -52,6 +53,19 @@ class Info(Cog):
             target (Member): mention member
         """
         target = target or ctx.author
+        embed = Embed()
+        embed.set_image(url= target.avatar.url)
+        await ctx.send(embed= embed)
+
+    @user_command(name='avatar', guild_ids=[823535615609667624])
+    async def avatar(self,ctx, user:Member):
+        """Menampilkan Display Picture
+
+        Args:
+            ctx (str): command
+            user (Member): Member yang diklik
+        """
+        target = user or ctx.author
         embed = Embed()
         embed.set_image(url= target.avatar.url)
         await ctx.send(embed= embed)

@@ -355,9 +355,10 @@ class Bot(BotBase):
                 
             await self.process_commands(message)
             
-
 bot = Bot()
-
 @bot.slash_command(guild_ids=[823535615609667624])
 async def tes(ctx):
     await ctx.send("tis")
+
+def launch(ver):
+    bot.run(ver)

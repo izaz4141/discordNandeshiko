@@ -1,7 +1,6 @@
-from discord.ext.commands import Cog, command, BadArgument, cooldown, BucketType
+from discord.ext.commands import Cog, command, BadArgument, cooldown, BucketType, slash_command
 from random import choice, randint
-from discord import Member, Embed
-from discord.commands import slash_command
+from discord import Member, Embed, ApplicationContext
 from discord.errors import HTTPException, Forbidden
 from ..utils.menus import MenuPages, ListPageSource
 from typing import Optional
@@ -363,9 +362,14 @@ class Fun(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # @command(name="luck")
-    # @cooldown(3, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
-    @slash_command(guild_ids=[823535615609667624], name='luck', description='Mengecek Stat Luck-mu')
+    @slash_command(
+        guild_ids=[823535615609667624]
+    )  # Create a slash command for the supplied guilds.
+    async def hello(self, ctx: ApplicationContext):
+        await ctx.respond("Hi, this is a slash command from a cog!")
+    
+    @command(name="luck")
+    @cooldown(3, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
     async def luck(self, ctx):
         """Meramalkan keberuntunganmu hari ini
 
@@ -384,6 +388,9 @@ class Fun(Cog):
             await ctx.send(f"{luck}! (0 o 0 ) Gila beuhh")
         db.execute("UPDATE exp SET Luck = ? WHERE UserID = ?", luck, ctx.author.id)
         
+    @slash_command(guild_ids=[823535615609667624], name='luck', description='Mengecek Stat Luck-mu')
+    async def luck_slash(self, ctx: ApplicationContext):
+        await self.luck(ctx=ctx)
 
     @command(name="dice")
     async def roll_n_dice(self, ctx, die_string: str):

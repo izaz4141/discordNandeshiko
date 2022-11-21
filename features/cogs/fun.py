@@ -386,6 +386,10 @@ class Fun(Cog):
     async def luck_slash(self, ctx):
         await self.luck(ctx)
 
+    @slash_command(name="tes", description="Test CMD", guild_ids=[823535615609667624])
+    async def testo(self,ctx):
+        await ctx.send("tis")
+
     @command(name="dice")
     async def roll_n_dice(self, ctx, die_string: str):
         dice, value = (int(msg) for msg in die_string.split("d"))

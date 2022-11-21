@@ -191,6 +191,7 @@ class Bot(BotBase):
 
 
     async def on_connect(self):
+        await self.sync_commands()
         print("bot connected")
 
     async def on_disconnect(self):

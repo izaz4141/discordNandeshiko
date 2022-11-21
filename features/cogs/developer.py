@@ -95,6 +95,36 @@ class IsiServerList(ListPageSource):
 
         return await self.write_page(menu, fields)
 
+class IsiPendApp(ListPageSource):
+    def __init__(self, ctx, data):
+        self.ctx = ctx
+
+        super().__init__(data, per_page=10)
+
+    async def write_page(self, menu, fields=[]):
+        offset = (menu.current_page*self.per_page) + 1
+        len_data = len(self.entries)
+
+        embed = Embed(title="Pending Application Command",
+                      colour=self.ctx.author.colour,
+                      timestamp=datetime.utcnow())
+        for name, value in fields:
+            if value == "":
+                value = "No Description"
+            embed.add_field(name=name, value=value, inline=False)
+        
+        embed.set_footer(text=f"{offset:,} - {min(len_data, offset + self.per_page - 1):,} dari {len_data:,} server.")
+        return embed
+    async def format_page(self, menu, entries):
+        fields = []
+        
+        for entry in entries:
+            fields.append((entry.name, entry.description))
+
+        # fields.append((entries["title"], f"Score = {entries['score']:,.2f}\nTipe = {entries['type']}\nEpisodes = {entries['episodes']:,}\nSinopsis =\n{entries['synopsis']}"))
+
+        return await self.write_page(menu, fields)
+
 class Developer(Cog):
     def __init__(self,bot):
         self.bot = bot
@@ -259,6 +289,19 @@ class Developer(Cog):
         if not isinstance(target.avatar, type(None)):
             embed.set_thumbnail(url=target.avatar.url)
         await ctx.send(embed=embed)
+
+    @command(name="pendingappcmd", aliases=["pac"])
+    async def pending_app_comand(self,ctx):
+        """
+        Melihat Application command yang masih pending
+        """
+        apps = [[app, app.name] for app in self.bot.pending_application_commands]
+        apps = sorted(apps, key= lambda y: y[1])
+        apps = [app[0] for app in apps]
+        menu = MenuPages(source=IsiPendApp(ctx, apps),
+                        # delete_message_after=True,
+                        timeout=60.0)# bisa ditambah clear_reaction_after=True
+        await menu.start(ctx)
         
     @command(name="fullrestart")
     async def full_restart(self, ctx):

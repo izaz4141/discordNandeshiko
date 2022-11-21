@@ -361,12 +361,6 @@ class IsiSauceNao(ListPageSource):
 class Fun(Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @slash_command(
-        guild_ids=[823535615609667624]
-    )  # Create a slash command for the supplied guilds.
-    async def hello(self, ctx: ApplicationContext):
-        await ctx.respond("Hi, this is a slash command from a cog!")
     
     @command(name="luck")
     @cooldown(3, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
@@ -388,7 +382,7 @@ class Fun(Cog):
             await ctx.send(f"{luck}! (0 o 0 ) Gila beuhh")
         db.execute("UPDATE exp SET Luck = ? WHERE UserID = ?", luck, ctx.author.id)
         
-    @slash_command(guild_ids=[823535615609667624], name='luck', description='Mengecek Stat Luck-mu')
+    @slash_command(name='luck', description='Mengecek Stat Luck-mu')
     async def luck_slash(self, ctx):
         await self.luck(ctx)
 
@@ -422,7 +416,7 @@ class Fun(Cog):
         await ctx.message.delete()
         await ctx.send(f"{message} <:nandeshikyot:752500122415267850>")
 
-    @slash_command()
+    @slash_command(name="bilang", description="Meminta Nandeshikyot untuk bilang sesuatu")
     @option("message", description="Masukkan kata-kata ke mulut Nadeshiko")
     async def say_slash(self, ctx, message: str):
         await self.say(ctx, message=message)
@@ -490,6 +484,11 @@ class Fun(Cog):
                              clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
             await menu.start(ctx)
+
+    @slash_command(name="danbooru", description="Mencari art di forum danbooru")
+    @option("tag", description="Basis tag yang dicari (max 1)")
+    async def danbooru_slash(self, ctx: ApplicationContext, tag):
+        await self.danbooru_postList(ctx, tagss=tag)
             
             
     async def danbooru_passivePost(self,ctx, tagss):
@@ -962,6 +961,17 @@ class Fun(Cog):
                             clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
             await menu.start(ctx)
+
+    @slash_command(name="gelbooru", description="Mencari art di forum gelbooru")
+    @option("tag", description="Tag yang ingin dicari (jika >1 disambungkan dengan ^)")
+    @option("exclude", description="Tag yang tidak akan diikutkan di hasil (jika >1 disambungkan dengan ^)", default='none')
+    @option("page", int, description="Halaman", min_value=1, default=1)
+    async def gelbooru_slash(self, ctx: ApplicationContext, tag, exclude, page):
+        if exclude == 'none':
+            tagss = f"{tag}::{page}"
+        else:
+            tagss = f"{tag}///{exclude}::{page}"
+        await self.gelbooru_postList(ctx, tagss=tagss)
     
     async def gelbooru_passiveSearch(self, ctx, term):
         term = term.lower()
@@ -1008,6 +1018,11 @@ class Fun(Cog):
                 description=f"```{hasil_search.name}```"
             )
             await ctx.send(embed=embed)
+
+    @slash_command(name='ts', description="Tag Search di forum booru")
+    @option("term", description="Term yang ingin dicari (autocomplete)")
+    async def tagsearch_slash(self, ctx: ApplicationContext, term):
+        await self.gelbooru_tagSearch(ctx, term=term)
             
     @command(name="sauce")
     async def sauceNao_link(self,ctx, link:Optional[str]="Takda"):
@@ -1050,6 +1065,11 @@ class Fun(Cog):
                 await self.passive_sauce(ctx, link)
         else:
             await self.passive_sauce(ctx, link)
+
+    @slash_command(name="sauce", description="Mencari sauce art di SauceNao")
+    @option("link", description="URL gambar", default="Takda")
+    async def sauce_slash(self, ctx: ApplicationContext, link):
+        await self.sauceNao_link(ctx, link=link)
 
     @retry(wait=wait_fixed(1), stop=stop_after_attempt(5))
     async def passive_sauce(self, ctx, link):

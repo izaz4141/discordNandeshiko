@@ -422,10 +422,10 @@ class Fun(Cog):
     @command(name="bilang")
     async def say(self, ctx, *, message, app=False):
         """Meminta Nandeshikyot untuk bilang sesuatu"""
-        await ctx.message.delete()
         if app:
             await ctx.respond(f"{message} <:nandeshikyot:752500122415267850>")
         else:
+            await ctx.message.delete()
             await ctx.send(f"{message} <:nandeshikyot:752500122415267850>")
 
     @slash_command(name="bilang", description="Meminta Nandeshikyot untuk bilang sesuatu")
@@ -465,9 +465,9 @@ class Fun(Cog):
         hasil_post = dclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
             if app:
-                await ctx.respond(f"Tidak ditemukan post dengan tag {tagss}")
+                await ctx.respond(f"Tidak ditemukan post dengan tag ```{tagss}```")
             else:
-                await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+                await ctx.send(f"Tidak ditemukan post dengan tag ```{tagss}```")
             tagl = tagss.split(" ")
             hasil_passSearch = {}
             for tagg in tagl:
@@ -512,15 +512,15 @@ class Fun(Cog):
         hasil_post = dclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
             if app:
-                await ctx.respond(f"Tidak ditemukan post dengan tag {tagss}")
+                await ctx.respond(f"Tidak ditemukan post dengan tag ```{tagss}```")
             else:
-                await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+                await ctx.send(f"Tidak ditemukan post dengan tag ```{tagss}```")
             
         else:
             if app:
-                await ctx.respond(f"Ditemukan post dengan tag {tagss}")
+                await ctx.respond(f"Ditemukan post dengan tag ```{tagss}```")
             else:
-                await ctx.send(f"Ditemukan post dengan tag {tagss}")
+                await ctx.send(f"Ditemukan post dengan tag ```{tagss}```")
             menu = MenuPages(source=PostListD(ctx, hasil_post),
                              clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
@@ -540,7 +540,7 @@ class Fun(Cog):
         tagss = tagss.lower()
         hasil_post = sclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+            await ctx.send(f"Tidak ditemukan post dengan tag ```{tagss}```")
             tagl = tagss.split(" ")
             hasil_passSearch = {}
             for tagg in tagl:
@@ -578,10 +578,10 @@ class Fun(Cog):
         tagss = " ".join("_".join(tagss.split(" ")).split("^"))
         hasil_post = sclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+            await ctx.send(f"Tidak ditemukan post dengan tag ```{tagss}```")
             
         else:
-            await ctx.send(f"Ditemukan post dengan tag {tagss}")
+            await ctx.send(f"Ditemukan post dengan tag ```{tagss}```")
             menu = MenuPages(source=PostListD(ctx, hasil_post),
                              clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
@@ -640,7 +640,7 @@ class Fun(Cog):
             tagss = tagss.lower()
             hasil_post = kclient.post_list(tags=tagss, limit= 50)
         if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+            await ctx.send(f"Tidak ditemukan post dengan tag ```{tagss}```")
             tagl = tagss.split(" ")
             hasil_passSearch = {}
             for tagog in tagl:
@@ -722,7 +722,7 @@ class Fun(Cog):
             tagss = tagss.lower()
             hasil_post = yclient.post_list(tags=tagss, limit= 50)
         if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+            await ctx.send(f"Tidak ditemukan post dengan tag ```{tagss}```")
             tagl = tagss.split(" ")
             hasil_passSearch = {}
             for tagog in tagl:
@@ -802,7 +802,7 @@ class Fun(Cog):
             tagss = tagss.lower()
             hasil_post = lclient.post_list(tags=tagss, limit= 50)
         if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+            await ctx.send(f"Tidak ditemukan post dengan tag ```{tagss}```")
             tagl = tagss.split(" ")
             hasil_passSearch = {}
             for tagog in tagl:
@@ -858,26 +858,35 @@ class Fun(Cog):
                                 timeout=60.0)# bisa ditambah clear_reaction_after=True
                 await menu.start(ctx)
 
-    async def gelbooru_passivePost(self,ctx, tagss:list, exclude_tags: Optional[list]=[], pagee:Optional[int]=0):
+    async def gelbooru_passivePost(self,ctx, tagss:list, exclude_tags: Optional[list]=[], pagee:Optional[int]=0, app=False):
         if exclude_tags == []:
             hasil_post = await gclient.search_posts(tags=tagss, limit= 50, page=pagee)
         if not exclude_tags == []:
             hasil_post = await gclient.search_posts(tags=tagss, exclude_tags=exclude_tags, limit= 50, page=pagee)
                 
         if hasil_post == []:
-            await ctx.send(f"Post dengan query `{'^'.join(tagss)}///{'^'.join(exclude_tags)}::{pagee}` tidak ditemukan")
+            if app:
+                await ctx.respond(f"Post dengan query `{'^'.join(tagss)}///{'^'.join(exclude_tags)}::{pagee}` tidak ditemukan")
+            else:
+                await ctx.send(f"Post dengan query `{'^'.join(tagss)}///{'^'.join(exclude_tags)}::{pagee}` tidak ditemukan")
         if not hasil_post == []:
             if exclude_tags == []:
-                await ctx.send(f"Ditemukan post dengan query `{'^'.join(tagss)}::{pagee}`")
+                if app:
+                    await ctx.respond(f"Ditemukan post dengan query `{'^'.join(tagss)}::{pagee}`")
+                else:
+                    await ctx.send(f"Ditemukan post dengan query `{'^'.join(tagss)}::{pagee}`")
             else:
-                await ctx.send(f"Ditemukan post dengan query `{'^'.join(tagss)}///{'^'.join(exclude_tags)}::{pagee}`")
+                if app:
+                    await ctx.respond(f"Ditemukan post dengan query `{'^'.join(tagss)}///{'^'.join(exclude_tags)}::{pagee}`")
+                else:
+                    await ctx.send(f"Ditemukan post dengan query `{'^'.join(tagss)}///{'^'.join(exclude_tags)}::{pagee}`")
             menu = MenuPages(source=PostListG(ctx, hasil_post),
                             clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True
             await menu.start(ctx)
             
     @command(name = "gelbooru", aliases=['gb'])
-    async def gelbooru_postList(self, ctx, *, tagss):
+    async def gelbooru_postList(self, ctx, *, tagss, app=False):
         """Pencarian gambar/video dengan tag yang diberikan (tidak random) oleh gelbooru
         Dapat dicari kombinasi tag dengan pemisah ^
         Spasi otomatis dikonversi ke underscore (untuk kemudahan)
@@ -919,14 +928,17 @@ class Fun(Cog):
                 hasil_post = await gclient.search_posts(tags= quary, limit =50)
                 
         if hasil_post == []:
-            await ctx.send(f"Post dengan query {str(tagss)} tidak ditemukan")
+            if app:
+                await ctx.respond(f"Post dengan query {str(tagss)} tidak ditemukan")
+            else:
+                await ctx.send(f"Post dengan query {str(tagss)} tidak ditemukan")
             hasil_passSearch = {}
             for tagog in quary:
-                hasil_passSearch[tagog] = await self.gelbooru_passiveSearch(ctx, tagog)
+                hasil_passSearch[tagog] = await self.gelbooru_passiveSearch(ctx, tagog, app)
             passSearch_exclude = {}
             try:
                 for tagog in exclude:
-                    passSearch_exclude[tagog] = await self.gelbooru_passiveSearch(ctx, tagog)
+                    passSearch_exclude[tagog] = await self.gelbooru_passiveSearch(ctx, tagog, app)
             except Exception:
                 pass
             tagsatu = True
@@ -963,17 +975,17 @@ class Fun(Cog):
                 
                         
                 if passSearch_exclude == {}:
-                    await self.gelbooru_passivePost(ctx, tagss=lis_tag, pagee=pagee)
+                    await self.gelbooru_passivePost(ctx, tagss=lis_tag, pagee=pagee, app=app)
                 else:
                     for bc in passSearch_exclude.values():
                         lis_ex.append(bc[0])
-                    await self.gelbooru_passivePost(ctx, tagss= lis_tag, exclude_tags= lis_ex, pagee=pagee)
+                    await self.gelbooru_passivePost(ctx, tagss= lis_tag, exclude_tags= lis_ex, pagee=pagee, app=app)
             else:
                 for tagog in quary:
-                    await self.gelbooru_tagSearch(ctx, term=tagog)
+                    await self.gelbooru_tagSearch(ctx, term=tagog, app=app)
                 try:
                     for tagog in exclude:
-                        await self.gelbooru_tagSearch(ctx, term=tagog)
+                        await self.gelbooru_tagSearch(ctx, term=tagog, app=app)
                 except Exception:
                     pass
             
@@ -992,15 +1004,18 @@ class Fun(Cog):
             tagss = f"{tag}::{page}"
         else:
             tagss = f"{tag}///{exclude}::{page}"
-        await self.gelbooru_postList(ctx, tagss=tagss)
+        await self.gelbooru_postList(ctx, tagss=tagss, app=True)
     
-    async def gelbooru_passiveSearch(self, ctx, term):
+    async def gelbooru_passiveSearch(self, ctx, term, app=False):
         term = term.lower()
         # charlist = []
         hasil_search = await gclient.tag_list(name_pattern= "%" + term + "%", limit= 30)
         try:
             if hasil_search == []:
-                await ctx.send(f"Tag {term} tidak ditemukan")
+                if app:
+                    await ctx.respond(f"Tag {term} tidak ditemukan")
+                else:
+                    await ctx.send(f"Tag {term} tidak ditemukan")
                 return hasil_search
             # else:
                 # for i, char in enumerate(hasil_search):
@@ -1018,14 +1033,17 @@ class Fun(Cog):
             
     
     @command(name="tagsearch", aliases=["ts"])
-    async def gelbooru_tagSearch(self, ctx, *, term):
+    async def gelbooru_tagSearch(self, ctx, *, term, app=False):
         """Mencari tag pada situs danbooru dengan kata kunci eksak"""
         term = term.lower()
         charlist = []
         hasil_search = await gclient.tag_list(name_pattern= "%" + term + "%", limit= 10000)
         try:
             if hasil_search == []:
-                await ctx.send(f"Tag {term} tidak ditemukan")
+                if app:
+                    await ctx.respond(f"Tag {term} tidak ditemukan")
+                else:
+                    await ctx.send(f"Tag {term} tidak ditemukan")
             else:
                 for i, char in enumerate(hasil_search):
                     charlist.append(f"{i+1:3d}  {char}")
@@ -1038,15 +1056,18 @@ class Fun(Cog):
                 title= f"Hasil Search {term}",
                 description=f"```{hasil_search.name}```"
             )
-            await ctx.send(embed=embed)
+            if app:
+                await ctx.respond(embed=embed)
+            else:
+                await ctx.send(embed=embed)
 
     @slash_command(name='ts', description="Tag Search di forum booru")
     @option("term", description="Term yang ingin dicari (autocomplete)")
     async def tagsearch_slash(self, ctx: ApplicationContext, term):
-        await self.gelbooru_tagSearch(ctx, term=term)
+        await self.gelbooru_tagSearch(ctx, term=term, app=True)
             
     @command(name="sauce")
-    async def sauceNao_link(self,ctx, link:Optional[str]="Takda"):
+    async def sauceNao_link(self,ctx, link:Optional[str]="Takda", app=False):
         """Mencari saos dari gambar yg dikirim
 
         Args:
@@ -1071,29 +1092,31 @@ class Fun(Cog):
                             except IndexError:
                                 if forma in m.content:
                                     return True
-                msg = await ctx.send("Kirim gambar kak")
+                if app:
+                    msg = await ctx.respond("Kirim gambar kak")
+                else:
+                    msg = await ctx.send("Kirim gambar kak")
                 
                 try:
                     link = await self.bot.wait_for("message", timeout=60, check=_check)
                 except asyncio.TimeoutError:
-                    await msg.delete()
-                    await ctx.send("Ih kacang")
+                    await msg.edit(content="Ih kacang")
             if not link =="Takda":
                 try:
                     link = link.attachments[0].url
                 except IndexError:
                     link = link.embeds[0].url
-                await self.passive_sauce(ctx, link)
+                await self.passive_sauce(ctx, link, app)
         else:
-            await self.passive_sauce(ctx, link)
+            await self.passive_sauce(ctx, link, app)
 
     @slash_command(name="sauce", description="Mencari sauce art di SauceNao")
     @option("link", description="URL gambar", default="Takda")
     async def sauce_slash(self, ctx: ApplicationContext, link):
-        await self.sauceNao_link(ctx, link=link)
+        await self.sauceNao_link(ctx, link=link, app=True)
 
     @retry(wait=wait_fixed(1), stop=stop_after_attempt(5))
-    async def passive_sauce(self, ctx, link):
+    async def passive_sauce(self, ctx, link, app=False):
         loop = self.bot.loop or asyncio.get_event_loop()
         result = await loop.run_in_executor(None, lambda: sauce.from_url(link))
         hasil_saos = result.results

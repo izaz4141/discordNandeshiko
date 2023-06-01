@@ -193,7 +193,7 @@ class Help(Cog):
             colour= ctx.author.colour
         )
         fields = [
-            ("Invite Link", "https://bit.ly/3sTBi5K")
+            ("Invite Link", "https://shorturl.at/oxCI6")
         ]
         embed.set_author(icon_url=self.bot.get_user(self.bot.owner_ids[0]).avatar.url, name= f"{self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}")
         embed.set_thumbnail(url=ctx.guild.me.avatar.url)
@@ -206,7 +206,7 @@ class Help(Cog):
         """Menunjukkan link untuk mengundang Nandeshikyot-bot"""
         embed = Embed(
             title= "Invite Link",
-            description= "https://bit.ly/3sTBi5K",
+            description= "https://shorturl.at/oxCI6",
             colour = ctx.author.colour
         )
         embed.set_author(icon_url=self.bot.get_user(self.bot.owner_ids[0]).avatar.url, name= f"{self.bot.get_user(self.bot.owner_ids[0]).name}#{self.bot.get_user(self.bot.owner_ids[0]).discriminator}")

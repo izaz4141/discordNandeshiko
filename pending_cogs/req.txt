@@ -1,0 +1,4 @@
+openai==0.16.0
+yt-dlp==2022.7.18
+youtube-search==2.1.0
+jikanpy==4.3.1

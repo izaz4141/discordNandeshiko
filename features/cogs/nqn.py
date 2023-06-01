@@ -1,4 +1,3 @@
-from types import NoneType
 from discord.ext.commands import Cog
 from discord.errors import NotFound, Forbidden
 

@@ -56,7 +56,7 @@ class Info(Cog):
         embed.set_image(url= target.avatar.url)
         await ctx.send(embed= embed)
 
-    @user_command(name='avatar', guild_ids=[823535615609667624])
+    @user_command(name='avatar')
     async def avatar(self,ctx, user:Member):
         """Menampilkan Display Picture
 
@@ -67,7 +67,7 @@ class Info(Cog):
         target = user or ctx.author
         embed = Embed()
         embed.set_image(url= target.avatar.url)
-        await ctx.send(embed= embed)
+        await ctx.respond(embed= embed)
 
     @command(name="serverinfo", aliases=["guildinfo", "si", "gi"])
     async def server_info(self, ctx, *, nama="Takda"):

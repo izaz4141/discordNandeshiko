@@ -364,31 +364,36 @@ class Fun(Cog):
     
     @command(name="luck")
     @cooldown(3, 60*60*24, BucketType.user)  #Parameternya(jumlah dipakai sebelum cd, waktu cd, type cd : member, user, guild, default)
-    async def luck(self, ctx):
+    async def luck(self, ctx, app=False):
         """Meramalkan keberuntunganmu hari ini
 
         Mungkin terdapat suatu mekanisme rahasia?
         """
         luck = randint(1,100)
         if luck <= 30:
-            await ctx.send(f'{luck}! Haha ampas')
+            teks = f'{luck}! Haha ampas'
         elif luck <= 50:
-            await ctx.send(f'{luck}! Mayan lucknya, {luck}% berhasil. Sisanya diisi dengan semangat aja!')
+            teks = f'{luck}! Mayan lucknya, {luck}% berhasil. Sisanya diisi dengan semangat aja!'
         elif luck <= 80:
-            await ctx.send(f'{luck}! Kalau dihitung dari pergerakan bintang dan snezhnaya keberuntungan kaka hari ini BAIK!! :thumbsup:')
+            ateks = f'{luck}! Kalau dihitung dari pergerakan bintang dan snezhnaya keberuntungan kaka hari ini BAIK!! :thumbsup:'
         elif luck <= 99:
-            await ctx.send(f'{luck}! Enaknyaa~ aku juga pengen laksek... bagi dong ka lucknya!')
+            teks = f'{luck}! Enaknyaa~ aku juga pengen laksek... bagi dong ka lucknya!'
         elif luck == 100:
-            await ctx.send(f"{luck}! (0 o 0 ) Gila beuhh")
+            teks = f"{luck}! (0 o 0 ) Gila beuhh"
+        if app:
+            await ctx.respond(teks)
+        else:
+            await ctx.send(teks)
         db.execute("UPDATE exp SET Luck = ? WHERE UserID = ?", luck, ctx.author.id)
         
     @slash_command(name='luck', description='Mengecek Stat Luck-mu')
+    @cooldown(3, 60*60*24, BucketType.user)
     async def luck_slash(self, ctx):
-        await self.luck(ctx)
+        await self.luck(ctx, True)
 
     @slash_command(name="tes", description="Test CMD", guild_ids=[823535615609667624])
     async def testo(self,ctx):
-        await ctx.send("tis")
+        await ctx.respond("tis")
 
     @command(name="dice")
     async def roll_n_dice(self, ctx, die_string: str):
@@ -415,15 +420,18 @@ class Fun(Cog):
         await ctx.reply(embed=embed)
     
     @command(name="bilang")
-    async def say(self, ctx, *, message):
+    async def say(self, ctx, *, message, app=False):
         """Meminta Nandeshikyot untuk bilang sesuatu"""
         await ctx.message.delete()
-        await ctx.send(f"{message} <:nandeshikyot:752500122415267850>")
+        if app:
+            await ctx.respond(f"{message} <:nandeshikyot:752500122415267850>")
+        else:
+            await ctx.send(f"{message} <:nandeshikyot:752500122415267850>")
 
     @slash_command(name="bilang", description="Meminta Nandeshikyot untuk bilang sesuatu")
     @option("message", description="Masukkan kata-kata ke mulut Nadeshiko")
     async def say_slash(self, ctx, message: str):
-        await self.say(ctx, message=message)
+        await self.say(ctx, message=message, app=True)
 
     @command(name="slap")
     async def slap_member(self, ctx, member: Member, *, reason: Optional[str] = "ngeselin"):
@@ -444,7 +452,7 @@ class Fun(Cog):
             await ctx.send("Siapa itu?")
 
     @command(name="danbooru", aliases=['db'])
-    async def danbooru_postList(self, ctx, *, tagss):
+    async def danbooru_postList(self, ctx, *, tagss, app=False):
         """Mencari gambar/video dengan tag yang diberikan (random) (maksimal 1 tags)
         Dapat dicari kombinasi tag dengan pemisah ^
         Spasi otomatis dikonversi ke underscore (untuk kemudahan)
@@ -456,7 +464,10 @@ class Fun(Cog):
         tagss = tagss.lower()
         hasil_post = dclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+            if app:
+                await ctx.respond(f"Tidak ditemukan post dengan tag {tagss}")
+            else:
+                await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
             tagl = tagss.split(" ")
             hasil_passSearch = {}
             for tagg in tagl:
@@ -479,7 +490,7 @@ class Fun(Cog):
                 for ab in hasil_passSearch.values():
                     lis_tag.append(ab[0])
                 
-                await self.danbooru_passivePost(ctx, tagss="^".join(lis_tag))
+                await self.danbooru_passivePost(ctx, tagss="^".join(lis_tag), app=app)
             else:
                 for tagg in tagl:
                     await self.gelbooru_tagSearch(ctx, term=tagg)
@@ -492,18 +503,24 @@ class Fun(Cog):
     @slash_command(name="danbooru", description="Mencari art di forum danbooru")
     @option("tag", description="Basis tag yang dicari (max 1)")
     async def danbooru_slash(self, ctx: ApplicationContext, tag):
-        await self.danbooru_postList(ctx, tagss=tag)
+        await self.danbooru_postList(ctx, tagss=tag, app=True)
             
             
-    async def danbooru_passivePost(self,ctx, tagss):
+    async def danbooru_passivePost(self,ctx, tagss, app=False):
         tagss = tagss.lower()
         tagss = " ".join("_".join(tagss.split(" ")).split("^"))
         hasil_post = dclient.post_list(tags=tagss, random=True, limit= 50)
         if hasil_post == []:
-            await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
+            if app:
+                await ctx.respond(f"Tidak ditemukan post dengan tag {tagss}")
+            else:
+                await ctx.send(f"Tidak ditemukan post dengan tag {tagss}")
             
         else:
-            await ctx.send(f"Ditemukan post dengan tag {tagss}")
+            if app:
+                await ctx.respond(f"Ditemukan post dengan tag {tagss}")
+            else:
+                await ctx.send(f"Ditemukan post dengan tag {tagss}")
             menu = MenuPages(source=PostListD(ctx, hasil_post),
                              clear_reactions_after=True,
                             timeout=60.0)# bisa ditambah clear_reaction_after=True

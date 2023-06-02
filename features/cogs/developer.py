@@ -342,7 +342,7 @@ class Developer(Cog):
         }
 
         for i in range(3):
-            await ctx.send(f"{key_list.keys[i]} = {key_list.values[i]}")
+            await ctx.send(f"{list(key_list.keys())[i]} = {list(key_list.values())[i]}")
             await asyncio.sleep(1.5)
 
     @Cog.listener()

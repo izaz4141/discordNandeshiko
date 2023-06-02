@@ -1077,11 +1077,15 @@ class Fun(Cog):
         """
         if link == "Takda":
             img_format = ["jpg", "png", "gif", "jpeg"]
-            if ctx.message.reference:
-                link = await ctx.fetch_message(ctx.message.reference.message_id)
-            elif not ctx.message.attachments == []:
-                link = ctx.message
-            else:
+            checker = False
+            if ctx.message:
+                if ctx.message.reference:
+                    link = await ctx.fetch_message(ctx.message.reference.message_id)
+                    checker = True
+                elif not ctx.message.attachments == []:
+                    link = ctx.message
+                    checker = True
+            if not checker:
                 def _check(m):
                     if m.author == ctx.author:
                         

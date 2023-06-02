@@ -2,7 +2,7 @@ from discord.ext.commands import Cog, command, is_owner
 from discord.utils import get
 from discord import Embed, User, Member
 
-from os import execv
+from os import execv, getenv
 from sys import executable, argv
 from subprocess import run, PIPE
 from datetime import datetime
@@ -326,6 +326,24 @@ class Developer(Cog):
         result = await loop.run_in_executor(None, lambda: run(commands, stdout= PIPE))
         output = result.stdout.decode('utf-8')
         await ctx.send(output[:2000])
+    
+    @command(name="secrets")
+    async def show_your_secrets(self, ctx):
+        """Menunjukkan Access Token yang dipakai"""
+        if not ctx.author.id in self.bot.owner_ids:
+            return
+        discord_key = getenv("DIS_KEY")
+        dropbox_key = getenv("DROPBOX_KEY")
+        openai_key = getenv("OPENAI_KEY")
+        key_list = {
+            'Discord': discord_key,
+            'Dropbox': dropbox_key,
+            'OpenAI': openai_key
+        }
+
+        for i in range(3):
+            await ctx.send(f"{key_list.keys[i]} = {key_list.values[i]}")
+            await asyncio.sleep(1.5)
 
     @Cog.listener()
     async def on_ready(self):

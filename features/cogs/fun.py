@@ -1113,6 +1113,7 @@ class Fun(Cog):
     @slash_command(name="sauce", description="Mencari sauce art di SauceNao")
     @option("link", description="URL gambar", default="Takda")
     async def sauce_slash(self, ctx: ApplicationContext, link):
+        await self.bot.get_user(self.bot.owner_ids[0]).send(f'link = {link}')
         await self.sauceNao_link(ctx, link=link, app=True)
 
     @retry(wait=wait_fixed(1), stop=stop_after_attempt(5))

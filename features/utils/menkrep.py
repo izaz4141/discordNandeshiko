@@ -38,21 +38,28 @@ async def get_status_2(link: Optional[str]=None):
     async with session() as sess:
         async with sess.get(f'https://api.mcsrvstat.us/2/{link}') as resp:
             data = await resp.json()
-    embed = Embed(
-        title= f"{link}",
-        description= f"{data['motd']['clean'][0]}"
-    )
-    fields = [
-        ("Versi", f"Server {data['software'] or 'Minecraft'}: {data['version']} "),
-        ("Jumlah Player", f"{data['players']['online']}/{data['players']['max']}")
-    ]
-    if data['players']['online'] > 0:
-        fields.append(("List Player Online", ', '.join(data['players']['list'][:10])))
-    for name, value in fields:
-        if value == [] or value == "":
-            value = "Tidak Diketahui"
-        embed.add_field(name=name, value=value, inline=False)
-    return embed, data['players']['online']
+    if data['online'] is True:
+        embed = Embed(
+            title= f"{link}",
+            description= f"{data['motd']['clean'][0]}"
+        )
+        fields = [
+            ("Versi", f"Server {data['software'] or 'Minecraft'}: {data['version']} "),
+            ("Jumlah Player", f"{data['players']['online']}/{data['players']['max']}")
+        ]
+        if data['players']['online'] > 0:
+            fields.append(("List Player Online", ', '.join(data['players']['list'][:10])))
+        for name, value in fields:
+            if value == [] or value == "":
+                value = "Tidak Diketahui"
+            embed.add_field(name=name, value=value, inline=False)
+        return embed, data['players']['online']
+    else:
+        embed = Embed(
+            title= link,
+            description= "Server tidak bisa dihubungi"
+        )
+        return embed, 0
 
 
 if __name__ == "__main__":

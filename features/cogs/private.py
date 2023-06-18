@@ -3,7 +3,7 @@ from typing import Optional
 from tenacity import retry, stop_after_attempt, wait_fixed
 from asyncio import get_event_loop
 
-from ..utils.menkrep import get_status
+from ..utils.menkrep import get_status_2
 
 class Private(Cog):
     def __init__(self, bot):
@@ -13,7 +13,7 @@ class Private(Cog):
     async def passive_mc_status(self, ctx, link):
         loop = self.bot.loop or get_event_loop()
         link = link or None
-        embed, online = await loop.run_in_executor(None, lambda: get_status(link))
+        embed, online = await get_status_2(link)
         await ctx.send(embed=embed)
 
     @command(name="mcstatus", aliases= ["mcs"])

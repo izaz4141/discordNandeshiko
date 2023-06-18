@@ -264,7 +264,7 @@ class Bot(BotBase):
     @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
     async def mc_check(self):
         loop = self.loop or get_event_loop()
-        embed, online = await loop.run_in_executor(None, lambda: menkrep.get_status(None))
+        embed, online = await menkrep.get_status_2(None)
         if self.mc_on != online:
             await self.get_channel(982940674213150760).send(embed=embed)
             self.mc_on = online

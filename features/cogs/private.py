@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog, command
 from typing import Optional
-from tenacity import retry, stop_after_attempt, wait_fixed
+# from tenacity import retry, stop_after_attempt, wait_fixed
 from asyncio import get_event_loop
 
 from ..utils.menkrep import get_status_2
@@ -9,9 +9,8 @@ class Private(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
+    # @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
     async def passive_mc_status(self, ctx, link):
-        loop = self.bot.loop or get_event_loop()
         link = link or None
         embed, online = await get_status_2(link)
         await ctx.send(embed=embed)

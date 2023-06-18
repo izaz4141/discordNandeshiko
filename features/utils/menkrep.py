@@ -47,8 +47,11 @@ async def get_status_2(link: Optional[str]=None):
             ("Versi", f"Server {data['software'] or 'Minecraft'}: {data['version']} "),
             ("Jumlah Player", f"{data['players']['online']}/{data['players']['max']}")
         ]
-        if data['players']['online'] > 0:
-            fields.append(("List Player Online", ', '.join(data['players']['list'][:10])))
+        try:
+            if data['players']['online'] > 0:
+                fields.append(("List Player Online", ', '.join(data['players']['list'][:10])))
+        except KeyError:
+            pass
         for name, value in fields:
             if value == [] or value == "":
                 value = "Tidak Diketahui"

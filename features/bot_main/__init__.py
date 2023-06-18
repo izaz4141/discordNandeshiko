@@ -29,10 +29,13 @@ from ..cloud.dropbox import *
 from dropbox.exceptions import ApiError
 from ..utils import wordle, kataple, menkrep
 
-try:
-    download_from_dropbox("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
-except ApiError:
-    backup("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
+DESKTOP_KEY = getenv("DESKTOP_KEY")
+
+if DESKTOP_KEY != "benar":
+    try:
+        download_from_dropbox("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
+    except ApiError:
+        backup("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
 
 
 
@@ -47,7 +50,6 @@ intents = Intents.all()
 OWNER_IDS = [343962708166574090]
 COGS = [path.split("\\")[-1][:-3] for path in glob("features/cogs/*.py")]
 IGNORE_EXCEPTION = (CommandNotFound, BadArgument, NotFound)
-DESKTOP_KEY = getenv("DESKTOP_KEY")
 if not DESKTOP_KEY == 'benar':
     load_opus("./libopus.so.0.8.0")
 
@@ -263,7 +265,6 @@ class Bot(BotBase):
 
     @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
     async def mc_check(self):
-        loop = self.loop or get_event_loop()
         embed, online = await menkrep.get_status_2(None)
         if self.mc_on != online:
             await self.get_channel(982940674213150760).send(embed=embed)
@@ -290,8 +291,9 @@ class Bot(BotBase):
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
-            for minu in range(0, 60, 1):
-                self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
+            if DESKTOP_KEY != "benar":
+                for minu in range(0, 60, 1):
+                    self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():

@@ -3,6 +3,7 @@ from discord import Embed
 from os import getenv
 from typing import Optional
 from aiohttp import ClientSession as session
+from datetime import datetime
 
 url = getenv("MINECRAFT_LINK")
 
@@ -16,7 +17,8 @@ def get_status(link: Optional[str]=None):
     query = server.query()
     embed = Embed(
         title= f"{link}",
-        description= f"{status.description}"
+        description= f"{status.description}",
+        timestamp=datetime.utcnow()
     )
     fields = [
         ("Versi", f"Server {status.version.name} {query.software.brand} {query.software.version}"),
@@ -41,7 +43,8 @@ async def get_status_2(link: Optional[str]=None):
     if data['online'] is True:
         embed = Embed(
             title= f"{link}",
-            description= f"{data['motd']['clean'][0]}"
+            description= f"{data['motd']['clean'][0]}",
+            timestamp=datetime.utcnow()
         )
         fields = [
             ("Versi", f"Server {data['software'] or 'Minecraft'}: {data['version']} "),

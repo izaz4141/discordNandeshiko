@@ -1,5 +1,4 @@
 from datetime import datetime
-import asyncio
 
 from discord import Embed, Colour
 from discord.errors import Forbidden

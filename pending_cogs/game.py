@@ -201,7 +201,7 @@ class Player:
                 self.items[key] += delta_items[key]
             except KeyError:
                 self.items[key] = delta_items[key]
-        db.execute("UPDATE SET Items = ? FROM exp WHERE UserID = ?", dumps(self.items), self.identity)
+        db.execute("UPDATE exp SET Items = ? WHERE UserID = ?", dumps(self.items), self.identity)
         
     def dungeon_treasures(self, ctx, dungeon_place:dict):
         kali = randint(dungeon_place["Treasure_times"][0], dungeon_place["Treasure_times"][1])

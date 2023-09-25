@@ -13,3 +13,4 @@ tenacity==8.0.1
 flask
 py-cord
 git+https://github.com/KT-Yeh/mihomo.git
+enkanetwork.py

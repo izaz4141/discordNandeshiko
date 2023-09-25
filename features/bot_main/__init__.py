@@ -95,6 +95,9 @@ class Bot(BotBase):
             cog = cog.split("/")[-1]
             self.load_extension(f"features.cogs.{cog}")
             print(f" {cog} cog loaded")
+
+    def download_db_fromCloud(self):
+        download_from_dropbox("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
             
     def update_db_intoCloud(self):
         backup("./data/db/nandeshiko-database.db", "/nandeshiko-database.db")
@@ -336,6 +339,8 @@ class Bot(BotBase):
                     return self.update_db_intoCloud()
                 elif message.content == "update db":
                     return self.update_db()
+                elif message.content == "download db":
+                    return self.download_db_fromCloud()
                 elif message.content == "maintenance on":
                     self.maintenance = True
                     return

@@ -335,7 +335,7 @@ class Bot(BotBase):
                         self.maintenance = False
                     return
             if message.author.id in self.owner_ids:
-                if message.content == "upload db" :
+                if message.content == "upload db" and DESKTOP_KEY == "benar":
                     return self.update_db_intoCloud()
                 elif message.content == "update db":
                     return self.update_db()

@@ -3,7 +3,7 @@ nest-asyncio==1.5.1
 Pybooru==4.2.2
 pygelbooru==0.3.2
 jsonschema>=2.6.0, <3.0.0
-yt-dlp==2022.7.18
+yt-dlp
 youtube-search==2.1.0
 dropbox==11.9.0
 PyNaCl==1.4.0
@@ -14,3 +14,5 @@ flask
 py-cord
 git+https://github.com/KT-Yeh/mihomo.git
 enkanetwork.py
+genshin
+cryptography

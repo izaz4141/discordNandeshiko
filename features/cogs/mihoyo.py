@@ -345,13 +345,13 @@ class MiHoYo(Cog):
                 colour= ctx.author.colour,
                 timestamp= datetime.utcnow()
             )
-            msg.set_thumbnail(reward.icon)
+            msg.set_thumbnail(url=reward.icon)
             await ctx.send(embed=msg)
         except AlreadyClaimed:
             return await ctx.send("Kakak sudah mendapatkan hadiah untuk hari ini~ Coba lagi besok!")
 
     @command(name="checkin_gi")
-    async def checkin_hsr(self, ctx):
+    async def checkin_gi(self, ctx):
         """Check-in GI pada HoyoLab (butuh Hoyolab Cookie)
         """
         try:
@@ -370,7 +370,7 @@ class MiHoYo(Cog):
                 colour= ctx.author.colour,
                 timestamp= datetime.utcnow()
             )
-            msg.set_thumbnail(reward.icon)
+            msg.set_thumbnail(url=reward.icon)
             await ctx.send(embed=msg)
         except AlreadyClaimed:
             return await ctx.send("Kakak sudah mendapatkan hadiah untuk hari ini~ Coba lagi besok!")

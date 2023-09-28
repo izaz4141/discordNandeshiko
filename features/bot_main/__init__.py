@@ -276,6 +276,7 @@ class Bot(BotBase):
             self.mc_on = online
 
     async def remind_hoyo(self):
+        self.get_user(OWNER_IDS[0]).send("masuk")
         remind_list = db.records("SELECT UserID, Remind FROM exp")
         remind_true = []
         for uid, remind in remind_list:
@@ -286,6 +287,7 @@ class Bot(BotBase):
             for game in remind.keys():
                 if remind[game]:
                     remind_true.append([uid, game])
+        self.get_user(OWNER_IDS[0]).send(remind_true)
         for remind in remind_true:
             try:
                 hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", remind[0])[0]

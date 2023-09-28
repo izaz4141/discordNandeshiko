@@ -303,8 +303,9 @@ class Bot(BotBase):
                 notes = await g_client.get_starrail_notes(db.record("SELECT HSR_UID FROM exp WHERE UserID = ?", remind[0])[0])
                 stamina = notes.current_stamina
                 max_stamina = notes.max_stamina
+            await self.get_user(OWNER_IDS[0]).send(f"{stamina}/{max_stamina}")
             if stamina >= 0.8 * max_stamina:
-                await self.get_user(remind[0]).send(f"Reminder\nSisa {'Resin' if remind[1] == 'GI' else 'Trailblazer Power'} kakak adalah {stamina/max_stamina}")
+                await self.get_user(remind[0]).send(f"Reminder~!\nSisa {'Resin' if remind[1] == 'GI' else 'Trailblazer Power'} kakak adalah {stamina}/{max_stamina}")
 
             
             

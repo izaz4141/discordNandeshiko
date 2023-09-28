@@ -287,7 +287,6 @@ class Bot(BotBase):
             for game in remind.keys():
                 if remind[game]:
                     remind_true.append([uid, game])
-        await self.get_user(OWNER_IDS[0]).send(remind_true)
         for remind in remind_true:
             try:
                 hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", remind[0])[0]
@@ -305,7 +304,6 @@ class Bot(BotBase):
                 notes = await g_client.get_starrail_notes(db.record("SELECT HSR_UID FROM exp WHERE UserID = ?", remind[0])[0])
                 stamina = notes.current_stamina
                 max_stamina = notes.max_stamina
-            await self.get_user(OWNER_IDS[0]).send(f"{stamina}/{max_stamina}")
             if stamina >= 0.8 * max_stamina:
                 await self.get_user(remind[0]).send(f"Reminder~!\nSisa {'Resin' if remind[1] == 'GI' else 'Trailblazer Power'} kakak adalah {stamina}/{max_stamina}")
 
@@ -391,7 +389,6 @@ class Bot(BotBase):
                     self.maintenance = False
                     return
                 elif message.content == "tes":
-                    await message.channel.send("tis")
                     await self.remind_hoyo()
             if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.totalE

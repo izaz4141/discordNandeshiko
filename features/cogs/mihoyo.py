@@ -422,7 +422,7 @@ class MiHoYo(Cog):
         except KeyError:
             remind[game] = True
         db.execute("UPDATE exp SET Remind = ? WHERE UserID = ?", dumps(remind), ctx.author.id)
-        await ctx.send(f"Reminder Stamina untuk {game} di{'aktifkan' if not remind[game] else 'nonaktifkan'}")
+        await ctx.send(f"Reminder Stamina untuk {game} di{'aktifkan' if remind[game] else 'nonaktifkan'}")
 
 
     @Cog.listener()

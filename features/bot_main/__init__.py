@@ -389,6 +389,7 @@ class Bot(BotBase):
                     self.maintenance = False
                     return
                 elif message.content == "tes":
+                    await message.channel.send("tis")
                     await self.remind_hoyo()
             if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.totalE

@@ -20,6 +20,8 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 from random import choices, randint
 from asyncio import sleep, get_event_loop
 from apscheduler.triggers.cron import CronTrigger
+from genshin import Client
+from cryptography.fernet import Fernet
 
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
 # system("git remote set_url origin https://github.com/izaz4141/discordNandeshiko.git")
@@ -273,6 +275,42 @@ class Bot(BotBase):
             await self.get_channel(982940674213150760).send(embed=embed)
             self.mc_on = online
 
+    async def remind_hoyo(self):
+        remind_list = db.records("SELECT UserID, Remind FROM exp")
+        remind_true = []
+        for uid, remind in remind_list:
+            if remind == '{}':
+                continue
+            else:
+                remind = loads(remind)
+            for game in remind.keys():
+                if remind[game]:
+                    remind_true.append([uid, game])
+        for remind in remind_true:
+            try:
+                hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", remind[0])[0]
+                hoyocookie = loads(hoyocookie)
+            except Exception:
+                pass
+            fernet = Fernet(hoyocookie['salt'])
+            cookie = {'ltuid': int(fernet.decrypt(hoyocookie['ltuid'].encode('utf-8')).decode()), 'ltoken': fernet.decrypt(hoyocookie['ltoken'].encode('utf-8')).decode()}
+            g_client = Client(cookies=cookie)
+            if remind[1] == "GI":
+                notes = await g_client.get_genshin_notes(db.record("SELECT GI_UID FROM exp WHERE UserID = ?", remind[0])[0])
+                stamina = notes.current_resin
+                max_stamina = notes.max_resin
+            else:
+                notes = await g_client.get_starrail_notes(db.record("SELECT HSR_UID FROM exp WHERE UserID = ?", remind[0])[0])
+                stamina = notes.current_stamina
+                max_stamina = notes.max_stamina
+            if stamina >= 0.8 * max_stamina:
+                await self.get_user(remind[0]).send(f"Reminder\nSisa {'Resin' if remind[1] == 'GI' else 'Trailblazer Power'} kakak adalah {stamina/max_stamina}")
+
+            
+            
+            
+
+
     async def on_ready(self):
         if not self.ready:
             # self.guilds = await self.fetch_guilds(limit= 5)
@@ -294,9 +332,11 @@ class Bot(BotBase):
             minute = [19, 39, 59]
             for minu in minute:
                 self.scheculer.add_job(self.update_db_intoCloud, CronTrigger(minute= minu))
-            if DESKTOP_KEY != "benar":
-                for minu in range(0, 60, 1):
-                    self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
+            for minu in [29, 59]:
+                self.scheculer.add_job(self.remind_hoyo, CronTrigger(minute= minu))
+            # if DESKTOP_KEY != "benar":
+            #     for minu in range(0, 60, 1):
+            #         self.scheculer.add_job(self.mc_check, CronTrigger(minute=minu))
             self.scheculer.start()
             self.update_db()
             while not self.cogs_ready.all_ready():
@@ -347,6 +387,8 @@ class Bot(BotBase):
                 elif message.content == "maintenance off":
                     self.maintenance = False
                     return
+                elif message.content == "tes":
+                    await self.remind_hoyo()
             if "nandeshi" in message.content or "nadeshi" in message.content:
                 total_emojis = self.totalE
                 await message.channel.send(choices(["Apa kak?", "Ui", str(total_emojis[randint(0, len(total_emojis)-1)])], weights= [1, 1, 2], k=1)[0])

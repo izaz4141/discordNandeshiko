@@ -12,7 +12,7 @@ from mihomo.models import StarrailInfoParsed
 from enkanetwork import EnkaNetworkAPI
 from genshin import Client
 from genshin.types import Game
-from genshin.errors import AlreadyClaimed, DataNotPublic
+from genshin.errors import AlreadyClaimed, DataNotPublic, RedemptionClaimed, RedemptionInvalid
 
 from ..utils import hsr
 from ..db import db
@@ -256,7 +256,7 @@ class MiHoYo(Cog):
         for expedition in notes.expeditions:
             if expedition.finished:
                 finished += 1 
-        waktu_MoC = celeng.end_time.datetime - celeng.begin_time.datetime
+        waktu_MoC = celeng.end_time.datetime - datetime.utcnow()
         if waktu_MoC.days == 0:
             sc = waktu_MoC.seconds
             j = int(sc/3600)
@@ -325,35 +325,18 @@ class MiHoYo(Cog):
         db.execute("UPDATE exp SET HoyoCookie = ? WHERE UserID = ?", dumps(cookie_dict), ctx.author.id)
         await ctx.respond("Oke kak, Cookie HoyoLab sudah Nadeshiko simpan~", ephemeral=True)
 
-    @command(name="checkin_hsr")
-    async def checkin_hsr(self, ctx):
-        """Check-in HSR pada HoyoLab (butuh Hoyolab Cookie)
+    @command(name="checkin")
+    async def checkin(self, ctx, *, game):
+        """Check-in Game MiHoYo pada HoyoLab (butuh Hoyolab Cookie)
         """
-        try:
-            hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", ctx.author.id)[0]
-            hoyocookie = loads(hoyocookie)
-        except JSONDecodeError:
-            return await ctx.send("Maaf, Kakak belom mengeset cookie hoyolab ๑•́ㅿ•̀๑) ᔆᵒʳʳᵞ\nCoba melakukan command set_hoyo_cookie terlebih dahulu~")
-        fernet = Fernet(hoyocookie['salt'])
-        cookie = {'ltuid': int(fernet.decrypt(hoyocookie['ltuid'].encode('utf-8')).decode()), 'ltoken': fernet.decrypt(hoyocookie['ltoken'].encode('utf-8')).decode()}
-        g_client = Client(cookie)
-        try:
-            reward = await g_client.claim_daily_reward(game=Game.STARRAIL)
-            msg = Embed(
-                title= "Daily Check-in",
-                description= f"{reward.name} x{reward.amount}",
-                colour= ctx.author.colour,
-                timestamp= datetime.utcnow()
-            )
-            msg.set_thumbnail(url=reward.icon)
-            await ctx.send(embed=msg)
-        except AlreadyClaimed:
-            return await ctx.send("Kakak sudah mendapatkan hadiah untuk hari ini~ Coba lagi besok!")
+        game = game.lower()
+        if game != "gi" and game != "hsr":
+            return await ctx.send("Game yang bisa dipilih hanyalah gi (Genshin Impact) atau hsr (Honkai: Star Rail)")
+        if game == "gi":
+            game = Game.GENSHIN
+        elif game == "hsr":
+            game = Game.STARRAIL
 
-    @command(name="checkin_gi")
-    async def checkin_gi(self, ctx):
-        """Check-in GI pada HoyoLab (butuh Hoyolab Cookie)
-        """
         try:
             hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", ctx.author.id)[0]
             hoyocookie = loads(hoyocookie)
@@ -363,7 +346,7 @@ class MiHoYo(Cog):
         cookie = {'ltuid': int(fernet.decrypt(hoyocookie['ltuid'].encode('utf-8')).decode()), 'ltoken': fernet.decrypt(hoyocookie['ltoken'].encode('utf-8')).decode()}
         g_client = Client(cookie)
         try:
-            reward = await g_client.claim_daily_reward(game=Game.GENSHIN)
+            reward = await g_client.claim_daily_reward(game=game)
             msg = Embed(
                 title= "Daily Check-in",
                 description= f"{reward.name} x{reward.amount}",
@@ -388,7 +371,7 @@ class MiHoYo(Cog):
 
         game = game.split(" ")
         code = game[1]
-        game = game[0]
+        game = game[0].lower()
 
         if game != "gi" and game != "hsr":
             return await ctx.send("Game yang bisa dipilih hanyalah gi (Genshin Impact) atau hsr (Honkai: Star Rail)")
@@ -402,12 +385,20 @@ class MiHoYo(Cog):
             uid = db.record("SELECT HSR_UID FROM exp WHERE UserID = ?", ctx.author.id)[0]
             if uid == 0:
                 return await ctx.send("Mmmm... maaf, Nadeshiko tidak bisa menemukan UID GI kakak~\nCoba command register_hsr untuk mendaftarkan UID-nya!")
-        
         try:
-            g_client = Client(base_cookie)
+            hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", ctx.author.id)[0]
+            hoyocookie = loads(hoyocookie)
+        except JSONDecodeError:
+            return await ctx.send("Maaf, Kakak belom mengeset cookie hoyolab ๑•́ㅿ•̀๑) ᔆᵒʳʳᵞ\nCoba melakukan command set_hoyo_cookie terlebih dahulu~")
+        fernet = Fernet(hoyocookie['salt'])
+        cookie = {'ltuid': int(fernet.decrypt(hoyocookie['ltuid'].encode('utf-8')).decode()), 'ltoken': fernet.decrypt(hoyocookie['ltoken'].encode('utf-8')).decode()}
+        g_client = Client(cookies=cookie)
+        try:
             await g_client.redeem_code(code=code, uid=uid, game=game)
-        except Exception:
+        except RedemptionClaimed:
             await ctx.send("Maaf, kode sudah diredeem sebelumnya")
+        except RedemptionInvalid:
+            await ctx.send("Maaf, kode yang diberikan tidak benar")
 
     @command(name="remind")
     async def reminder(self, ctx, *, game:str):
@@ -418,7 +409,7 @@ class MiHoYo(Cog):
         """
         if game.lower() != "gi" and game.lower() != "hsr":
             return await ctx.send("Game yang bisa dipilih hanyalah gi (Genshin Impact) atau hsr (Honkai: Star Rail)")
-        game = game.capitalize()
+        game = game.upper()
         try:
             remind = db.record(f"SELECT Remind FROM exp WHERE UserID = ?", ctx.author.id)[0]
             remind = loads(remind)
@@ -426,9 +417,12 @@ class MiHoYo(Cog):
             remind = { game: True }
             db.execute("UPDATE exp SET Remind = ? WHERE UserID = ?", dumps(remind), ctx.author.id)
             return await ctx.send(f"Reminder Stamina untuk {game} diaktifkan")
-        remind[game] = not remind[game]
+        try:
+            remind[game] = not remind[game]
+        except KeyError:
+            remind[game] = True
         db.execute("UPDATE exp SET Remind = ? WHERE UserID = ?", dumps(remind), ctx.author.id)
-        await ctx.send(f"Reminder Stamina untuk {game} di{'aktifkan' if not game else 'nonaktifkan'}")
+        await ctx.send(f"Reminder Stamina untuk {game} di{'aktifkan' if not remind[game] else 'nonaktifkan'}")
 
 
     @Cog.listener()

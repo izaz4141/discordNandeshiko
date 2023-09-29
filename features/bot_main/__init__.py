@@ -276,7 +276,6 @@ class Bot(BotBase):
             self.mc_on = online
 
     async def remind_hoyo(self):
-        await self.get_user(OWNER_IDS[0]).send("masuk")
         remind_list = db.records("SELECT UserID, Remind FROM exp")
         remind_true = []
         for uid, remind in remind_list:
@@ -305,7 +304,7 @@ class Bot(BotBase):
                 stamina = notes.current_stamina
                 max_stamina = notes.max_stamina
             if stamina >= 0.8 * max_stamina:
-                await self.get_user(remind[0]).send(f"Reminder~!\nSisa {'Resin' if remind[1] == 'GI' else 'Trailblazer Power'} kakak adalah {stamina}/{max_stamina}")
+                await self.get_user(remind[0]).send(f"Reminder~!\{'Resin' if remind[1] == 'GI' else 'Trailblazer Power'} kakak sudah hampir penuh! {stamina}/{max_stamina}")
 
             
             

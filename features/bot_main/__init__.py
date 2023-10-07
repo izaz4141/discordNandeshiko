@@ -263,7 +263,7 @@ class Bot(BotBase):
             elif isinstance(exc.original, RetryError):
                 await ctx.send("Maaf kak Nadeshiko tidak dapat menghubungi server yang terkait...")
             elif isinstance(exc.original, InvalidCookies):
-                await ctx.send("Maaf kak, Nadeshiko tidak dapat menemukan cookie yang benar\n\Untuk mendaftarkan cookie gunakan /set_hoyo_cookie")
+                await ctx.send("Maaf kak, Nadeshiko tidak dapat menemukan cookie yang benar\nUntuk mendaftarkan cookie gunakan /set_hoyo_cookie")
 
             else:
                 raise exc.original
@@ -307,7 +307,7 @@ class Bot(BotBase):
                 stamina = notes.current_stamina
                 max_stamina = notes.max_stamina
             if stamina >= 0.8 * max_stamina:
-                await self.get_user(remind[0]).send(f"Reminder~!\{'Resin' if remind[1] == 'GI' else 'Trailblazer Power'} kakak sudah hampir penuh! {stamina}/{max_stamina}")
+                await self.get_user(remind[0]).send(f"Reminder~!\n{'Resin' if remind[1] == 'GI' else 'Trailblazer Power'} kakak sudah hampir penuh! {stamina}/{max_stamina}")
 
             
             

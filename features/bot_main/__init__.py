@@ -21,6 +21,7 @@ from random import choices, randint
 from asyncio import sleep, get_event_loop
 from apscheduler.triggers.cron import CronTrigger
 from genshin import Client
+from genshin.errors import InvalidCookies
 from cryptography.fernet import Fernet
 
 # system("git init && git remote add origin https://github.com/izaz4141/discordNandeshiko.git")
@@ -261,6 +262,8 @@ class Bot(BotBase):
                 await ctx.send("Maaf! Limit sauce yang boleh dicari hari ini sudah tercapai")
             elif isinstance(exc.original, RetryError):
                 await ctx.send("Maaf kak Nadeshiko tidak dapat menghubungi server yang terkait...")
+            elif isinstance(exc.original, InvalidCookies):
+                await ctx.send("Maaf kak, Nadeshiko tidak dapat menemukan cookie yang benar\n\Untuk mendaftarkan cookie gunakan /set_hoyo_cookie")
 
             else:
                 raise exc.original

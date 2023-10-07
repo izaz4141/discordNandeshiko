@@ -12,7 +12,7 @@ from mihomo.models import StarrailInfoParsed
 from enkanetwork import EnkaNetworkAPI
 from genshin import Client
 from genshin.types import Game
-from genshin.errors import AlreadyClaimed, DataNotPublic, RedemptionClaimed, RedemptionInvalid
+from genshin.errors import AlreadyClaimed, DataNotPublic, RedemptionClaimed, RedemptionInvalid, InvalidCookies
 
 from ..utils import hsr
 from ..db import db
@@ -33,6 +33,16 @@ OPTIONS = {
     "8️⃣": 7,
     "9️⃣": 8,
 }
+
+def search_cookie(ctx):
+    try:
+        hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", ctx.author.id)[0]
+        hoyocookie = loads(hoyocookie)
+        fernet = Fernet(hoyocookie['salt'])
+    except (JSONDecodeError, KeyError):
+        raise InvalidCookies
+    cookie = {'ltuid': int(fernet.decrypt(hoyocookie['ltuid'].encode('utf-8')).decode()), 'ltoken': fernet.decrypt(hoyocookie['ltoken'].encode('utf-8')).decode()}
+    return cookie
 
 class MiHoYo(Cog):
     def __init__(self, bot):
@@ -182,13 +192,7 @@ class MiHoYo(Cog):
                 return await ctx.send("Mmmm... maaf, Nadeshiko tidak bisa menemukan UID GI kakak~\nCoba command register_gi untuk mendaftarkan UID-nya!")
         
         data = await gi_client.fetch_user(uid)
-        try:
-            hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", ctx.author.id)[0]
-            hoyocookie = loads(hoyocookie)
-        except JSONDecodeError:
-            return await ctx.send("Maaf, Kakak belom mengeset cookie hoyolab ๑•́ㅿ•̀๑) ᔆᵒʳʳᵞ\nCoba melakukan command set_hoyo_cookie terlebih dahulu~")
-        fernet = Fernet(hoyocookie['salt'])
-        cookie = {'ltuid': int(fernet.decrypt(hoyocookie['ltuid'].encode('utf-8')).decode()), 'ltoken': fernet.decrypt(hoyocookie['ltoken'].encode('utf-8')).decode()}
+        cookie = search_cookie(ctx)
         g_client = Client(cookie)
         try:
             notes = await g_client.get_genshin_notes(uid)
@@ -229,13 +233,7 @@ class MiHoYo(Cog):
                 return await ctx.send("Mmmm... maaf, Nadeshiko tidak bisa menemukan UID HSR kakak~\nCoba command register_hsr untuk mendaftarkan UID-nya!")
 
         data: StarrailInfoParsed = await hsr_client.fetch_user(uid, replace_icon_name_with_url=True)
-        try:
-            hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", ctx.author.id)[0]
-            hoyocookie = loads(hoyocookie)
-        except JSONDecodeError:
-            return await ctx.send("Maaf, Kakak belom mengeset cookie hoyolab ๑•́ㅿ•̀๑) ᔆᵒʳʳᵞ\nCoba melakukan command set_hoyo_cookie terlebih dahulu~")
-        fernet = Fernet(hoyocookie['salt'])
-        cookie = {'ltuid': int(fernet.decrypt(hoyocookie['ltuid'].encode('utf-8')).decode()), 'ltoken': fernet.decrypt(hoyocookie['ltoken'].encode('utf-8')).decode()}
+        cookie = search_cookie(ctx)
         g_client = Client(cookie)
         try:
             notes = await g_client.get_starrail_notes(uid)
@@ -271,7 +269,7 @@ class MiHoYo(Cog):
             ("Assignments", f"Finished: { finished }/{notes.total_expedition_num}"),
             ("Simulated Universe", f"{notes.current_rogue_score}/{notes.max_rogue_score}"),
             ("Echo of War", f"{notes.remaining_weekly_discounts}/{notes.max_weekly_discounts}"),
-            ("Memory of Chaos", f"{celeng.total_stars}/30\n{waktu_MoC}"),
+            ("Memory of Chaos", f"{celeng.total_stars}/30\n{waktu_MoC} ❇"),
         ]
         for name, value in fields:
             if value == '':
@@ -291,22 +289,8 @@ class MiHoYo(Cog):
         Contoh:
             +set_hoyo cookie 3223424 j23hv4kj23gv4j23hv52j3kh
         """
-        cookie = cookie.split(" ")
-        ltuid = cookie[0]
-        ltoken = cookie[1]
-        salt = Fernet.generate_key()
-        salt_string = salt.decode()
-        fernet = Fernet(salt)
-        ltuid_encrypted = fernet.encrypt(ltuid.encode('utf-8')).decode()
-        ltoken_encrypted = fernet.encrypt(ltoken.encode('utf-8')).decode()
-        cookie_dict = {
-            'ltuid': ltuid_encrypted,
-            'ltoken': ltoken_encrypted,
-            'key': salt_string
-        }
-        db.execute("UPDATE exp SET HoyoCookie = ? WHERE UserID = ?", dumps(cookie_dict), ctx.author.id)
-        await ctx.message.delete()
-        await ctx.send("Oke kak, Cookie HoyoLab sudah Nadeshiko simpan~")
+        
+        await ctx.send("Kak... tolong pakai slash command ya~")
 
     @slash_command(name="set_hoyo_cookie", description="Mengeset HoyoLab Cookie untuk melakukan claim reward, dll")
     @option("ltuid", int)
@@ -325,7 +309,7 @@ class MiHoYo(Cog):
         db.execute("UPDATE exp SET HoyoCookie = ? WHERE UserID = ?", dumps(cookie_dict), ctx.author.id)
         await ctx.respond("Oke kak, Cookie HoyoLab sudah Nadeshiko simpan~", ephemeral=True)
 
-    @command(name="checkin")
+    @command(name="checkin", aliases=["ci"])
     async def checkin(self, ctx, *, game):
         """Check-in Game MiHoYo pada HoyoLab (butuh Hoyolab Cookie)
         """
@@ -337,13 +321,8 @@ class MiHoYo(Cog):
         elif game == "hsr":
             game = Game.STARRAIL
 
-        try:
-            hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", ctx.author.id)[0]
-            hoyocookie = loads(hoyocookie)
-        except JSONDecodeError:
-            return await ctx.send("Maaf, Kakak belom mengeset cookie hoyolab ๑•́ㅿ•̀๑) ᔆᵒʳʳᵞ\nCoba melakukan command set_hoyo_cookie terlebih dahulu~")
-        fernet = Fernet(hoyocookie['salt'])
-        cookie = {'ltuid': int(fernet.decrypt(hoyocookie['ltuid'].encode('utf-8')).decode()), 'ltoken': fernet.decrypt(hoyocookie['ltoken'].encode('utf-8')).decode()}
+        cookie = search_cookie(ctx)
+
         g_client = Client(cookie)
         try:
             reward = await g_client.claim_daily_reward(game=game)
@@ -385,13 +364,7 @@ class MiHoYo(Cog):
             uid = db.record("SELECT HSR_UID FROM exp WHERE UserID = ?", ctx.author.id)[0]
             if uid == 0:
                 return await ctx.send("Mmmm... maaf, Nadeshiko tidak bisa menemukan UID GI kakak~\nCoba command register_hsr untuk mendaftarkan UID-nya!")
-        try:
-            hoyocookie = db.record("SELECT HoyoCookie FROM exp WHERE UserID = ?", ctx.author.id)[0]
-            hoyocookie = loads(hoyocookie)
-        except JSONDecodeError:
-            return await ctx.send("Maaf, Kakak belom mengeset cookie hoyolab ๑•́ㅿ•̀๑) ᔆᵒʳʳᵞ\nCoba melakukan command set_hoyo_cookie terlebih dahulu~")
-        fernet = Fernet(hoyocookie['salt'])
-        cookie = {'ltuid': int(fernet.decrypt(hoyocookie['ltuid'].encode('utf-8')).decode()), 'ltoken': fernet.decrypt(hoyocookie['ltoken'].encode('utf-8')).decode()}
+        cookie = search_cookie(ctx)
         g_client = Client(cookies=cookie)
         try:
             await g_client.redeem_code(code=code, uid=uid, game=game)

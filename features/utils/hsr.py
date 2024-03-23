@@ -1,12 +1,11 @@
-from mihomo import Language, MihomoAPI
-from mihomo.models import StarrailInfoParsed
-
 from discord import Embed, Colour
 from datetime import datetime
 
-client = MihomoAPI(language=Language.EN)
+from genshin.models.starrail import chronicle as models
+from mihomo.models import StarrailInfoParsed
 
-def relic_scorer(chara, uid):
+
+def relic_scorer(chara, uid) -> Embed :
     if chara.rarity == 5:
         color = Colour.gold()
     else:
@@ -27,31 +26,47 @@ def relic_scorer(chara, uid):
     relics.set_footer(text= f"UID: {uid}")
     return relics
 
-def artifact_eval(chara, uid):
-    if chara.rarity == 5:
-        color = Colour.gold()
-    else:
-        color = Colour.purple()
-    relics = Embed(
-        title= chara.name,
-        colour= color
+def profile_template(data, notes: models.StarRailNote, celeng: models.StarRailChallenge, pf: models.StarRailPureFiction, uid, ctx) -> Embed :
+    embed = Embed(
+        title= f"{data.player.name}         ({data.player.level})",
+        description= f"*{data.player.signature}*",
+        color=ctx.author.colour
     )
-    fields = []
-    for eq in chara.equipments:
-        if eq.props == []:
-            continue
-        enhance = {}
-        for prop in eq.props:
-            try:
-                enhance[prop.prop_id] += 1
-            except KeyError:
-                enhance[prop.prop_id] = 1
-        subfix = '\n'.join([f"{substat.name} +{enhance[substat.prop_id]}:  {substat.value}{'%' if substat.type == 1 else ''}" for substat in eq.detail.substats])
-        fields += [(f"{eq.detail.name} +{eq.level}", f"**{eq.detail.mainstats.name}:  {eq.detail.mainstats.value}{'%' if eq.detail.mainstats.type == 1 else ''}**\n{subfix}", True)]
-    for name, value, inline in fields:
+     
+    sec = notes.stamina_recover_time.seconds
+    jam = int(sec/3600)
+    menit = int((sec % 3600)/60)
+    detik = sec % 60
+    finished = 0
+    for expedition in notes.expeditions:
+        if expedition.finished:
+            finished += 1 
+    waktu_MoC = celeng.end_time.datetime - datetime.utcnow()
+    waktu_PF = pf.end_time.datetime - datetime.utcnow()
+    waktu = [waktu_MoC, waktu_PF]
+    for i, n in enumerate(waktu):
+        if i.days == 0:
+            sc = i.seconds
+            j = int(sc/3600)
+            m = int((sc % 3600)/60)
+            d = sc % 60
+            waktu[n] = f"{j} jam {m} menit {d} detik"
+        else:
+            waktu[n] = f"{i.days} hari" 
+    fields = [
+        ("Trailblaze Power", f"{notes.current_stamina}/{notes.max_stamina}\n{jam} jam {menit} menit {detik} detik"),
+        ("Daily Commision", f"{notes.current_train_score}/{notes.max_train_score}"),
+        ("Assignments", f"Finished: { finished }/{notes.total_expedition_num}"),
+        ("Simulated Universe", f"{notes.current_rogue_score}/{notes.max_rogue_score}"),
+        ("Echo of War", f"{notes.remaining_weekly_discounts}/{notes.max_weekly_discounts}"),
+        ("Memory of Chaos", f"{celeng.total_stars}/36\n{waktu[0]} ❇"),
+        ("Pure Fiction", f"{pf.total_stars}/12\n{waktu[1]} ❇"),
+    ]
+    for name, value in fields:
         if value == '':
                 value = "N/A"
-        relics.add_field(name=name, value=value, inline=inline)
-    relics.set_thumbnail(url= chara.image.card.url)
-    relics.set_footer(text= f"UID: {uid}")
-    return relics
+        embed.add_field(name=name, value=value, inline=True)
+    embed.set_thumbnail(url= data.player.avatar.icon)
+    embed.set_footer(text= f"UID: {uid}")
+
+    return embed

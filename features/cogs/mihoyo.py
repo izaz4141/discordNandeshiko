@@ -14,7 +14,7 @@ from genshin import Client
 from genshin.types import Game
 from genshin.errors import AlreadyClaimed, DataNotPublic, RedemptionClaimed, RedemptionInvalid, InvalidCookies
 
-from ..utils import hsr
+from ..utils import hsr, gi
 from ..db import db
 
 
@@ -175,7 +175,7 @@ class MiHoYo(Cog):
         else:
             await msg.delete()
             chara = data.characters[OPTIONS[reaction.emoji]]
-            artifacts = hsr.artifact_eval(chara, uid)
+            artifacts = gi.artifact_eval(chara, uid)
             await ctx.send(embed=artifacts)
     @slash_command(name="artifact_eval", description="Melihat Relic pada karakter di Genshin Impact")
     @option("uid", int, description="UID GI", default=None)
@@ -198,29 +198,8 @@ class MiHoYo(Cog):
             notes = await g_client.get_genshin_notes(uid)
         except DataNotPublic:
             return await ctx.send("Data HoyoLab Kakak belum publik!\nData Battle Chronicles dapat dipublikkan dari setting privasi HoyoLab")
-        embed = Embed(
-            title= f"{data.player.nickname}         ({data.player.level})",
-            description= f"*{data.player.signature}*",
-            color=ctx.author.colour
-        )
-        exped = 0
-        for expedition in notes.expeditions:
-            if expedition.finished:
-                exped += 1
-        fields = [
-            ("Resin", f"{notes.current_resin}/{notes.max_resin}"),
-            ("Daily Commision", f"{notes.completed_commissions}/{notes.max_commissions}\nClaimed: {notes.claimed_commission_reward}"),
-            ("Expedition", f"Finished: { exped }/{notes.max_expeditions}"),
-            ("Abyss Floor", f"{data.player.abyss_floor} - {data.player.abyss_room}"),
-            ("Teapot Coin", f"{notes.current_realm_currency}/{notes.max_realm_currency}")
-        ]
-        for name, value in fields:
-            if value == '':
-                    value = "N/A"
-            embed.add_field(name=name, value=value, inline=True)
-        embed.set_thumbnail(url= data.player.avatar.icon.url)
-        embed.set_footer(text= f"UID: {uid}")
-
+        
+        embed = gi.profile_template(data, notes, ctx, uid)
         await ctx.send(embed=embed)
 
     @command(name="profile_hsr", aliases=["ph"])
@@ -238,45 +217,11 @@ class MiHoYo(Cog):
         try:
             notes = await g_client.get_starrail_notes(uid)
             celeng = await g_client.get_starrail_challenge(uid)
+            pf = await g_client.get_starrail_pure_fiction(uid)
         except DataNotPublic:
             return await ctx.send("Data HoyoLab Kakak belum publik!\nData Battle Chronicles dapat dipublikkan dari setting privasi HoyoLab")
 
-        embed = Embed(
-            title= f"{data.player.name}         ({data.player.level})",
-            description= f"*{data.player.signature}*",
-            color=ctx.author.colour
-        )
-        sec = notes.stamina_recover_time.seconds
-        jam = int(sec/3600)
-        menit = int((sec % 3600)/60)
-        detik = sec % 60
-        finished = 0
-        for expedition in notes.expeditions:
-            if expedition.finished:
-                finished += 1 
-        waktu_MoC = celeng.end_time.datetime - datetime.utcnow()
-        if waktu_MoC.days == 0:
-            sc = waktu_MoC.seconds
-            j = int(sc/3600)
-            m = int((sc % 3600)/60)
-            d = sc % 60
-            waktu_MoC = f"{j} jam {m} menit {d} detik"
-        else:
-            waktu_MoC = f"{waktu_MoC.days} hari" 
-        fields = [
-            ("Trailblaze Power", f"{notes.current_stamina}/{notes.max_stamina}\n{jam} jam {menit} menit {detik} detik"),
-            ("Daily Commision", f"{notes.current_train_score}/{notes.max_train_score}"),
-            ("Assignments", f"Finished: { finished }/{notes.total_expedition_num}"),
-            ("Simulated Universe", f"{notes.current_rogue_score}/{notes.max_rogue_score}"),
-            ("Echo of War", f"{notes.remaining_weekly_discounts}/{notes.max_weekly_discounts}"),
-            ("Memory of Chaos", f"{celeng.total_stars}/30\n{waktu_MoC} ❇"),
-        ]
-        for name, value in fields:
-            if value == '':
-                    value = "N/A"
-            embed.add_field(name=name, value=value, inline=True)
-        embed.set_thumbnail(url= data.player.avatar.icon)
-        embed.set_footer(text= f"UID: {uid}")
+        embed = hsr.profile_template(data, notes, celeng, pf, uid, ctx)
         await ctx.send(embed=embed)
 
     @command(name="set_hoyo_cookie")

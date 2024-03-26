@@ -44,7 +44,7 @@ def profile_template(data, notes: models.StarRailNote, celeng: models.StarRailCh
     waktu_MoC = celeng.end_time.datetime - datetime.utcnow()
     waktu_PF = pf.end_time.datetime - datetime.utcnow()
     waktu = [waktu_MoC, waktu_PF]
-    for i, n in enumerate(waktu):
+    for n, i in enumerate(waktu):
         if i.days == 0:
             sc = i.seconds
             j = int(sc/3600)

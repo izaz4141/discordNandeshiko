@@ -14,5 +14,5 @@ flask
 py-cord
 git+https://github.com/KT-Yeh/mihomo.git
 enkanetwork.py
-genshin
+git+https://github.com/thesadru/genshin.py.git
 cryptography
